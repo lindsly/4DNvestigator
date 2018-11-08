@@ -54,14 +54,8 @@ else
     H_j(idx) = C(:,3);
 end
 
-%% extra
-% transpose is slower somehow
-% tic
-% H_j = zeros(H_size);
-% idx = sub2ind(size(H_j),C(:,1),C(:,2));
-% H_j(idx) = C(:,3);
-% H_j = H_j+triu(H_j,1)';
-% toc
+H_j(isnan(H_j)) = 0;
+H_j(isinf(H_j)) = 0;
 
 end
 
