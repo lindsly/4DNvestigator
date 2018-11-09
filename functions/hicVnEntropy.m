@@ -3,19 +3,14 @@ function [vnEntropy,AInputEigs] = hicVnEntropy(AInput,numEigs,normEigs,preProces
 %
 %   inputs
 %   AInput: Input matrix for Von Neumann entropy calculation (NxN double; default: N/A)
-%
 %   numEigs: number of eigenvalues to consider for compuation (integer;
 %   default: min(size(AInput,1),20))
-%
 %   normEigs: normalize eigenvalues flag ([0,1]; default: 1)
-%
 %   preProcess: arguments for preprocessing methods (string; default: 'none')
 %
 %   outputs
 %   vnEntropy: Von Neumann Entropy of the input matrix (double)
-%
 %   AInputEigs: eigenvalues of the input matrix (numEigsx1 double)
-%
 %
 %   example
 %   [B] = function(A)
@@ -52,4 +47,13 @@ for i = 1:size(AInput,3)
 end
 
 end
+
+%% EXTRA 
+% temp = eig(corr(H(:,:,1)))                                %eigs of corr
+% temp = temp/sum(temp);                                    %normalize eigs so sum to 1
+% numLambda = length(temp);                                 %determine number of eigs to consider
+% vne = -sum(temp(1:numLambda).*log(temp(1:numLambda)));    %calculate VNE
+
+
+
 

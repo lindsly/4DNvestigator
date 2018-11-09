@@ -74,14 +74,18 @@ H2corr = corr(HtrimAll(:,:,2));
 
 % Larntz-Perlman
 R = cat(3,H1corr,H2corr);
-[H0,M] = larntzPerlman(R,size(R,1),alphaParam);
+[H0,M,P] = larntzPerlman(R,size(R,1),alphaParam);
 
 mask = triu(true(size(M)),1);
 r = sort(M(mask),'descend');
 % M = (M >= r(5));
 
+% P-val thresh matrix
+figure, imagesc(P < .01)
+
+
 figure('position',[100 100 900 900])
-tempMin = min([min(corrA(:)),min(corrB(:))]);
+tempMin = min([min(H1corr(:)),min(H2corr(:))]);
 subplot(2,2,1), imagesc(H1corr), axis square, caxis([tempMin 1]), colorbar, title(sampleNames{1})
 subplot(2,2,2), imagesc(H2corr), axis square, caxis([tempMin 1]), colorbar, title(sampleNames{2})
 subplot(2,2,3), imagesc(abs(H1corr-H2corr)), axis square,  colorbar, title(sprintf('%s - %s',sampleNames{1},sampleNames{2}))
@@ -93,43 +97,44 @@ linkaxes(get(gcf,'children'))
 % amount of strength of the electrophysiological response) at the 19 sites
 % across the subjects was then calculated for each laboratory"
 
-%% create sample data
-% parameters
-rng(1)
-numSubjectsPerLab = 15;
-numLabs = 6;
-numElectrodes = 19;
-labVar = 1;
-subjectVar = 1;
-electrodeVar = 1;
-electrodeMean = rand(numElectrodes,1)*100;
-
-% create sample data
-corrData = zeros(numElectrodes,numElectrodes,numLabs);
-
-for iLab = 1:numLabs
-    labNoise = randn*labVar;
-    electrodeData = zeros(numElectrodes,numSubjectsPerLab);
-    
-    for iSubject = 1:numSubjectsPerLab
-        subjectNoise = randn*subjectVar;
-        
-        for iElectrode = 1:numElectrodes
-            electrodeData(iElectrode,iSubject) =...
-                normrnd(electrodeMean(iElectrode),electrodeVar) + subjectNoise + labNoise;
-        end
-    end
-    corrData(:,:,iLab) = corr(electrodeData');%figure, imagesc(corr(electrodeData'))
-end
-%figure, imagesc(corrData(:,:,1))
-
-%% test larntz-Perlman on sample data
-alphaParam = .95;
-[H0,z] = larntzPerlman(corrData, numSubjectsPerLab, alphaParam);
-
-%% Hi-C data
-
-
-%% trisomy 7 data
+%% EXTRA
+% %% create sample data
+% % parameters
+% rng(1)
+% numSubjectsPerLab = 15;
+% numLabs = 6;
+% numElectrodes = 19;
+% labVar = 1;
+% subjectVar = 1;
+% electrodeVar = 1;
+% electrodeMean = rand(numElectrodes,1)*100;
+% 
+% % create sample data
+% corrData = zeros(numElectrodes,numElectrodes,numLabs);
+% 
+% for iLab = 1:numLabs
+%     labNoise = randn*labVar;
+%     electrodeData = zeros(numElectrodes,numSubjectsPerLab);
+%     
+%     for iSubject = 1:numSubjectsPerLab
+%         subjectNoise = randn*subjectVar;
+%         
+%         for iElectrode = 1:numElectrodes
+%             electrodeData(iElectrode,iSubject) =...
+%                 normrnd(electrodeMean(iElectrode),electrodeVar) + subjectNoise + labNoise;
+%         end
+%     end
+%     corrData(:,:,iLab) = corr(electrodeData');%figure, imagesc(corr(electrodeData'))
+% end
+% %figure, imagesc(corrData(:,:,1))
+% 
+% %% test larntz-Perlman on sample data
+% alphaParam = .95;
+% [H0,z] = larntzPerlman(corrData, numSubjectsPerLab, alphaParam);
+% 
+% %% Hi-C data
+% 
+% 
+% %% trisomy 7 data
 
 

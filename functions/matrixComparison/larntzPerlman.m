@@ -1,4 +1,4 @@
-function [H0,M] = larntzPerlman(R,n,alphaParam)
+function [H0,M,P] = larntzPerlman(R,n,alphaParam)
 %larntzPerlman Larntz-Perlman procedure for covariance matrix equivalence
 %   R: sample covariance matrices, p x p x k
 %   n: sample size
@@ -40,6 +40,9 @@ for iK = 1:k
     mask = triu(true(size(Rk)),1);
     r = Rk(mask);
     z(:,iK) = .5*log((1+r)./(1-r));
+    
+    % Anderson-Darling test for normality % figure, histogram(z(:,iK))
+    [adtestH,adtestP] = adtest(z(:,iK)); % 1 = normality rejected
 end
 
 zBar = mean(z,2);
@@ -50,10 +53,20 @@ eAlpha = (1-alphaParam).^(2/(p*(p-1)));
 %% test null hypothesis
 H0 = T > chi2inv(eAlpha,k-1); % https://www.mathworks.com/matlabcentral/answers/74472-how-can-i-create-the-chisquare-table
 
-% alpha score matrix
+% plot location in Chi-squared distribution
+chiTemp = chi2pdf(.1:.1:T+5,k-1);
+figure, plot(.1:.1:T+5,chiTemp), hold on
+plot([T T], [0 nanmax(chiTemp)],'r-')
+
+% alpha matrix
 M = zeros(p, p);
-M(triu(true(p),1)) = chi2cdf(S,k-1);
+M(triu(true(p),1)) = chi2cdf(S,k-1); % chi2cdf and chi2inv are inverses
 M = M + M';
+
+% P-Value matrix matrix
+P = zeros(p, p);
+P(triu(true(p),1)) = 1-chi2cdf(S,k-1);
+P = P + P';
 
 end
 

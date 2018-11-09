@@ -54,6 +54,7 @@ else
     H_j(idx) = C(:,3);
 end
 
+% remove NaNs and Infs
 H_j(isnan(H_j)) = 0;
 H_j(isinf(H_j)) = 0;
 
