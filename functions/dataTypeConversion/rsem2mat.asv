@@ -39,14 +39,12 @@ switch class(dataIn)
         end
     case 'cell' % FIX THIS LATER
         dataFn = dataIn;
-        
-        dataName = cell(length(dataIn),1);
-        for iSample = 1:length(dataIn)
-            dotLoc = strfind(dataFn{iSample},'.');
-            dotSlashLoc = strfind(dataFn{iSample},'\');
-            dataName{iSample} = dataFn{iSample}(dotSlashLoc(end)+1:dotLoc(end-1)-1);
+        for iSample = 1:height(dataIn)
+            
         end
-        %dataName = {'CT_r1','CT_r2','CT_r3','KT_r1','KT_r2','KT_r3'};
+        
+        dataName
+        dataName = {'CT_r1','CT_r2','CT_r3','KT_r1','KT_r2','KT_r3'};
 end
 
 %% load geneinfo

@@ -11,7 +11,6 @@
 
 % Example
 
-
 % Scott Ronquist, 10/16/18
 
 %% default start
@@ -20,21 +19,23 @@ close all
 restoredefaultpath
 addpath(genpath('.'))
 
+isTest = 0;
+
 %% Input data Information
-if 1==0
-    [dataInfo] = gsfatUserInput;
-else
+if 1==isTest
     load('testDataInfo.mat')
+else
+    [dataInfo] = gsfatLoadUserInput;
 end
 
 %GOI list? gene Info table?
 
 %% load Hi-C
 % loads and formats Hi-C data output from Juicer
-if 1==0
-    H = gsfatLoadHic(dataInfo);
-else
+if 1==isTest
     load('testDataInfo.mat','H')
+else
+    H = gsfatLoadHic(dataInfo);
 end
 
 %% load RNA-seq
@@ -42,9 +43,9 @@ end
 % H variable is loaded first and passed into this function to inform on
 % which regions were "trimmed" (removed due to sparse coverage)
 if 1==0
-    R = gsfatLoadRnaseq(dataInfo,H);
-else
     load('testDataInfo.mat','R')
+else
+    R = gsfatLoadRnaseq(dataInfo,H);
 end
 
 %% Analysis
