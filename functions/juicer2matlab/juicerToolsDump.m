@@ -58,7 +58,7 @@ end
 
 %format data
 if ~isempty(fnOut)
-    temp = readtable(fnOut);
+    temp = readtable(fnOut,'Delimiter','\t');
     juicerOut = temp{:,:};
     if isempty(juicerOut)
         juicerOut = zeros(1,3);

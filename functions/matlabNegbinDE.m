@@ -1,4 +1,4 @@
-function [pvalue,padj] = matlab_negbin_DE(sample_counts1,sample_counts2,var_link,lowCountThreshold)
+function [pvalue,padj] = matlabNegbinDE(sample_counts1,sample_counts2,var_link,lowCountThreshold)
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 
