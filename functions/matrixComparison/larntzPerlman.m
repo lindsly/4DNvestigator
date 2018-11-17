@@ -1,14 +1,17 @@
-function [H0,M,P] = larntzPerlman(R,n,alphaParam)
+function [H0,M,P,Sout] = larntzPerlman(R,n,alphaParam,plotFlag)
 %larntzPerlman Larntz-Perlman procedure for covariance matrix equivalence
+%
+%   Input
 %   R: sample covariance matrices, p x p x k
 %   n: sample size
 %   alphaParam: alpha parameter to determine significance
 %   
-%   output
+%   Output
 %   H0: logical on whether the null hypothesis was rejected.
 %   0 = same, 1 = different
-%
-%   Z: output z-transform matrix, p x p x k
+%   M: 
+%   P: 
+%   S: 
 %
 %   Example:
 %   clear,rng(1)
@@ -27,6 +30,7 @@ function [H0,M,P] = larntzPerlman(R,n,alphaParam)
 %% cat if nargin < 2
 if nargin < 2;n = 100;fprintf('sample size not defined...\n'),pause(1);end
 if nargin < 3;alphaParam = .95;fprintf('default alpha=%.2f...\n',alphaParam),pause(1);end
+if nargin < 4;plotFlag = 0;fprintf('default plotFlag=%i...\n',plotFlag),pause(1);end
 
 %% get upper triangle of matrices to vector
 p = size(R,1);
@@ -54,9 +58,11 @@ eAlpha = (1-alphaParam).^(2/(p*(p-1)));
 H0 = T > chi2inv(eAlpha,k-1); % https://www.mathworks.com/matlabcentral/answers/74472-how-can-i-create-the-chisquare-table
 
 % plot location in Chi-squared distribution
-chiTemp = chi2pdf(.1:.1:T+5,k-1);
-figure, plot(.1:.1:T+5,chiTemp), hold on
-plot([T T], [0 nanmax(chiTemp)],'r-')
+if plotFlag
+    chiTemp = chi2pdf(.1:.1:T+5,k-1);
+    figure, plot(.1:.1:T+5,chiTemp), hold on
+    plot([T T], [0 nanmax(chiTemp)],'r-')
+end
 
 % alpha matrix
 M = zeros(p, p);
@@ -67,6 +73,11 @@ M = M + M';
 P = zeros(p, p);
 P(triu(true(p),1)) = 1-chi2cdf(S,k-1);
 P = P + P';
+
+% reconstruct S as a matrix
+Sout = zeros(p, p);
+Sout(triu(true(p),1)) = S;
+Sout = Sout + Sout';
 
 end
 
