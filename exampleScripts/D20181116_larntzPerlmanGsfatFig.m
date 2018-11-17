@@ -74,13 +74,13 @@ for iSample = 1:length(sampleNames)
     title(sampleNames{iSample})
     
     % add Larntz-Perlman ROIs
-    % addROICircles(LPRegions)
-    stats = regionprops('table',LPRegions,'Centroid',...
-        'MajorAxisLength','MinorAxisLength');
-    centers = stats.Centroid;
-    diameters = mean([stats.MajorAxisLength stats.MinorAxisLength],2);
-    radii = diameters/2;
-    viscircles(centers,radii*1.5,'Color','b');
+    addROICircles(LPRegions)
+%     stats = regionprops('table',LPRegions,'Centroid',...
+%         'MajorAxisLength','MinorAxisLength');
+%     centers = stats.Centroid;
+%     diameters = mean([stats.MajorAxisLength stats.MinorAxisLength],2);
+%     radii = diameters/2;
+%     viscircles(centers,radii*1.5,'Color','b');
     
     % add VNGE
     L = diag(sum(HtrimAll(:,:,iSample)))-HtrimAll(:,:,iSample);
@@ -93,7 +93,11 @@ end
 set(get(gcf,'children'),'linewidth',2,'fontsize',15)
 linkaxes(get(gcf,'children'))
 
-
-
+%% simple example
+[H0,M,P,S] = larntzPerlman(Hcorr,size(Hcorr,1),alphaParam,plotFlag);
+tempXPrctile = 99;
+LPRegions = S > prctile(S(:),tempXPrctile);
+imagesc(Hcorr(:,:,iSample))
+addROICircles(LPRegions,'red')
 
 
