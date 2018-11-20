@@ -25,7 +25,7 @@ data = rand(numGenes,numTPs);
 % geneentropyfilter
 
 %% possible normalizations
-normType = 'log2';
+normType = 'normalize';
 
 switch normType
     case 'log2'
@@ -44,6 +44,7 @@ figure
 for c = 1:numK
     subplot(numSubplot,numSubplot,c);
     plot(TPs,dataNorm((cidx == c),:)');
+    xticklabels(TPLabel)
     axis tight
 end
 suptitle('K-Means Clustering of Profiles');
@@ -53,6 +54,7 @@ figure
 for c = 1:numK
     subplot(numSubplot,numSubplot,c);
     plot(TPs,ctrs(c,:)');
+    xticklabels(TPLabel)
     axis tight
     axis off
 end
@@ -63,9 +65,10 @@ figure
 for c = 1:numK
     subplot(numSubplot,numSubplot,c);
     stdshade(dataNorm((cidx == c),:),.5,'b',[],.1)
+    xticklabels(TPLabel)
     axis tight
 end
-suptitle('K-Means Clustering of Profiles');
+suptitle('K-Means Smooth trend');
 
 %% FIGURE: clustergram
 % get color scale info from rnaSeq
@@ -76,20 +79,64 @@ green = [0 1 0];
 colorScale = [linspace(red(1),green(1),cLength)',...
     linspace(red(2),green(2),cLength)',...
     linspace(red(3),green(3),cLength)'];
-dataNormColorIdx = ceil(((dataNorm - min(dataNorm))./...
-    (max(dataNorm) - min(dataNorm)))*cLength); % normalize 0 to cLength
-dataNormColorIdx(dataNormColorIdx==0) = 1;
-
-% tempColor = colorScale(dataNormColorIdx(iGene),:);
 
 figure
 for c = 1:numK
     subplot(numSubplot,numSubplot,c);
-    image(dataNormColorIdx((cidx == c),:))
+    imagesc(dataNorm((cidx == c),:))
     colormap(colorScale), colorbar
-    xlabel(TPLabel)
+    xticklabels(TPLabel)
     axis tight
 end
-suptitle('K-Means Clustering of Profiles');
+suptitle('K-Means Clustergrams');
+
+%% FIGURE: subcluster
+for iC = 1:numK
+    tempData = dataNorm((cidx == iC),:);
+    [cidx2, ~] = kmeans(tempData,numK,'dist','corr','rep',5,'disp','final');
+    
+    figure
+    for c = 1:numK
+        subplot(numSubplot,numSubplot,c);
+        imagesc(tempData((cidx2 == c),:))
+        colormap(colorScale), colorbar
+        xticklabels(TPLabel)
+        axis tight
+    end
+    suptitle(sprintf('K-Means sub-Clustergrams cluster:%i',iC));
+end
+
+
+%% EXTRA
+
+figure
+for c = 1:numK
+    % get temp data mean and std
+    tempData = dataNorm((cidx == c),:);
+    tempDataMean = mean(tempData);
+    tempDataStdLim = [tempDataMean+nanstd(tempData);tempDataMean-nanstd(tempData)];
+    
+    % smooth data
+    tempDataMeanSmooth = interp1(1:size(tempDataMean,2),...
+        tempDataMean,1:.1:size(tempDataMean,2),'spline');
+    tempDataStdLimSmooth = [interp1(1:size(tempDataStdLim(1,:),2),...
+        tempDataStdLim(1,:),1:.1:size(tempDataStdLim(1,:),2),'spline');...
+        interp1(1:size(tempDataStdLim(2,:),2),tempDataStdLim(2,:),...
+        1:.1:size(tempDataStdLim(2,:),2),'spline')];
+    
+    % plot data
+    subplot(numSubplot,numSubplot,c), hold on
+    
+    smoothPlotMeanStd()
+    
+    patch([1:.1:size(tempDataMean,2),size(tempDataMean,2):-.1:1],...
+        [tempDataStdLimSmooth(1,:),fliplr(tempDataStdLimSmooth(2,:))],'b',...
+        'facealpha',.2,'edgecolor','none')
+    %plot(tempDataStdLim','b*')
+    plot(1:.1:size(tempDataMean,2),tempDataMeanSmooth','b')
+    plot(tempDataMean,'bs')
+    xticklabels(TPLabel)
+    axis tight
+end
 
 

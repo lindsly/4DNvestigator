@@ -106,3 +106,12 @@ for iC = 1:numK
     suptitle(sprintf('K-Means sub-Clustergrams cluster:%i',iC));
 end
 
+%% new smooth
+figure
+for c = 1:numK
+    subplot(numSubplot,numSubplot,c), hold on
+    smoothPlotMeanStd(dataNorm((cidx == c),:))
+    xticklabels(TPLabel)
+end
+
+
