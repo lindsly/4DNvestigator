@@ -79,14 +79,11 @@ green = [0 1 0];
 colorScale = [linspace(red(1),green(1),cLength)',...
     linspace(red(2),green(2),cLength)',...
     linspace(red(3),green(3),cLength)'];
-dataNormColorIdx = ceil(((dataNorm - min(dataNorm))./...
-    (max(dataNorm) - min(dataNorm)))*cLength); % normalize 0 to cLength
-dataNormColorIdx(dataNormColorIdx==0) = 1;
 
 figure
 for c = 1:numK
     subplot(numSubplot,numSubplot,c);
-    image(dataNormColorIdx((cidx == c),:))
+    imagesc(dataNorm((cidx == c),:))
     colormap(colorScale), colorbar
     xticklabels(TPLabel)
     axis tight
@@ -96,13 +93,12 @@ suptitle('K-Means Clustergrams');
 %% FIGURE: subcluster
 for iC = 1:numK
     tempData = dataNorm((cidx == iC),:);
-    tempDataNormColorIdx = dataNormColorIdx((cidx == iC),:);
     [cidx2, ~] = kmeans(tempData,numK,'dist','corr','rep',5,'disp','final');
     
     figure
     for c = 1:numK
         subplot(numSubplot,numSubplot,c);
-        image(tempDataNormColorIdx((cidx2 == c),:))
+        imagesc(tempData((cidx2 == c),:))
         colormap(colorScale), colorbar
         xticklabels(TPLabel)
         axis tight
