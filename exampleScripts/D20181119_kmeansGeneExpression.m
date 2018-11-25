@@ -110,7 +110,7 @@ end
 figure
 for c = 1:numK
     subplot(numSubplot,numSubplot,c), hold on
-    smoothPlotMeanStd(dataNorm((cidx == c),:))
+    smoothPlotMeanStd(dataNorm((cidx == c),:),1)
     xticklabels(TPLabel)
 end
 
