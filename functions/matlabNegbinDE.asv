@@ -40,7 +40,7 @@ ylabel('Frequency')
 title('P-value enrichment')
 
 % filter low counts
-lowCountGenes = all(countAll < lowCountThreshold, 2);
+lowCountGenes = all(countAll{:,:} < lowCountThreshold, 2);
 histogram(tRegression.pValue(~lowCountGenes),100)
 xlabel('P-value')
 ylabel('Frequency')
