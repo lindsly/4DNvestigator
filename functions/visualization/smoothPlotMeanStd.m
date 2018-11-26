@@ -10,7 +10,7 @@ if nargin < 2;interpNum = .1;end
 
 %% get data mean and std
 dataMean = mean(data,1);
-dataStdLim = [dataMean+nanstd(data,1);dataMean-nanstd(data,1)];
+dataStdLim = [dataMean+nanstd(data,[],1);dataMean-nanstd(data,[],1)];
 
 % smooth data
 dataMeanSmooth = interp1(1:size(dataMean,2),...
