@@ -22,7 +22,7 @@ addpath(genpath('.'))
 isTest = 0;
 
 %% Input data Information
-if 1==isTest
+if 1 == isTest
     load('testDataInfo.mat')
 else
     [dataInfo] = gsfatLoadUserInput;

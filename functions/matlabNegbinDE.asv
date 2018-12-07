@@ -19,37 +19,40 @@ countAll = [sampleCounts1, sampleCounts2];
 %% Inferring Differential Expression with a Negative Bionomial Model
 % neg bin Regression
 tRegression = nbintest(sampleCounts1,sampleCounts2,'VarianceLink',varLink);
-h = plotVarianceLink(tRegression);
-
-% set custom title
-h(1).Title.String = 'Variance Link on Treated Samples';
-h(2).Title.String = 'Variance Link on Untreated Samples';
-
-% comparison
-h = plotVarianceLink(tRegression,'compare',true);
-
-% set custom title
-h(1).Title.String = 'Variance Link on Treated Samples';
-h(2).Title.String = 'Variance Link on Untreated Samples';
+% % % % % h = plotVarianceLink(tRegression);
+% % % % % 
+% % % % % % set custom title
+% % % % % h(1).Title.String = 'Variance Link on Treated Samples';
+% % % % % h(2).Title.String = 'Variance Link on Untreated Samples';
+% % % % % 
+% % % % % % comparison
+% % % % % h = plotVarianceLink(tRegression,'compare',true);
+% % % % % 
+% % % % % % set custom title
+% % % % % h(1).Title.String = 'Variance Link on Treated Samples';
+% % % % % h(2).Title.String = 'Variance Link on Untreated Samples';
   
 %% histogram of P-values
-figure;
-histogram(tRegression.pValue,100)
-xlabel('P-value')
-ylabel('Frequency')
-title('P-value enrichment')
-
-% filter low counts
-lowCountGenes = all(countAll{:,:} < lowCountThreshold, 2);
-histogram(tRegression.pValue(~lowCountGenes),100)
-xlabel('P-value')
-ylabel('Frequency')
-title('P-value enrichment without low count genes')
+% % % % % figure;
+% % % % % histogram(tRegression.pValue,100)
+% % % % % xlabel('P-value')
+% % % % % ylabel('Frequency')
+% % % % % title('P-value enrichment')
 
 %% Multiple Testing and Adjusted P-values
 % compute the adjusted P-values (BH correction)
 padj = mafdr(tRegression.pValue,'BHFDR',true);
 pvalue = tRegression.pValue;
+
+%% Filter low counts
+lowCountGenes = all(countAll < lowCountThreshold, 2);
+% % % % % % histogram(tRegression.pValue(~lowCountGenes),100)
+% % % % % % xlabel('P-value')
+% % % % % % ylabel('Frequency')
+% % % % % % title('P-value enrichment without low count genes')
+
+padj(lowCountGenes) = NaN;
+pvalue(lowCountGenes) = NaN;
 
 end
 
