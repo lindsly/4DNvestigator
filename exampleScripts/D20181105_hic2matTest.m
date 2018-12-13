@@ -18,7 +18,7 @@ hicParam.intraFlag = 1;
 hicParam.chr = 1;
 %%% PARAMETERS ^^^
 
-H = hic2mat(hicParam.norm3d,hicParam.norm1d,hicLoc,...
-    hicParam.chr,hicParam.chr,hicParam.binType,hicParam.binSize,hicParam.intraFlag);
+[H,hicHeader] = hic2mat(hicParam.norm3d,hicParam.norm1d,hicLoc,...
+    hicParam.chr,hicParam.chr,hicParam.binType,hicParam.binSize,hicParam.intraFlag,1);
 
 figure, imagesc(log(H))

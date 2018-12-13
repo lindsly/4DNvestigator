@@ -1,4 +1,4 @@
-function [H] = hic2mat(norm2d,norm1d,fn,chr1,chr2,bpFrag,binSize,intraFlag)
+function [H,hicHeader] = hic2mat(norm3d,norm1d,fn,chr1,chr2,bpFrag,binSize,intraFlag,headerFlag)
 %hic2mat converts .hic files to MATLAB matrices
 %   Reference:
 %   https://github.com/theaidenlab/juicer/wiki/Data-Extraction
@@ -24,8 +24,10 @@ function [H] = hic2mat(norm2d,norm1d,fn,chr1,chr2,bpFrag,binSize,intraFlag)
 %   Scott Ronquist, 8/28/18
 
 if ~exist('intraFlag','var')||isempty(intraFlag); intraFlag=0; end
+if ~exist('headerFlag','var')||isempty(headerFlag); headerFlag=0; end
 
-H = juicerDump2mat(juicerToolsDump(norm2d,norm1d,fn,chr1,chr2,bpFrag,binSize),intraFlag);
+[juicerOut,hicHeader] = juicerToolsDump(norm3d,norm1d,fn,chr1,chr2,bpFrag,binSize,[],headerFlag);
+H = juicerDump2mat(juicerOut,intraFlag);
 
 end
 

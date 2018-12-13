@@ -204,7 +204,7 @@ if nargin > 2
                 case 4  % s flag
                     showbandlabels = bioinfoprivate.opttf(pval,okargs{k},mfilename);              
                 case 5 % unit
-                    if isnumeric(pval) && isscalar(pval) && pval >=1 && pval <=3
+                    if isnumeric(pval) && isscalar(pval) %&& pval >=1 && pval <=3 %SRedit
                         unit = fix(pval);
                     else
                          error(message('bioinfo:chromosomeplot:IncorrectUnit'));
@@ -252,18 +252,31 @@ if addtoplot
     if numel(axs) > 1
         error(message('bioinfo:chromosomeplot:TooManyAxesinFigure'));
     end
-
-    h = 0.15; % Height for plot the chromosome
-    voffset = 0.05; % vertical offset from the bottom
-    % Reposition the original axes and add a new axes
-    rect_o = get(ha_old, 'Position');
-    set(ha_old, 'Position', [rect_o(1) h+voffset rect_o(3) rect_o(4)-h-voffset/2],...
-                'XAxisLocation', 'Top')
     
-    ha = axes('parent', hf,...
-              'Position',[rect_o(1) voffset rect_o(3) h],...
-              chromaxes_props{:},  'Visible', 'off');
-    orientation = 2;
+    %%%%%%%%%%% SRedit vvvvvvvvvvvvvvvvvvv
+%     h = 0.15; % Height for plot the chromosome
+%     voffset = 0.05; % vertical offset from the bottom
+%     % Reposition the original axes and add a new axes
+%     rect_o = get(ha_old, 'Position');
+%     
+%     set(ha_old, 'Position', [rect_o(1) h+voffset rect_o(3) rect_o(4)-h-voffset/2],...
+%                 'XAxisLocation', 'Top')
+%     
+%     ha = axes('parent', hf,...
+%               'Position',[rect_o(1) voffset rect_o(3) h],...
+%               chromaxes_props{:},  'Visible', 'off');
+%     orientation = 2;
+    
+    h = 0.1;            % width of chromosome
+    voffset = 0.01;     % offset from the plot
+    
+    ax = gca;
+    pos2 = plotboxpos(ax);
+    ha = axes('Position', [pos2(1)-(h+voffset), pos2(2), h, pos2(4)],...
+        'Visible', 'off');
+    orientation = 1;
+    
+    %%%%%%%%%%% SRedit ^^^^^^^^^^^^^^^^^^^
 else
     if isempty(hf_old)
         hf = figure('Color',[1 1 1],...
@@ -285,16 +298,22 @@ appdata = localGetAppData(hf);
 
 appdata.orientation = orientation; % 1 is vertical and 2 is horizontal
 appdata.chromnum = chromnum;
-if unit == 1
-    appdata.unit = 1;
-    appdata.unitstr = '';
-elseif unit == 2
-    appdata.unit = 1000;
-    appdata.unitstr = '(kb)';
-elseif unit == 3
-    appdata.unit = 10^6;
-    appdata.unitstr = '(mb)';
-end
+
+%%%%%%%%%%%%%%%%%%%%%% SRedit 12/12/2018 vvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+% if unit == 1
+%     appdata.unit = 1;
+%     appdata.unitstr = '';
+% elseif unit == 2
+%     appdata.unit = 1000;
+%     appdata.unitstr = '(kb)';
+% elseif unit == 3
+%     appdata.unit = 10^6;
+%     appdata.unitstr = '(mb)';
+% end
+
+appdata.unit = unit;
+appdata.unitstr = '(bp)';
+%%%%%%%%%%%%%%%%%%%%%% SRedit 12/12/2018 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 if ~isempty(hf_old)
     delete(appdata.plotgrp)

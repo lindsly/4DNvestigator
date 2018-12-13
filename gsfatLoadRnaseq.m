@@ -7,7 +7,9 @@ numChr = height(dataInfo.chrSizes);
 repGrp = findgroups(dataInfo.sampleInfo.sample(strcmp(dataInfo.sampleInfo.dataType,'rnaseq')));
 
 % RSEM to mat
-R = rsem2mat(dataInfo.sampleInfo,dataInfo.refGenome);
+% R = rsem2mat(dataInfo.sampleInfo,dataInfo.refGenome);
+R = rsem2matV2(dataInfo.sampleInfo(ismember(dataInfo.sampleInfo.dataType,'rnaseq'),:),...
+    dataInfo.refGenome);
 
 Rfields = fields(R);
 

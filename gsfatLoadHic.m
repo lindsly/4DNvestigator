@@ -5,11 +5,7 @@ function [H] = gsfatLoadHic(dataInfo)
 numChr = height(dataInfo.chrSizes);
 
 %% get Hi-C sample Locations
-temp = find(ismember(dataInfo.sampleInfo.dataType,'hic'));
-sampleFn = cell(length(temp),1);
-for i = 1:length(temp)
-    sampleFn{i} = [dataInfo.sampleInfo.folder{temp(i)},'\',dataInfo.sampleInfo.name{temp(i)}];
-end
+sampleFn = dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'hic'));
 
 %% get chr sizes to stitch together
 chrSizesSorted = zeros(numChr,1);
@@ -25,6 +21,10 @@ for iChr = 1:numChr
         end
     end
 end
+
+%% get hic header info
+[~,dataInfo.hicHeader] = hic2mat('observed','NONE',sampleFn{1},...
+    numChr,numChr,'BP',1E6,hicParam.intraFlag);
 
 %% load Hi-C data - 100kb
 %%% PARAMETERS vvv
