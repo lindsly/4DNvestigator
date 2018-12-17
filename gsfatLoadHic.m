@@ -1,6 +1,13 @@
 function [H] = gsfatLoadHic(dataInfo)
 %gsfatLoadHiC Loads and formats Hi-C data specified in dataInfo
-%   Detailed explanation goes here
+%
+%   Input
+%   dataInfo: structure containing all experiment metadata
+%
+%   Output
+%   H: structure containing all Hi-C data needed for GSFAT
+%
+%   Scott Ronquist, scotronq@umich.edu. 12/13/18
 
 numChr = height(dataInfo.chrSizes);
 

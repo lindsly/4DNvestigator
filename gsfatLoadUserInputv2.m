@@ -48,16 +48,32 @@ while ~strcmp(answer,'Yes')
     end
 end
 
-%% get peripheral info
-% select reference genome
-temp = {'hg19','hg38'};
-[indx,~] = listdlg('PromptString','Select a Reference Genome:',...
-    'SelectionMode','single','ListString',temp);
-dataInfo.refGenome = temp{indx};
-dataInfo.numChr = 22;
-dataInfo.chrSizes = readtable(sprintf('%s.chrom.sizes',dataInfo.refGenome),'filetype','text');
-dataInfo.chrSizes = dataInfo.chrSizes(1:dataInfo.numChr,:);
+%% get available information from .hic files
+% refgenome
+fprintf('reading .hic header information...\n')
+hicSampleLocs = find(ismember(dataInfo.sampleInfo.dataType,'hic'));
 
+hicHeader = cell(length(hicSampleLocs),1);
+refGenome = cell(length(hicSampleLocs),1);
+for iHicSample = 1:length(hicSampleLocs)
+    hicHeader{iHicSample} = readHicHeader(dataInfo.sampleInfo.path{hicSampleLocs(iHicSample)});
+    refGenome{iHicSample} = hicHeader{iHicSample}.refGenome;
+end
+
+if length(unique(refGenome)) == 1
+    dataInfo.hicHeader = hicHeader{iHicSample};
+    dataInfo.refGenome = dataInfo.hicHeader.refGenome;
+    
+    % need to fix this later vvvvvvvvvv
+    dataInfo.numChr = 22;
+    dataInfo.chrSizes = readtable(sprintf('%s.chrom.sizes',dataInfo.refGenome),'filetype','text');
+    dataInfo.chrSizes = dataInfo.chrSizes(1:dataInfo.numChr,:);
+    % need to fix this later ^^^^^^^^^^
+else
+    error('.hic files have different reference genomes')
+end
+
+%% get peripheral info
 % Get experiment Name
 temp = inputdlg('Input Project Name:','Project Name');
 dataInfo.projName = temp{1};
@@ -80,6 +96,18 @@ dataInfo.sampleInfo.uniqueName = strcat(dataInfo.sampleInfo.dataType,...
 dataInfo.path.output = uigetdir(pwd,'Select Output folder');
 mkdir([dataInfo.path.output,dataInfo.delim,'figures'])
 mkdir([dataInfo.path.output,dataInfo.delim,'/tables'])
+
+%% depreciated
+% % select reference genome
+% temp = {'hg19','hg38'};
+% [indx,~] = listdlg('PromptString','Select a Reference Genome:',...
+%     'SelectionMode','single','ListString',temp);
+% dataInfo.refGenome = temp{indx};
+% 
+% 
+% dataInfo.numChr = 22;
+% dataInfo.chrSizes = readtable(sprintf('%s.chrom.sizes',dataInfo.refGenome),'filetype','text');
+% dataInfo.chrSizes = dataInfo.chrSizes(1:dataInfo.numChr,:);
 
 end
 
