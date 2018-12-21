@@ -4,7 +4,7 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %   with RNA-seq, then determines a low dimensional projection to extract
 %   regions that change significantly
 %
-%   inputs
+%   Inputs
 %   hic: Hi-C matrix, typically normalized (NxNxM double; default: N/A)
 %   rnaSeq: rnaseq values, (NxM double; default: N/A)
 %   binNames: names associated with Hi-C and RNA-seq bins (string or cell array; default: empty cell)
@@ -12,7 +12,7 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %   binInfo: bin chr information necessary for normalization (array; default: [])
 %   graphWeighted: use graph weighted centrality analysis ([0,1]; default: 1)
 %
-%   outputs
+%   Outputs
 %   features: concatonated feature array (Nx3 double)
 %   score: location of bin in low dimensional projection (Nx3 double)
 %

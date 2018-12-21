@@ -9,31 +9,16 @@ function [H] = gsfatLoadHic(dataInfo)
 %
 %   Scott Ronquist, scotronq@umich.edu. 12/13/18
 
-numChr = height(dataInfo.chrSizes);
+%% get information dataInfo
+% get chr information from hic header
+chrInfo = dataInfo.hicHeader.Chromosomes;
+numChr = height(chrInfo);
 
-%% get Hi-C sample Locations
+% get Hi-C sample Locations
 sampleFn = dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'hic'));
 
-%% get chr sizes to stitch together
-chrSizesSorted = zeros(numChr,1);
-for iChr = 1:numChr
-    if iChr == numChr+1
-        iChr_ = 'X';
-    else
-        iChr_ = num2str(iChr);
-    end
-    for i = 1:height(dataInfo.chrSizes)
-        if strcmp(dataInfo.chrSizes{i,1}{1}(4:end),iChr_)
-            chrSizesSorted(iChr) = dataInfo.chrSizes{i,2};
-        end
-    end
-end
-
-%% get hic header info
-[~,dataInfo.hicHeader] = hic2mat('observed','NONE',sampleFn{1},...
-    numChr,numChr,'BP',1E6,hicParam.intraFlag);
-
 %% load Hi-C data - 100kb
+% this loads intra-chr Hi-C
 %%% PARAMETERS vvv
 hicParam.binType = 'BP';
 hicParam.binSize = 1E5;
@@ -42,7 +27,7 @@ hicParam.norm3d = 'oe';
 hicParam.intraFlag = 1;
 %%% PARAMETERS ^^^
 
-chrBinSizes = ceil(dataInfo.chrSizes{:,2}/hicParam.binSize);
+chrBinSizes = ceil(chrInfo.chrLength/hicParam.binSize);
 H.s100kb.oe = cell(numChr,1);
 H.s100kb.kr = cell(numChr,1);
 
@@ -52,14 +37,16 @@ for iChr = 1:numChr
     for iSample = 1:length(sampleFn)
         fprintf('loading 100kb Hi-C. Sample: (%d/%d), chr:%d...\n',iSample,length(sampleFn),iChr)
         
+        % extract o/e normalized
         temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
-            iChr,iChr,hicParam.binType,hicParam.binSize,hicParam.intraFlag);
+            chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
         temp(isnan(temp)) = 0;
         temp = max(cat(3,temp,temp'),[],3);
         H.s100kb.oe{iChr}(1:length(temp),1:length(temp),iSample) = temp;
         
+        % extract observed as well
         temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
-            iChr,iChr,hicParam.binType,hicParam.binSize,hicParam.intraFlag);
+            chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
         temp(isnan(temp)) = 0;
         temp = max(cat(3,temp,temp'),[],3);
         H.s100kb.kr{iChr}(1:length(temp),1:length(temp),iSample) = temp;
@@ -67,11 +54,12 @@ for iChr = 1:numChr
 end
 
 %% load Hi-C data - 1Mb
+% this loads both intra- and inter-chr Hi-C
 %%% PARAMETERS vvv
 hicParam.binSize = 1E6;
 %%% PARAMETERS ^^^
 
-H.s1mb.chrStart = [1;cumsum(ceil(chrSizesSorted/hicParam.binSize))+1];
+H.s1mb.chrStart = [1;cumsum(ceil(chrInfo.chrLength/hicParam.binSize))+1];
 
 % get Hi-C data
 H.s1mb.oe = zeros(H.s1mb.chrStart(end)-1,H.s1mb.chrStart(end)-1,length(sampleFn));
@@ -79,23 +67,22 @@ H.s1mb.kr = zeros(H.s1mb.chrStart(end)-1,H.s1mb.chrStart(end)-1,length(sampleFn)
 for iSample = 1:length(sampleFn)
     for iChr1 = 1:numChr
         for iChr2 = iChr1:numChr
-            iChr1_ = iChr1;iChr2_ = iChr2;
-            if iChr1 == numChr+1;  iChr1_ = 'X';end
-            if iChr2 == numChr+1;  iChr2_ = 'X';end
-            fprintf('loading 1Mb Hi-C. Sample: (%d/%d), chr1:%d, chr2:%d...\n',...
-                iSample,length(sampleFn),iChr1,iChr2)
+            fprintf('loading 1Mb Hi-C. Sample: (%d/%d), chr1:%s, chr2:%s...\n',...
+                iSample,length(sampleFn),chrInfo.chr{iChr1},chrInfo.chr{iChr2})
             
+            % o/e
             temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
-                iChr1_,iChr2_,hicParam.binType,hicParam.binSize);
+                chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
             
-            if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
+            %if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
             H.s1mb.oe(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
                 H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
             
+            % observed
             temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
-                iChr1_,iChr2_,hicParam.binType,hicParam.binSize);
+                chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
             
-            if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
+            %if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
             H.s1mb.kr(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
                 H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
         end

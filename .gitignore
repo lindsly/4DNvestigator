@@ -2,3 +2,6 @@
 *.hic
 *.results
 *.mat
+
+/functions/depreciated
+/sampleData

@@ -1,15 +1,27 @@
 function [R] = gsfatLoadRnaseq(dataInfo,H)
 %gsfatLoadRnaseq Loads and formats RNA-seq data specified in dataInfo
-%   Detailed explanation goes here
-% loads and formats RNA-seq data output from RSEM
+%   
+%   Inputs
+%   dataInfo:
+%   H: Hi-C data
+%
+%   Outputs
+%   R: RNA-seq data structure
+%
+%   Scott Ronquist, scotronq@umich.edu. 12/19/18
 
-numChr = height(dataInfo.chrSizes);
+%% get information dataInfo
+% get chr information from hic header
+chrInfo = dataInfo.hicHeader.Chromosomes;
+numChr = height(chrInfo);
+
+% get Hi-C sample Locations
 repGrp = findgroups(dataInfo.sampleInfo.sample(strcmp(dataInfo.sampleInfo.dataType,'rnaseq')));
 
 % RSEM to mat
-% R = rsem2mat(dataInfo.sampleInfo,dataInfo.refGenome);
-R = rsem2matV2(dataInfo.sampleInfo(ismember(dataInfo.sampleInfo.dataType,'rnaseq'),:),...
-    dataInfo.refGenome);
+R = rsem2mat(dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
+    dataInfo.sampleInfo.name(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
+    dataInfo.hicHeader.refGenome);
 
 Rfields = fields(R);
 
@@ -20,7 +32,7 @@ end
 
 %% bined RNA-seq
 %100kb bins
-chrBinSizes = ceil(dataInfo.chrSizes{:,2}/1E5);
+chrBinSizes = ceil(chrInfo.chrLength/1E5);
 [R.s100kb.tpm,R.s100kb.gene] = rna2bin(R.TPM{:,7:end},R.TPM.geneName,...
     [R.TPM.chr R.TPM.geneStart R.TPM.geneEnd],1E5,chrBinSizes);
 
@@ -34,7 +46,7 @@ for iChr = 1:numChr
 end
 
 %1mb bins
-chrBinSizes = ceil(dataInfo.chrSizes{:,2}/1E6);
+chrBinSizes = ceil(chrInfo.chrLength/1E6);
 [R.s1mb.tpm,R.s1mb.gene] = rna2bin(R.TPM{:,7:end},R.TPM.geneName,...
     [R.TPM.chr R.TPM.geneStart R.TPM.geneEnd],1E6,chrBinSizes);
 

@@ -1,52 +1,28 @@
-function [dataOut] = rsem2mat(dataIn,refGenome)
+function [dataOut] = rsem2mat(fn,dataName,refGenome)
 %rsem2mat takes the rsem raw data and formats it for MATLAB
-%   dataIn: table or filename or directory with RSEM output
-%   dataOut: table for RSEM output, formatted with biomart
+%
+%   Input
+%   fn: cell array of file names for RNA-seq samples
+%   dataName: names for each sample
+%   refGenome: references genome information
+%
+%   Output
+%   dataOut: RNA-seq data
+%
+%   Scott Ronquist, scotronq@umich.edu. 12/19/18
+%
+%% set default parameters
+if ~exist('refGenome','var') || isempty(refGenome); refGenome='hg19'; end
 
-if nargin<2; refGenome='hg19'; end
-
-%% load data
-switch class(dataIn)
-    %formatted table input
-    case 'table'
-        if ismember('dataType',dataIn.Properties.VariableNames)
-            dataIn(~ismember(dataIn.dataType,'rnaseq'),:) = [];
-        end
-        
-        dataFn = cell(height(dataIn),1);
-        for iSample = 1:height(dataIn)
-            dataFn{iSample} = [dataIn.folder{iSample},'\',dataIn.name{iSample}];
-        end
-        dataName = dataIn.uniqname;
-        
-        %file location input
-    case 'char'
-        if exist(dataIn)==7
-            dataLoc = rdir([dataIn,'/**/*.genes.results'],'',1);
-            
-            dataFn = cell(height(dataIn),1);
-            dataName = cell(height(dataIn),1);
-            for iSample = 1:height(dataIn)
-                dataFn{iSample} = [dataLoc(iSample).folder,'/',dataLoc(iSample).name];
-                dotLoc = strfind(dataLoc(iSample).name,'.');
-                dataName{iSample} = dataLoc(iSample).name(1:dotLoc(1)-1);
-                dataName{iSample} = strrep(dataName,'-','_');
-            end
-        else
-            dataFn = {dataIn};
-            dataName = {'a'};
-            
-        end
-    case 'cell' % FIX THIS LATER
-        dataFn = dataIn;
-        
-        dataName = cell(length(dataIn),1);
-        for iSample = 1:length(dataIn)
-            dotLoc = strfind(dataFn{iSample},'.');
-            dotSlashLoc = strfind(dataFn{iSample},'\');
-            dataName{iSample} = dataFn{iSample}(dotSlashLoc(end)+1:dotLoc(end-1)-1);
-        end
-        %dataName = {'CT_r1','CT_r2','CT_r3','KT_r1','KT_r2','KT_r3'};
+% use file names if no specified names given
+if ~exist('dataName','var') || isempty(dataName)
+    dataName = cell(length(fn),1);
+    for iSample = 1:length(fn)
+        slashLoc = regexp(fn{iSample},'[\\/]');
+        temp = fn{iSample}(slashLoc(end)+1:end);
+        dotLoc = regexp(temp,'\.');
+        dataName{iSample} = temp(1:dotLoc(1)-1);
+    end
 end
 
 %% load geneinfo
@@ -58,12 +34,13 @@ switch refGenome
 end
 
 %% load and compare biomart info
-for iSample = 1:length(dataFn)
-    fprintf('formatting sample %d of %d\n',iSample,length(dataFn))
+for iSample = 1:length(fn)
+    fprintf('formatting sample %d of %d\n',iSample,length(fn))
     
-    dataIn = readtable(dataFn{iSample},'filetype', 'text');
+    dataIn = readtable(fn{iSample},'filetype', 'text');
     
     if iSample==1
+        % keep genes that are found in both RNA-seq and biomart
         [C,~,IB] = intersect(dataIn.gene_id,biomart.GeneStableID);
         if ~isequal(dataIn.gene_id,C)
             error('biomart-RSEM gene incompatible')
@@ -75,8 +52,7 @@ for iSample = 1:length(dataFn)
         geneEnd = biomart.GeneEnd_bp_(IB);
         geneStrand = biomart.Strand(IB);
         
-        %         baseTable = [table(geneName) table(geneDescription) table(chr),...
-        %             table(geneStart) table(geneEnd) table(geneStrand)];
+        % create table of gene information
         baseTable = [table(chr) table(geneStart) table(geneEnd),...
             table(geneName) table(geneDescription) table(geneStrand)]; % like .bed file (sort-of)
         
@@ -91,9 +67,10 @@ for iSample = 1:length(dataFn)
     
     dataOutFields = fields(dataOut);
     
+    % add to tables with RNA-seq sample information
     for ii = 1:length(dataOutFields)
         dataOut.(dataOutFields{ii}) = [dataOut.(dataOutFields{ii}),table(dataIn.(dataOutFields{ii}))];
-        dataOut.(dataOutFields{ii}).Properties.VariableNames{end}=dataName{iSample};
+        dataOut.(dataOutFields{ii}).Properties.VariableNames{end} = dataName{iSample};
     end
     
 end
@@ -111,52 +88,6 @@ for iField = 1:length(dataOutFields)
     % sort
     dataOut.(dataOutFields{iField}) = sortrows(dataOut.(dataOutFields{iField}),'geneName');
 end
-
-%% EXTRA
-% [LIA,LOCB] = ismember(biomart.GeneStableID,data_in.gene_id);
-% biomart = [biomart table(LOCB)];
-% biomart(~LIA,:) = [];
-
-% temp_start = grpstats(biomart,'LOCB','min','DataVars','GeneStart_bp_');
-% temp_start = grpstats(biomart,'LOCB','max','DataVars','GeneEnd_bp_');
-
-% if length(unique(data_in.gene_id)) ~= length(data_in.gene_id)
-%     error('gene list not unique')
-% end
-%
-% [C,~,IB] = intersect(data_in.gene_id,biomart.GeneStableID);
-% if ~isequal(data_in.gene_id,C)
-%     error('biomart-RSEM gene incompatible')
-% end
-%
-% gene_name = biomart.HGNCSymbol(IB);
-% gene_description = biomart.GeneDescription(IB);
-% chr = biomart.Chromosome_scaffoldName(IB);
-% gene_start = biomart.GeneStart_bp_(IB);
-% gene_end = biomart.GeneEnd_bp_(IB);
-% gene_strand = biomart.Strand(IB);
-%
-% data_out = [table(gene_name) table(gene_description) table(chr),...
-%     table(gene_start) table(gene_end) table(gene_strand) data_in];
-%
-% %remove empty gene names
-% data_out(cellfun(@isempty,data_out.gene_name),:) = [];
-%
-% % chr str2num
-% chr_nums = cellfun(@str2num,data_out.chr,'UniformOutput',0);
-% data_out.chr(~cellfun(@isempty,chr_nums)) = chr_nums(~cellfun(@isempty,chr_nums));
-%
-% data_out = sortrows(data_out,'gene_name');
-%
-% %remove empty gene names
-% data_out(cellfun(@isempty,data_out.gene_name),:) = [];
-%
-% % chr str2num
-% chr_nums = cellfun(@str2num,data_out.chr,'UniformOutput',0);
-% data_out.chr(~cellfun(@isempty,chr_nums)) = chr_nums(~cellfun(@isempty,chr_nums));
-%
-% % sort
-% data_out = sortrows(data_out,'gene_name');
 
 end
 
