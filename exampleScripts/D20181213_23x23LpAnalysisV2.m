@@ -52,13 +52,32 @@ end
 dataInfo(remSamp,:) = [];
 hicHeader(remSamp) = [];
 
+%% Create the waitbar and determine intialization properties
+waitBar = waitbar(0,'loading Hi-C...','Name','Loading Data');
+set(findall(waitBar),'Units', 'normalized');    % Change the Units Property of the figure and all the children
+set(waitBar,'Position', [0.25 0.4 0.5 0.08]);   % Change the size of the figure
+totalWait = height(dataInfo);
+currentWait = 1;
+avTime = 0;
+
 %% load hic
 H = cell(height(dataInfo),1);
 for iSample = 1:height(dataInfo)
-    disp(iSample)
+    if iSample==1;tic;end
+    
+    % update load bar
+    waitbar(currentWait/totalWait,waitBar,...
+        sprintf('Loading Hi-C. Sample: %s, estimated time: %i secs...',...
+        dataInfo.ct{iSample},round(avTime*(totalWait-currentWait))));
+    
+    % load data
     H{iSample} = hic2mat('observed','none',dataInfo.fnPath{iSample},'ALL','ALL',...
         param.binType,max(hicHeader{iSample}.BasePairdelimitedResolutions),...
         param.intraFlag);
+    
+    % update load bar variable
+    currentWait = currentWait+1;
+    if iChr==1 && iSample==1;avTime = toc;end % for estimation of time to load
 end
 
 %% normalize data

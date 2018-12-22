@@ -1,6 +1,5 @@
-% This script performs all default analysis methods for the Genome
-% Structure Function Analysis Toolbox (GSFAT)
-% https://github.com/scotronq/srMatlabFunctions
+% This script performs all default analysis methods for the 4DNvestigator
+% https://github.com/scotronq/4DNvestigator
 %
 % Variables
 % dataInfo: MATLAB Structure that stores information that explains the input data.
@@ -26,17 +25,15 @@ isTest = 0;
 if isTest == 1
     load('testDataInfo.mat')
 else
-    [dataInfo] = gsfatLoadUserInput;
+    [dataInfo] = fdnLoadUserInput;
 end
-
-%GOI list? gene Info table?
 
 %% load Hi-C
 % loads and formats Hi-C data output from Juicer
 if isTest == 1
     load('testDataInfo.mat','H')
 else
-    H = gsfatLoadHic(dataInfo);
+    H = fdnLoadHic(dataInfo);
 end
 
 %% load RNA-seq
@@ -46,27 +43,31 @@ end
 if isTest == 1
     load('testDataInfo.mat','R')
 else
-    R = gsfatLoadRnaseq(dataInfo,H);
+    R = fdnLoadRnaseq(dataInfo,H);
 end
 
 %% save
 save(sprintf('./sampleData/data/%s.mat',dataInfo.projName),'dataInfo','H','R','-v7.3')
 
 %% Chromatin partitioning
-[H] = gsfatChromPartition(dataInfo,H,R);
+[H] = fdnChromPartition(dataInfo,H,R);
 
 % find AB switch regions differences
 
 %% RNA-seq differential expression (between each sample)
 % automatically compares between all samples
-[R] = gsfatDiffExpGsaa(dataInfo,R);
+[R] = fdnDiffExpGsaa(dataInfo,R);
 
 %% 4DN feature analyzer - 1Mb level
 % select sample
-[features,score] = gsfatSfAnalysis(dataInfo,R,H);
+[features,score] = fdnSfAnalysis(dataInfo,R,H);
 
-%% matrix comparisons
-LP
+%% Matrix comparisons
+% LP - genome-wide
+
+% LP - chr by chr
+
+% VNGE
 
 
 %% EXTRA

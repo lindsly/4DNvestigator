@@ -1,4 +1,4 @@
-function [features,score] = gsfatSfAnalysis(dataInfo,R,H,sampleSelect,goi,hExtract)
+function [features,score] = fdnSfAnalysis(dataInfo,R,H,sampleSelect,goi,hExtract)
 %gsfatSfAnalysis Summary of this function goes here
 %   Detailed explanation goes here
 %

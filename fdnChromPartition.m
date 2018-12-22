@@ -1,4 +1,4 @@
-function [H] = gsfatChromPartition(dataInfo,H,R)
+function [H] = fdnChromPartition(dataInfo,H,R)
 %gsfatChromPartition partitions the chromatin into nodal domains
 %   Detailed explanation goes here
 %

@@ -1,4 +1,4 @@
-function [R] = gsfatLoadRnaseq(dataInfo,H)
+function [R] = fdnLoadRnaseq(dataInfo,H)
 %gsfatLoadRnaseq Loads and formats RNA-seq data specified in dataInfo
 %   
 %   Inputs

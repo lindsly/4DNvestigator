@@ -1,4 +1,4 @@
-function [H] = gsfatLoadHic(dataInfo)
+function [H] = fdnLoadHic(dataInfo)
 %gsfatLoadHiC Loads and formats Hi-C data specified in dataInfo
 %
 %   Input

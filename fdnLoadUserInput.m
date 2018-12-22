@@ -1,4 +1,4 @@
-function [dataInfo] = gsfatLoadUserInput(indexFile,projectName,outputPath)
+function [dataInfo] = fdnLoadUserInput(indexFile,projectName,outputPath)
 %gsfatUserInput loads User input data
 %   This function loads formats data structures for GSFAT analysis
 %

@@ -1,4 +1,4 @@
-function [R] = gsfatDiffExpGsaa(dataInfo,R)
+function [R] = fdnDiffExpGsaa(dataInfo,R)
 %gsfatDiffExpGsaa This function performs differential expression and
 %creates files for GSAA
 %
