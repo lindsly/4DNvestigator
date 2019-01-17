@@ -14,20 +14,8 @@ function [H] = fdnChromPartition(dataInfo,H,R,partParam)
 %   Scott Ronquist, scotronq@umich.edu. 12/19/18
 
 %% set parameter defaults
-if ~exist('partParam.method','var')||isempty(partParam.method)
-    partParam.method = 'pc1';
-end
-if ~exist('partParam.rnaSeqNorm','var')||isempty(partParam.rnaSeqNorm)
-    partParam.rnaSeqNorm = [];
-end
-if ~exist('partParam.chrDivide','var')||isempty(partParam.chrDivide)
-    partParam.chrDivide = 'no';
-end
-if ~exist('partParam.plotFlag','var')||isempty(partParam.plotFlag)
-    partParam.plotFlag = 0;
-end
-if ~exist('partParam.fdvSplitMethod','var')||isempty(partParam.fdvSplitMethod)
-    partParam.fdvSplitMethod = 'sign';
+if ~exist('partParam','var')||isempty(partParam);fdvSplitMethod='sign';
+
 end
 
 %% get chr information from hic header
@@ -36,6 +24,14 @@ numChr = height(chrInfo);
 numHicSamps = length(find(ismember(dataInfo.sampleInfo.dataType,'hic')));
 
 %% Chromatin Partitioning
+%%% PARAMETERS vvv
+hicParam.method='pc1';
+hicParam.rnaSeqNorm=[];
+hicParam.chrDivide='no';
+hicParam.plotFlag=0;
+hicParam.fdvSplitMethod='sign';
+%%% PARAMETERS ^^^
+
 H.s100kb.ABcomp = cell(numChr,1);
 H.s100kb.groupIdx = cell(numChr,1);
 for iChr = 1:numChr
@@ -50,8 +46,8 @@ for iChr = 1:numChr
             
             rTemp = log2(R.s100kb.tpmMeanTrim{iChr}(:,iSample)+1);
             [H.s100kb.ABcomp{iChr}(:,iSample),H.s100kb.groupIdx{iChr}(:,iSample)] =...
-                hicABcomp(hTemp,partParam.method,rTemp,partParam.rnaSeqNorm,...
-                partParam.chrDivide,partParam.plotFlag,partParam.fdvSplitMethod);
+                hicABcomp(hTemp,hicParam.method,rTemp,hicParam.rnaSeqNorm,...
+                hicParam.chrDivide,hicParam.plotFlag,hicParam.fdvSplitMethod);
             
         end
     end

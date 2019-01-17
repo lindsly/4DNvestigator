@@ -113,21 +113,15 @@ for iSample = 1:length(sampleFn)
             % observed
             temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
                 chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
+            
             %if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
             H.s1mb.kr(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
                 H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
-            
-            % update load bar variable
-            currentWait = currentWait+1;
-            
-            % for estimation of time to load
-            if iChr1==1 && iChr2==1 && iSample==1;avTime = toc;end
         end
     end
     H.s1mb.oe(:,:,iSample) = max(cat(3,H.s1mb.oe(:,:,iSample),H.s1mb.oe(:,:,iSample)'),[],3);
     H.s1mb.kr(:,:,iSample) = max(cat(3,H.s1mb.kr(:,:,iSample),H.s1mb.kr(:,:,iSample)'),[],3);
 end
-close(waitBar)
 
 %% trim data (remove unmappable regions) - 100kb and 1Mb
 %%% PARAMETERS vvv
