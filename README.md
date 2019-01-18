@@ -1,14 +1,14 @@
-# README for the GSFAT toolbox
+# README for the 4DNvestigator toolbox
 
-Scott Ronquist, scotronq@umich.edu. 12/22/18
+Scott Ronquist, scotronq@umich.edu. 1/18/19
 
 # Overview
-The Genome Structure Function Analysis Toolbox (GSFAT) is a user-friendly
+The 4DNvestigator is a user-friendly
 MATLAB toolbox that analyzes time-series genome-wide chromosome
 conformation capture data (Hi-C) and gene expression (RNA-seq).
 
 Paper: TBD
-Availability: https://github.com/scotronq/gsfat
+Availability: https://github.com/scotronq/4DNvestigator
 
 # Functions
 - Larntz-Perlman procedure: Method for testing the equality of correlation
@@ -23,10 +23,14 @@ partitioning corresponds to euchromatin and heterochromatin, or A/B
 compartments.
 - Differential expression: Differential expression measures the
 significance of RNA-seq expression differences between samples.
-- 4DN Feature Analyzer: 
-- A/B switch RNA-seq: 
-
-# In progress
+- 4DN Feature Analyzer: This measures the amount of change in both genome
+structure and function for specified genomic regions by mapping all time
+points to a consistent low dimensional embedding, and quantifying the variance
+of each loci within this space over time. Method specifics can be found in:
+["Genome Architecture Mediates Transcriptional Control of Human Myogenic Reprogramming"](https://www.cell.com/iscience/fulltext/S2589-0042(18)30114-7)
+- A/B switch RNA-seq: This function determines which genomic regions change
+their chromatin structure from compartment "A" to compartment "B", with a
+corresponding change in gene expression
 
 
 
