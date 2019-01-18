@@ -1,4 +1,4 @@
-function [H] = fdnChromPartition(dataInfo,H,R,partParam)
+function [H,R] = fdnChromPartition(dataInfo,H,R,partParam)
 %fdnChromPartition partitions the chromatin into nodal domains
 %   Detailed explanation goes here
 %
@@ -14,19 +14,19 @@ function [H] = fdnChromPartition(dataInfo,H,R,partParam)
 %   Scott Ronquist, scotronq@umich.edu. 12/19/18
 
 %% set parameter defaults
-if ~exist('partParam.method','var')||isempty(partParam.method)
-    partParam.method = 'pc1';
+if ~isfield(partParam,'method')||isempty(partParam.method)
+    partParam.method = 'fiedler';
 end
-if ~exist('partParam.rnaSeqNorm','var')||isempty(partParam.rnaSeqNorm)
+if ~isfield('partParam','rnaSeqNorm')||isempty(partParam.rnaSeqNorm)
     partParam.rnaSeqNorm = [];
 end
-if ~exist('partParam.chrDivide','var')||isempty(partParam.chrDivide)
+if ~isfield('partParam','chrDivide')||isempty(partParam.chrDivide)
     partParam.chrDivide = 'no';
 end
-if ~exist('partParam.plotFlag','var')||isempty(partParam.plotFlag)
+if ~isfield('partParam','plotFlag')||isempty(partParam.plotFlag)
     partParam.plotFlag = 0;
 end
-if ~exist('partParam.fdvSplitMethod','var')||isempty(partParam.fdvSplitMethod)
+if ~isfield('partParam','fdvSplitMethod')||isempty(partParam.fdvSplitMethod)
     partParam.fdvSplitMethod = 'sign';
 end
 
@@ -58,9 +58,18 @@ for iChr = 1:numChr
 end
 
 %% plot each partition
+fn = [dataInfo.path.output,dataInfo.delim,'figures',dataInfo.delim,'chromPart'];
+mkdir(fn)
 for iChr = 1:numChr
     for iSample = 1:numHicSamps
         fprintf('plotting figure, Sample: (%d/%d), chr:%d...\n',iSample,numHicSamps,iChr)
+        
+        % skip if doesnt exist
+        try
+            temp = H.s100kb.ABcomp{iChr}(:,iSample);
+        catch
+            continue
+        end
         
         % get figure properties
         hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
@@ -68,28 +77,31 @@ for iChr = 1:numChr
         
         % plot RNA-seq
         ax1 = subplot(6,1,1);
-        rTemp = log2(R.s100kb.tpmMeanTrim{iChr}(:,1)+1);
+        rTemp = log2(R.s100kb.tpmMeanTrim{iChr}(:,iSample)+1);
         bar(rTemp), axis tight
-        title('HCEC'), ylabel('log_2 TPM')
+        title(sprintf('%s, T:%i, Chr%s',dataInfo.sampleInfo.sample{iSample},...
+            dataInfo.sampleInfo.timePoint(iSample),chrInfo.chr{iChr}))
+        ylabel('log_2 TPM')
         
         % plot ABcomp
         ax2 = subplot(6,1,2);
-        tempAB = H.s100kb.ABcomp{iChr}(:,1);
+        tempAB = H.s100kb.ABcomp{iChr}(:,iSample);
         b = bar(tempAB,'FaceColor','flat','EdgeColor','none');
-        b.CData(H.s100kb.groupIdx{iChr}(:,1)==1,:) = repmat([1 0 0],...
-            sum(H.s100kb.groupIdx{iChr}(:,1)==1),1);
-        b.CData(H.s100kb.groupIdx{iChr}(:,1)==2,:) = repmat([0 1 0],...
-            sum(H.s100kb.groupIdx{iChr}(:,1)==2),1);
+        b.CData(H.s100kb.groupIdx{iChr}(:,iSample)==1,:) = repmat([1 0 0],...
+            sum(H.s100kb.groupIdx{iChr}(:,iSample)==1),1);
+        b.CData(H.s100kb.groupIdx{iChr}(:,iSample)==2,:) = repmat([0 1 0],...
+            sum(H.s100kb.groupIdx{iChr}(:,iSample)==2),1);
         axis tight
-        ylabel('Fiedler vector')
+        ylabel(partParam.method)
         
         % plot Hi-C
         ax3 = subplot(6,1,3:6);
-        hTemp = H.s100kb.oeTrim{iChr}(:,:,1);
+        hTemp = H.s100kb.oeTrim{iChr}(:,:,iSample);
         climMain = [0 prctile(hTemp(:),90)];
         hTemp(hTemp>prctile(hTemp(:),99)) = prctile(hTemp(:),99);
         imagesc(hTemp), axis square
-        colormap(ax3,hicCMap); colorbar, caxis(climMain)
+        colormap(ax3,hicCMap); %colorbar
+        caxis(climMain)
         ylabel(sprintf('chr%i Hi-C map',iChr))
         
         % figure format
@@ -97,9 +109,12 @@ for iChr = 1:numChr
         linkaxes(get(gcf,'children'),'x')
         
         % save figure
-        saveas(gcf,sprintf('chr%s_s%s_t%i.fig',chrInfo.chr{iChr},...
-            dataInfo.sampleInfo.sample{iSample},...
-            dataInfo.sampleInfo.timePoint(iSample)))
+        saveas(gcf,sprintf('%s%ss%s_t%i_chr%s.fig',fn,...
+            dataInfo.delim,dataInfo.sampleInfo.sample{iSample},...
+            dataInfo.sampleInfo.timePoint(iSample),...
+            chrInfo.chr{iChr}))
+        
+        close all
     end
 end
 

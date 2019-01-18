@@ -81,7 +81,7 @@ end
 switch rnaSeqNorm
     case 'none'
     case 'log2'
-        rnaSeq = log2(rnaSeq+.5)+1;
+        rnaSeq = log2(rnaSeq+1);
 end
 
 %% correlate with RNA-seq, if available
