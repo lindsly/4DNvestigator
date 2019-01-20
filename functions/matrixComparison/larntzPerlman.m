@@ -1,4 +1,4 @@
-function [H0,M,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
+function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %larntzPerlman Larntz-Perlman procedure for testing covariance matrix equivalence
 %
 %   Input
@@ -72,10 +72,10 @@ if plotFlag
     plot([T T], [0 nanmax(chiTemp)],'r-')
 end
 
-% alpha matrix
-M = zeros(p, p);
-M(triu(true(p),1)) = chi2cdf(SVec,k-1); % chi2cdf and chi2inv are inverses
-M = M + M';
+% % alpha matrix
+% M = zeros(p, p);
+% M(triu(true(p),1)) = chi2cdf(SVec,k-1); % chi2cdf and chi2inv are inverses
+% M = M + M';
 
 % P-Value matrix matrix
 P = zeros(p, p);

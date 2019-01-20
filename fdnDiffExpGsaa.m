@@ -23,6 +23,10 @@ nameAll = cell(length(samps)*length(Tps),1);
 c=cat(2,A',B');
 compIndex = reshape(c,[],2);
 
+% get output folder
+fnBase = [dataInfo.path.output,dataInfo.delim,'data',dataInfo.delim,'gsaa',...
+    dataInfo.delim];
+
 % compare between all possibilities
 for i = 1:size(compIndex,1)
     for ii = i+1:size(compIndex,1)
@@ -66,8 +70,7 @@ for i = 1:size(compIndex,1)
         FileName = sprintf('%s_vs_%s',...
             sprintf('rnaseq_s%s_t%i',tempSampleA,tempTpA),...
             sprintf('rnaseq_s%s_t%i',tempSampleB,tempTpB));
-        FileNameFull = sprintf('%s%sdata%sgsaa%s%s',dataInfo.path.output,...
-            dataInfo.delim,dataInfo.delim,dataInfo.delim,FileName);
+        FileNameFull = sprintf('%s%s',fnBase,FileName);
         
         % Create RNA-Seq Data Format (*.gct)
         tempTable = sortrows(R.expected_count,'geneName','ascend');

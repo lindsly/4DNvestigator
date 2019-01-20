@@ -22,7 +22,7 @@ end
 
 %% load from input index file
 if exist('indexFile','var')
-    dataInfo.indexFile = indexFile;
+    dataInfo.sampleInfo = indexFile;
 else
     answer = [];
     while ~strcmp(answer,'Yes')
@@ -51,10 +51,9 @@ else
                     'An example Index File is located in ./sampleData/sampleDataIndex.xlsx\n'])
         end
     end
+    % read index file
+    dataInfo.sampleInfo = readtable(dataInfo.indexFile);
 end
-
-% read index file
-dataInfo.sampleInfo = readtable(dataInfo.indexFile);
 
 % extract sample names from sample filename
 tempName = cell(height(dataInfo.sampleInfo),1);
