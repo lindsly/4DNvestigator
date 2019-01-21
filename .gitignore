@@ -6,6 +6,7 @@
 # folders
 /functions/depreciated
 /sampleData/*
+/exampleScripts/dev
 
 # exceptions
 !/sampleData/indexFiles
