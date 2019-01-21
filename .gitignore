@@ -2,6 +2,7 @@
 *.hic
 *.results
 *.mat
+*.pptx
 
 # folders
 /functions/depreciated
