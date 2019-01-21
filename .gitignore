@@ -1,7 +1,11 @@
-
+# file types
 *.hic
 *.results
 *.mat
 
+# folders
 /functions/depreciated
-/sampleData
+/sampleData/*
+
+# exceptions
+!/sampleData/indexFiles

@@ -1,18 +1,18 @@
 function [H,R] = fdnChromPartition(dataInfo,H,R,partParam)
-%fdnChromPartition partitions the chromatin into nodal domains based on
-%Hi-C contact map
+%fdnChromPartition partitions the chromatin into nodal domains
+%   Detailed explanation goes here
 %
 %   Input
-%   dataInfo: data structure with experiment sample info
-%   H: data structure containing all Hi-C data
-%   R: data structure containing all RNA-seq data
-%   partParam: data structure containing partitioning parameters
+%   dataInfo: Information 
+%   H: 
+%   R: 
+%   partParam: 
 %
 %   Output
-%   H: same as input, now with fields for chromatin partitioning
-%   R: same as input, now with fields for chromatin partitioning
+%   H: same as input, now with a fields for chromatin partitioning
+%   H: same as input, now with a fields for chromatin partitioning
 %
-%   Scott Ronquist, scotronq@umich.edu. 1/21/19
+%   Scott Ronquist, scotronq@umich.edu. 12/19/18
 
 %% set parameter defaults
 if ~isfield(partParam,'method')||isempty(partParam.method)
@@ -65,7 +65,7 @@ for iChr = 1:numChr
     for iSample = 1:numHicSamps
         fprintf('plotting figure, Sample: (%d/%d), chr:%d...\n',iSample,numHicSamps,iChr)
         
-        % skip if doesn't exist
+        % skip if doesnt exist
         try
             temp = H.s100kb.ABcomp{iChr}(:,iSample);
         catch
