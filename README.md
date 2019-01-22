@@ -11,6 +11,15 @@ Paper: in preparation
 
 Availability: https://github.com/scotronq/4DNvestigator
 
+# Hi-C and RNA-seq data types
+
+the 4DNvestigator accepted the following input file formats:
+
+|**Data Type**|**File Type**|**Program**|
+|----|----|----|
+|Hi-C|.hic|Juicer|
+|RNA-seq|.genes.results|RSEM|
+
 # Functions
 - Larntz-Perlman procedure: Method for testing the equality of correlation
 matrices. This is applied to Hi-C correlation matrices to determine the
