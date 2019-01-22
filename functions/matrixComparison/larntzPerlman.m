@@ -10,7 +10,6 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %   Output
 %   H0: logical on whether the null hypothesis was rejected.
 %   0 = same, 1 = different
-%   M: inverse of "P" (depreciated, used for testing purposes)
 %   P: matrix with p-values, testing Sij in chi-squared distribution (depreciated, used for testing purposes)
 %   SMat: S matrix
 %
@@ -20,10 +19,10 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %   p = 10;
 %   a = rand(n,p);A = cov(a);
 %   b = rand(n,p);B = cov(b);
-%   [H0,M,P,SMat] = larntzPerlman(cat(3,A,B),n,.95,1);
+%   [H0,P,SMat] = larntzPerlman(cat(3,A,B),n,.95,1);
 %   
 %   c = randn(n,p);C = cov(c);
-%   [H0,M,P,SMat] = larntzPerlman(cat(3,A,B,C),n,.95,1);
+%   [H0,P,SMat] = larntzPerlman(cat(3,A,B,C),n,.95,1);
 %
 %   Reference: Koziol, James A., et al. "A graphical technique for
 %   displaying correlation matrices." The American Statistician 51.4
@@ -32,7 +31,7 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %
 %   "if homogeneity is not rejected, data can be pooled"
 %
-%   Scott Ronquist, 12/11/18. scotronq@umich.edu
+%   Scott Ronquist, 1/21/19. scotronq@umich.edu
 
 %% cat if nargin < 2
 % "n" should not have a default...

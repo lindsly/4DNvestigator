@@ -8,6 +8,7 @@
 /functions/depreciated
 /sampleData/*
 /exampleScripts/dev
+/paperFiles
 
 # exceptions
 !/sampleData/indexFiles
