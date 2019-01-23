@@ -59,85 +59,88 @@ for iChr = 1:numChr
 end
 
 %% plot each partition
-fn = [dataInfo.path.output,dataInfo.delim,'figures',dataInfo.delim,'chromPart'];
-mkdir(fn)
-for iChr = 1:numChr
-    for iSample = 1:numHicSamps
-        fprintf('plotting figure, Sample: (%d/%d), chr:%d...\n',iSample,numHicSamps,iChr)
-        
-        % skip if doesn't exist
-        try
-            temp = H.s100kb.ABcomp{iChr}(:,iSample);
-        catch
-            continue
+if partParam.plotFlag
+    fn = [dataInfo.path.output,dataInfo.delim,'figures',dataInfo.delim,'chromPart'];
+    mkdir(fn)
+    for iChr = 1:numChr
+        for iSample = 1:numHicSamps
+            fprintf('plotting figure, Sample: (%d/%d), chr:%d...\n',iSample,numHicSamps,iChr)
+            
+            % skip if doesn't exist
+            try
+                temp = H.s100kb.ABcomp{iChr}(:,iSample);
+            catch
+                continue
+            end
+            
+            % get figure properties
+            hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
+            figure('position',[100 100 700 1000])
+            
+            % plot RNA-seq
+            ax1 = subplot(6,1,1);
+            rTemp = log2(R.s100kb.tpmMeanTrim{iChr}(:,iSample)+1);
+            bar(rTemp), axis tight
+            title(sprintf('%s, T:%i, Chr%s',dataInfo.sampleInfo.sample{iSample},...
+                dataInfo.sampleInfo.timePoint(iSample),chrInfo.chr{iChr}))
+            ylabel('log_2 TPM')
+            
+            % plot ABcomp
+            ax2 = subplot(6,1,2);
+            tempAB = H.s100kb.ABcomp{iChr}(:,iSample);
+            b = bar(tempAB,'FaceColor','flat','EdgeColor','none');
+            b.CData(H.s100kb.groupIdx{iChr}(:,iSample)==1,:) = repmat([1 0 0],...
+                sum(H.s100kb.groupIdx{iChr}(:,iSample)==1),1);
+            b.CData(H.s100kb.groupIdx{iChr}(:,iSample)==2,:) = repmat([0 1 0],...
+                sum(H.s100kb.groupIdx{iChr}(:,iSample)==2),1);
+            axis tight
+            ylabel(partParam.method)
+            
+            % plot Hi-C
+            ax3 = subplot(6,1,3:6);
+            hTemp = H.s100kb.oeTrim{iChr}(:,:,iSample);
+            climMain = [0 prctile(hTemp(:),90)];
+            hTemp(hTemp>prctile(hTemp(:),99)) = prctile(hTemp(:),99);
+            imagesc(hTemp), axis square
+            colormap(ax3,hicCMap); %colorbar
+            caxis(climMain)
+            ylabel(sprintf('chr%i Hi-C map',iChr))
+            
+            % figure format
+            set(get(gcf,'children'),'linewidth',2,'fontsize',15)
+            linkaxes(get(gcf,'children'),'x')
+            
+            % save figure
+            saveas(gcf,sprintf('%s%ss%s_t%i_chr%s.fig',fn,...
+                dataInfo.delim,dataInfo.sampleInfo.sample{iSample},...
+                dataInfo.sampleInfo.timePoint(iSample),...
+                chrInfo.chr{iChr}))
+            
+            close all
         end
-        
-        % get figure properties
-        hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
-        figure('position',[100 100 700 1000])
-        
-        % plot RNA-seq
-        ax1 = subplot(6,1,1);
-        rTemp = log2(R.s100kb.tpmMeanTrim{iChr}(:,iSample)+1);
-        bar(rTemp), axis tight
-        title(sprintf('%s, T:%i, Chr%s',dataInfo.sampleInfo.sample{iSample},...
-            dataInfo.sampleInfo.timePoint(iSample),chrInfo.chr{iChr}))
-        ylabel('log_2 TPM')
-        
-        % plot ABcomp
-        ax2 = subplot(6,1,2);
-        tempAB = H.s100kb.ABcomp{iChr}(:,iSample);
-        b = bar(tempAB,'FaceColor','flat','EdgeColor','none');
-        b.CData(H.s100kb.groupIdx{iChr}(:,iSample)==1,:) = repmat([1 0 0],...
-            sum(H.s100kb.groupIdx{iChr}(:,iSample)==1),1);
-        b.CData(H.s100kb.groupIdx{iChr}(:,iSample)==2,:) = repmat([0 1 0],...
-            sum(H.s100kb.groupIdx{iChr}(:,iSample)==2),1);
-        axis tight
-        ylabel(partParam.method)
-        
-        % plot Hi-C
-        ax3 = subplot(6,1,3:6);
-        hTemp = H.s100kb.oeTrim{iChr}(:,:,iSample);
-        climMain = [0 prctile(hTemp(:),90)];
-        hTemp(hTemp>prctile(hTemp(:),99)) = prctile(hTemp(:),99);
-        imagesc(hTemp), axis square
-        colormap(ax3,hicCMap); %colorbar
-        caxis(climMain)
-        ylabel(sprintf('chr%i Hi-C map',iChr))
-        
-        % figure format
-        set(get(gcf,'children'),'linewidth',2,'fontsize',15)
-        linkaxes(get(gcf,'children'),'x')
-        
-        % save figure
-        saveas(gcf,sprintf('%s%ss%s_t%i_chr%s.fig',fn,...
-            dataInfo.delim,dataInfo.sampleInfo.sample{iSample},...
-            dataInfo.sampleInfo.timePoint(iSample),...
-            chrInfo.chr{iChr}))
-        
-        close all
     end
 end
 
 %% add average A/B to gene table
-% create gene AB table
-R.abTable = R.TPM(:,1:6);
-ab = zeros(height(R.abTable),size(H.s100kb.ABcomp{1},2));
-
-% loop through gene list and find AB for each gene
-for iGene = 1:height(R.abTable)
-    disp(iGene/height(R.abTable))
+if 1==0
+    % create gene AB table
+    R.abTable = R.TPM(:,1:6);
+    ab = zeros(height(R.abTable),size(H.s100kb.ABcomp{1},2));
     
-    % find gene name in trim 100kb bin genenames
-    temp = mean(H.s100kb.ABcomp{R.abTable.chr(iGene)}...
-        (cellfun(@(x) any(strcmp(x,R.abTable.geneName{iGene})),...
-        R.s100kb.geneTrim{R.abTable.chr(iGene)}),:),1);
+    % loop through gene list and find AB for each gene
+    for iGene = 1:height(R.abTable)
+        disp(iGene/height(R.abTable))
+        
+        % find gene name in trim 100kb bin genenames
+        temp = mean(H.s100kb.ABcomp{R.abTable.chr(iGene)}...
+            (cellfun(@(x) any(strcmp(x,R.abTable.geneName{iGene})),...
+            R.s100kb.geneTrim{R.abTable.chr(iGene)}),:),1);
+        
+        ab(iGene,:) = temp;
+    end
     
-    ab(iGene,:) = temp;
+    R.abTable = [R.abTable,table(ab)];
 end
-
-R.abTable = [R.abTable,table(ab)];
-
 %% find AB switch region
 
 
