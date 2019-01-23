@@ -5,11 +5,11 @@
 *.pptx
 
 # folders
-/functions/depreciated
-/functions/dev/*
-/sampleData/*
-/exampleScripts/dev
-/paperFiles
+functions/depreciated/
+functions/dev/
+sampleData/
+exampleScripts/dev/
+paperFiles/
 
 # exceptions
 !/sampleData/indexFiles
