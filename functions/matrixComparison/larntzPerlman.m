@@ -2,16 +2,17 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %larntzPerlman Larntz-Perlman procedure for testing covariance matrix equivalence
 %
 %   Input
-%   R: sample covariance matrices, p x p x k
-%   n: sample size
-%   alphaParam: alpha parameter to determine significance
-%   plotFlag: logical for plotting max(Sij) vs chi-squared distribution
+%   R:          Sample covariance matrices, p x p x k
+%   n:          Sample size
+%   alphaParam: Alpha parameter to determine significance
+%   plotFlag:   Logical for plotting max(Sij) vs chi-squared distribution
 %   
 %   Output
-%   H0: logical on whether the null hypothesis was rejected.
-%   0 = same, 1 = different
-%   P: matrix with p-values, testing Sij in chi-squared distribution (depreciated, used for testing purposes)
-%   SMat: S matrix
+%   H0:         logical on whether the null hypothesis was rejected.
+%               0 = same, 1 = different
+%   P:          matrix with p-values, testing Sij in chi-squared
+%               distribution (depreciated, used for testing purposes)
+%   SMat:       S matrix
 %
 %   Example:
 %   clear,rng(1)
@@ -31,11 +32,9 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %
 %   "if homogeneity is not rejected, data can be pooled"
 %
-%   Scott Ronquist, 1/21/19. scotronq@umich.edu
+%   Scott Ronquist, 1/22/19. scotronq@umich.edu
 
-%% cat if nargin < 2
-% "n" should not have a default...
-% if nargin < 2;n = 100;fprintf('sample size not defined...\n'),pause(1);end
+%% set default parameters
 if nargin < 3;alphaParam = .95;fprintf('default alpha=%.2f...\n',alphaParam),pause(1);end
 if nargin < 4;plotFlag = 0;fprintf('default plotFlag=%i...\n',plotFlag),pause(1);end
 
@@ -62,7 +61,8 @@ T = max(SVec);
 eAlpha = (1-alphaParam).^(2/(p*(p-1)));
 
 %% test null hypothesis
-H0 = T > chi2inv(eAlpha,k-1); % https://www.mathworks.com/matlabcentral/answers/74472-how-can-i-create-the-chisquare-table
+ % https://www.mathworks.com/matlabcentral/answers/74472-how-can-i-create-the-chisquare-table
+H0 = T > chi2inv(eAlpha,k-1);
 
 % plot location in Chi-squared distribution
 if plotFlag
@@ -70,11 +70,6 @@ if plotFlag
     figure, plot(.1:.1:T+5,chiTemp), hold on
     plot([T T], [0 nanmax(chiTemp)],'r-')
 end
-
-% % alpha matrix
-% M = zeros(p, p);
-% M(triu(true(p),1)) = chi2cdf(SVec,k-1); % chi2cdf and chi2inv are inverses
-% M = M + M';
 
 % P-Value matrix matrix
 P = zeros(p, p);

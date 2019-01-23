@@ -8,26 +8,26 @@ function [juicerOut,hicHeader] = juicerToolsDump(norm3d,norm1d,fn,chr1,chr2,bpFr
 %   https://github.com/theaidenlab/juicer/wiki/Data-Extraction
 %
 %   Input
-%   norm1d: 2D normalization [observed/oe]
-%   norm1d: 1D normalization [NONE/VC/VC_SQRT/KR]
-%   fn:     hicFile(s) location
-%   chr1:   chromosome # (eg 1-22,X,Y in human)
-%   chr2:   chromosome # (eg 1-22,X,Y in human)
-%   bpFrag: bin units [BP/FRAG] (FRAG dependant on RE)
-%   binSize: bin size (ie 1E5 for 100kb resolution)
-%   fnOut:  temporary file name to output. Reccomended that this not input
-%           this, and let it be default (this will create a temporary .txt file in 
-%           your wd, which will be deleted automatically)
+%   norm1d:     2D normalization [observed/oe]
+%   norm1d:     1D normalization [NONE/VC/VC_SQRT/KR]
+%   fn:         HicFile(s) location
+%   chr1:       Chromosome # (eg 1-22,X,Y in human)
+%   chr2:       Chromosome # (eg 1-22,X,Y in human)
+%   bpFrag:     Bin units [BP/FRAG] (FRAG dependant on RE)
+%   binSize:    Bin size (ie 1E5 for 100kb resolution)
+%   fnOut:      Temporary file name to output. Reccomended that this not
+%               input this, and let it be default (this will create a
+%               temporary .txt file in your wd, which will be deleted
+%               automatically)
 %   headerFlag: flag for whether or not to output hic header (requires python)
 %
 %   Output
 %   juicerOut: juicer_tools dump output (N x 3 matrix)
 %   hicHeader: MATLAB structure with .hic header information
 %
-%   example:
-%
-%   Scott Ronquist, scotronq@umich.edu. 6/27/18, 12/12/18
+%   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
+%% set default parameters
 if ~exist('fnOut','var')||isempty(fnOut);fnOut = 'juicer_temp.txt';end
 if ~exist('headerFlag','var')||isempty(headerFlag);headerFlag = 0;end
 

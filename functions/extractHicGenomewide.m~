@@ -3,20 +3,19 @@ function [H,chrStart] = extractHicGenomewide(hicPath,refGenome,binSize,binType,n
 %
 %   Input
 %   hicPath:    .hic file path (string)
-%   refGenome:  Reference genome (string; eg 'hg19' [default])
-%   binSize:    Bin size, or Hi-C resolution (string or double)
-%   binType:    Bin type, 'BP' or 'FRAG' (string)
+%   refGenome:  reference genome (string; eg 'hg19' [default])
+%   binSize:    bin size, or Hi-C resolution (string or double)
+%   binType:    bin type, 'BP' or 'FRAG' (string)
 %   norm1d:     Hi-C 3d normalization, 'oe' or 'observed' (string)
 %   norm3d:     Hi-C 1d normalization, 'KR' or 'NONE' (string)
 %
 %   Output
 %   H:          Hi-C matrix
-%   chrStart:   Chromosome start locations
 %
-%   Example
+%   example: 
 %   [H,chrStart] = extractHicGenomewide('E:\MATLAB\srMatlabFunctions\GSFAT\sampleData\hic\aldh_N.hic','hg19');
 %
-%   Scott Ronquist, 1/22/19
+%   Scott Ronquist, 10/1/18
 
 %% check input arguments, set defaults
 if ~exist('refGenome','var')||isempty(refGenome); refGenome = 'hg19';end

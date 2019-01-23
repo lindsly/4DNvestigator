@@ -5,14 +5,18 @@ function [iScoreLocs,delta] = iScore(H,iBoxSize,deltaWindow,plotFlag)
 %   dosage compensation." Nature 523.7559 (2015): 240. Insulation score can
 %   be used to define TAD boundaries.
 %   
-%   H: raw Hi-C matrix, intra-chr (1D normalized, e.g. KR/VC/ICE, NOT O/E)
+%   Input
+%   H:              Raw Hi-C matrix, intra-chr (1D normalized, e.g. KR/VC/ICE, NOT O/E)
+%   iBoxSize:       Box size for I score (recommended 500kb, 5)
+%   deltaWindow:    Window size for delta score (recommended 100kb left/
+%                   right, 1)
+%   plotFlag:       Logical ([0 1]) to set whether to plot findings
+%
+%   Output
+%   iScoreLocs:     Location of I-score boundaries
+%   delta:          Vector of delta scores
 %   
-%   iBoxSize: box size for I score (recommended 500kb, 5)
-%   
-%   deltaWindow: window size for delta score (recommended 100kb left/
-%   right, 1)
-%   
-%   Scott Ronquist, 3/27/18
+%   Scott Ronquist, 1/22/19
 
 %% set default parameters (assume 100kb input data)
 if nargin<4; plotFlag=1; end
@@ -46,25 +50,25 @@ end
 iScoreLocs = find(diff(delta>0)<0);
 
 % boundary strength
-[delta_local_max,delta_local_max_loc] = findpeaks(delta);
-[delta_local_min,delta_local_min_loc] = findpeaks(-delta);
-delta_local_min = -delta_local_min;
+[deltaLocalMax,deltaLocalMaxLoc] = findpeaks(delta);
+[deltaLocalMin,deltaLocalMinLoc] = findpeaks(-delta);
+deltaLocalMin = -deltaLocalMin;
 
-boundary_strength = zeros(length(iScoreLocs),1);
+boundaryStrength = zeros(length(iScoreLocs),1);
 for i = 1:length(iScoreLocs)-1
-    temp = -(delta_local_max_loc-iScoreLocs(i));
-    temp_max_loc = find(delta_local_max_loc==iScoreLocs(i)-min(temp(temp > 0)));
+    temp = -(deltaLocalMaxLoc-iScoreLocs(i));
+    tempMaxLoc = find(deltaLocalMaxLoc==iScoreLocs(i)-min(temp(temp > 0)));
     
-    temp = delta_local_min_loc-iScoreLocs(i);
-    temp_min_loc = find(delta_local_min_loc==iScoreLocs(i)+min(temp(temp > 0)));
+    temp = deltaLocalMinLoc-iScoreLocs(i);
+    tempMinLoc = find(deltaLocalMinLoc==iScoreLocs(i)+min(temp(temp > 0)));
     
-    boundary_strength(i) = delta_local_max(temp_max_loc)-...
-        delta_local_min(temp_min_loc);
+    boundaryStrength(i) = deltaLocalMax(tempMaxLoc)-...
+        deltaLocalMin(tempMinLoc);
 end
 
 % filter
 boundary_strength_thresh = .1;
-iScoreLocs(boundary_strength<boundary_strength_thresh) = [];
+iScoreLocs(boundaryStrength<boundary_strength_thresh) = [];
 
 %% plot (optional)
 if 1==plotFlag

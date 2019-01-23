@@ -1,17 +1,19 @@
 function [Ln,Fdv,L,FdNum] = hicLaplacianFdv(A)
 %hicLaplacianFdv calculates the graph laplacian from the matrix A
-%   inputs
-%   A: Hi-C contact matrix, typically normalized (NxN double; default: N/A)
 %
-%   outputs
-%   Ln: laplacian matrix, normalized (NxN double)
-%   Fdv: Fielder vector (Nx1 double)
-%   L: laplacian matrix, unnormalized (NxN double)
+%   Inputs
+%   A:      Hi-C contact matrix, typically normalized (NxN double; default: N/A)
 %
-%   example
+%   Outputs
+%   Ln:     Laplacian matrix, normalized (NxN double)
+%   Fdv:    Fielder vector (Nx1 double)
+%   L:      Laplacian matrix, unnormalized (NxN double)
+%   FdNum:  Fiedler number of normalized laplacian
+%
+%   Example
 %   [B] = hicLaplacianFdv(A)
 %
-%   Scott Ronquist, 7/29/18
+%   Scott Ronquist, 1/22/19
 
 %% calculate normalized laplacian
 D = diag(sum(A));

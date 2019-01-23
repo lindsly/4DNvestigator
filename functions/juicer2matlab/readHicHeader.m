@@ -2,15 +2,15 @@ function [hicHeader] = readHicHeader(fn)
 %readHicHeader reads the .hic header information
 %
 %   Input
-%   fn: full path to .hic file
+%   fn:         full path to .hic file
 %
 %   Output
 %   hicHeader: .hic header information
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/13/18
+%   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
 %% format juicer tools input info
-% find GSFAT juicer tools path
+% find 4DNvestigator juicer tools path
 juicerJarDir = mfilename('fullpath');
 
 folderSlash = '\';

@@ -1,22 +1,26 @@
-function [H_j] = juicerDump2mat(juicerFn,intraFlag,specificBins,dataType)
+function [Hj] = juicerDump2mat(juicerFn,intraFlag,specificBins,dataType)
 %juicer2mat creates a Hi-C adjacency matrix from "juicer dump" output
 %   This function outputs a square adjacency matrix from juicer output.
 %   juicer dump command creates a 3 column tab-delimited file: bin1 bin2
 %   count
 %
-%   juicer_fn: juicer file name or juicer_tools dump output (N x 3 matrix)
-%   intraFlag: denote intra-chr (1) vs inter-chr (0) (default: 0)
-%   specific_bins: specify bins to output (default: all bins output)
-%   data_type: variable number type (default: double)
+%   Input
+%   juicerFn:      Juicer file name or juicer_tools dump output (N x 3 matrix)
+%   intraFlag:      Denote intra-chr (1) vs inter-chr (0) (default: 0)
+%   specificBins:  Specify bins to output (default: all bins output)
+%   dataType:      Variable number type (default: double)
 %
-%   Scott Ronquist, 6/27/18
+%   Output
+%   Hj:             MATLAB formatted Hi-C matrix
+%
+%   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
-%% to be used later for whole genome input
+%% set default parameters
 if ~exist('intraFlag','var')||isempty(intraFlag); intraFlag = 0; end
 if ~exist('specificBins','var')||isempty(specificBins); specificBins = []; end
 if ~exist('dataType','var')||isempty(dataType); dataType = 'double'; end
 
-% extract juicer txt data
+%% extract juicer txt data
 if ischar(juicerFn)
     fileID = fopen(juicerFn);
     C = textscan(fileID,'%d %d %d');
@@ -39,24 +43,24 @@ end
 %% create matrix
 % cheat fix for inter vs intra, probably should make more robust
 if intraFlag
-    H_size = max(max(C(:,1:2)));
+    HSize = max(max(C(:,1:2)));
     
-    H_j = zeros(H_size,dataType);%,'int32');
-    idx = sub2ind(size(H_j),C(:,1),C(:,2));
-    H_j(idx) = C(:,3);
-    idx = sub2ind(size(H_j),C(:,2),C(:,1));
-    H_j(idx) = C(:,3);
+    Hj = zeros(HSize,dataType);%,'int32');
+    idx = sub2ind(size(Hj),C(:,1),C(:,2));
+    Hj(idx) = C(:,3);
+    idx = sub2ind(size(Hj),C(:,2),C(:,1));
+    Hj(idx) = C(:,3);
 else
-    H_size = max(C(:,1:2));
+    HSize = max(C(:,1:2));
     
-    H_j = zeros(H_size,dataType);%,'int32');
-    idx = sub2ind(size(H_j),C(:,1),C(:,2));
-    H_j(idx) = C(:,3);
+    Hj = zeros(HSize,dataType);%,'int32');
+    idx = sub2ind(size(Hj),C(:,1),C(:,2));
+    Hj(idx) = C(:,3);
 end
 
 % remove NaNs and Infs
-H_j(isnan(H_j)) = 0;
-H_j(isinf(H_j)) = 0;
+Hj(isnan(Hj)) = 0;
+Hj(isinf(Hj)) = 0;
 
 end
 

@@ -9,6 +9,7 @@ clear
 close all
 
 %% Hi-C type example
+% define Hi-C extraction parameters
 %%% PARAMETERS vvv
 hicParam.binType = 'BP';
 hicParam.binSize = 1E6;
@@ -19,6 +20,7 @@ hicParam.chr = 14;
 sampleSelect = {'IMR90','HFFc6','H1-hESC'};
 %%% PARAMETERS ^^^
 
+% Public Hi-C data locations
 sampleDataLoc = {'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015/WT-combined.hic',...
     'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic',...
     'https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic',...
@@ -27,9 +29,9 @@ sampleDataLoc = {'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015
     'https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic',...
     'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic',...
     'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic'};
-
 sampleNames = {'RPE1 WT','GM12878','IMR90','HMEC','NHEK','HUVEC','HFFc6','H1-hESC'};
 
+% select samples of interest
 sampleDataLoc = sampleDataLoc(ismember(sampleNames,sampleSelect));
 sampleNames = sampleNames(ismember(sampleNames,sampleSelect));
 
@@ -45,13 +47,14 @@ end
 % trim regions with low number of contacts
 [HtrimAll,badLocs] = hicTrim(H,1,.5);
 
-% correlation
+% find the correlation matrices
 Hcorr = zeros(size(HtrimAll));
 for iSample = 1:length(sampleNames)
     Hcorr(:,:,iSample) = corr(HtrimAll(:,:,iSample));
 end
 
 %% Larntz-Perlman procedure
+% perform the Larntz-Perlman procedure on you correlation matrices
 alphaParam = .95;
 plotFlag = 0;
 [H0,P,S] = larntzPerlman(Hcorr,size(Hcorr,1),alphaParam,plotFlag);
@@ -63,6 +66,7 @@ LPRegions = S > prctile(S(:),tempXPrctile);
 %% figure
 hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
 climMain = [0 prctile(HtrimAll(:),95)];
+
 figure
 for iSample = 1:length(sampleNames)
     

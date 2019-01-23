@@ -2,15 +2,15 @@ function [dataOut] = rsem2mat(fn,dataName,refGenome)
 %rsem2mat takes the rsem raw data and formats it for MATLAB
 %
 %   Input
-%   fn: cell array of file names for RNA-seq samples
-%   dataName: names for each sample
-%   refGenome: references genome information
+%   fn:         cell array of file names for RNA-seq samples
+%   dataName:   names for each sample
+%   refGenome:  references genome information
 %
 %   Output
-%   dataOut: RNA-seq data
+%   dataOut:    formated RNA-seq data
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/19/18
-%
+%   Scott Ronquist, scotronq@umich.edu. 1/22/19
+
 %% set default parameters
 if ~exist('refGenome','var') || isempty(refGenome); refGenome='hg19'; end
 

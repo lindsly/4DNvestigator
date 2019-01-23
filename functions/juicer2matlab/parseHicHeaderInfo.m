@@ -2,12 +2,12 @@ function [structOut] = parseHicHeaderInfo(cmdout)
 %parseHicHeaderInfo parses the information output from read_hic_header.py
 %
 %   Input
-%   cmdIn: characters output from read_hic_header.py
+%   cmdIn:      Characters output from read_hic_header.py
 %
 %   Output
-%   structOut: structured information output
+%   structOut:  Structured information output
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/12/18
+%   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
 %% Start
 % split character string on new line character

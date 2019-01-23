@@ -1,25 +1,24 @@
 function [HTrim,badLocs] = hicTrim(H,numDiag,numSparse)
 %hic_trim trims Hi-C data to remove poor mapping regions
-%   inputs
+%
+%   Input
 %   H: Hi-C matrix to be trimed (NxN double; default: N/A)
-%   
-%   numDiag: Number of bins off the diagonal to consider. All elements
-%   further than numDiag from the diagonal will be considered (integer;
-%   default: 1)
+%   numDiag:    Number of bins off the diagonal to consider. All elements
+%               further than numDiag from the diagonal will be considered (integer;
+%               default: 1)
+%   numSparse:  Specifies which bins to consider sparse. If 0<=numSparse<1,
+%               this specifies the threshold proportion for keeping a row (ie rows with
+%               <= numSparse bins full are removed). if numSparse>1, this is the number
+%               bins that must be observed per row to be kept(type; default: )
 %
-%   numSparse: specifies which bins to consider sparse. If 0<=numSparse<1,
-%   this specifies the threshold proportion for keeping a row (ie rows with
-%   <= numSparse bins full are removed). if numSparse>1, this is the number
-%   bins that must be observed per row to be kept(type; default: )
+%   Output
+%   HTrim:      The trimmed Hi-C matrix (MxM double)
+%   badLocs:    Location of removed locs, relative to the original Hi-C (type)
 %
-%   outputs
-%   HTrim: the trimmed Hi-C matrix (MxM double)
-%   badLocs: location of removed locs, relative to the original Hi-C (type)
-%
-%   example
+%   Example
 %   [B] = function(A)
 %
-%   Scott Ronquist, 7/29/18
+%   Scott Ronquist, 1/22/19
 
 %% set defaults if not specified
 if nargin<2;numDiag=1;end
@@ -53,7 +52,7 @@ for i = 1:size(H,3)
 end
 
 %% trim matrix
-%determine where there is a bad_loc in any sample and remove
+%determine where there is a badLocs in any sample and remove
 badLocs = logical(sum(badLocs,1));
 
 HTrim = H(~badLocs,~badLocs,:);
