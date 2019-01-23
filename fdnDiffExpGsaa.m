@@ -1,15 +1,15 @@
 function [R] = fdnDiffExpGsaa(dataInfo,R)
-%gsfatDiffExpGsaa This function performs differential expression and
+%fdnDiffExpGsaa This function performs differential expression and
 %creates files for GSAA
 %
 %   Input
-%   dataInfo: gsfat structure that contains information on samples input
-%   R: gsfat structure that contains RNA-seq data
+%   dataInfo: 4DNvestigator structure that contains information on samples input
+%   R: 4DNvestigator structure that contains RNA-seq data
 %
 %   Output 
-%   R: gsfat structure that contains RNA-seq data
+%   R: 4DNvestigator structure that contains RNA-seq data
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/20/18
+%   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
 %% start
 % create cell array with differential expression comparisons

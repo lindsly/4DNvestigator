@@ -4,21 +4,23 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %   with RNA-seq, then determines a low dimensional projection to extract
 %   regions that change significantly
 %
-%   Input
+%   Inputs
 %   hic:            Hi-C matrix, typically normalized (NxNxM double; default: N/A)
-%   rnaSeq:         Rnaseq values, (NxM double; default: N/A)
-%   binNames:       Bames associated with Hi-C and RNA-seq bins (string or cell array; default: empty cell)
-%   norm:           Normalize Hi-C flag ([0,1]; default: 0)
-%   binInfo:        Bin chr information necessary for normalization (array; default: [])
-%   graphWeighted:  Use graph weighted centrality analysis ([0,1]; default: 1)
+%   rnaSeq:         rnaseq values, (NxM double; default: N/A)
+%   binNames:       names associated with Hi-C and RNA-seq bins (string or cell array; default: empty cell)
+%   norm:           normalize Hi-C flag ([0,1]; default: 0)
+%   binInfo:        bin chr information necessary for normalization (array; default: [])
+%   graphWeighted:  se graph weighted centrality analysis ([0,1]; default: 1)
 %
-%   Output
+%   Outputs
 %   features:       Concatonated feature array (Nx3 double)
 %   score:          Location of bin in low dimensional projection (Nx3 double)
 %
-%   Scott Ronquist, 1/23/19
+%   example
+%   [B] = function(A)
+%
+%   Scott Ronquist, 7/28/18
 
-%% set defulat parameters
 if nargin<6; graphWeighted=1; end
 if nargin<5; binInfo=[]; end
 if nargin<4; norm=0; end
@@ -56,13 +58,13 @@ features = cat(2,features,reshape(rnaSeq,size(rnaSeq,1),1,size(rnaSeq,2)));
 Xnorm = FeatureNorm2(features);
 
 % stack time points
-XnormStacked = [];
+Xnorm_stacked = [];
 for i = 1:size(Xnorm,3)
-    XnormStacked = [XnormStacked;Xnorm(:,:,i)];
+    Xnorm_stacked = [Xnorm_stacked;Xnorm(:,:,i)];
 end
 
 % PCA
-[~,score,~,~,~] = pca(XnormStacked);
+[~,score,~,~,~] = pca(Xnorm_stacked);
 
 %% distance measurement
 switch size(Xnorm,3)
@@ -70,27 +72,27 @@ switch size(Xnorm,3)
         
     case 2
         %% CASE 2
-        nBins = length(binNames);
-        pcaDist = zeros(nBins,1);
-        for i = 1:nBins
+        n_bins = length(binNames);
+        pca_dist = zeros(n_bins,1);
+        for i = 1:n_bins
             fprintf('extracting PCA length: %d\n',i)
-            pcaDist(i) = pdist(score([i,nBins+i],1:3));
+            pca_dist(i) = pdist(score([i,n_bins+i],1:3));
         end
         
         %plot
         figure, hold on
-        for i = 1:nBins
+        for i = 1:n_bins
             plot(score(i,1),score(i,2),'bo')
         end
-        for i = 1:nBins
-            plot(score(i+nBins,1),score(i+nBins,2),'r*')
+        for i = 1:n_bins
+            plot(score(i+n_bins,1),score(i+n_bins,2),'r*')
         end
         
         % select top percentile of genes to label and draw line
-        for i = 1:nBins
-            if pcaDist(i) > prctile(pcaDist,90)
-                plot([score(i,1),score(i+nBins,1)],[score(i,2),score(i+nBins,2)],'k-')
-                text(score(i+nBins,1),score(i+nBins,2),binNames{i})
+        for i = 1:n_bins
+            if pca_dist(i) > prctile(pca_dist,90)
+                plot([score(i,1),score(i+n_bins,1)],[score(i,2),score(i+n_bins,2)],'k-')
+                text(score(i+n_bins,1),score(i+n_bins,2),binNames{i})
             end
         end
         xlabel('PC1'),ylabel('PC2'),title('S-F features PCA')
@@ -101,43 +103,43 @@ switch size(Xnorm,3)
         h(2) = plot(NaN,NaN,'r*');
         legend(h,'sample1','sample2');
         
-    %case 3
+    case 3
         
     otherwise
         %% OTHERWISE
         % calculate ellipse
-        nBins = size(binNames,1);
-        binVol = zeros(nBins,1);
+        n_bins = size(binNames,1);
+        bin_vol = zeros(n_bins,1);
         temp = [];
         
         % ellipsoid volume
-        for i = 1:nBins
+        for i = 1:n_bins
             fprintf('extracting bin volume: %d\n',i)
-            if size(unique(score(i:nBins:nBins*(size(Xnorm,3)-1)+i,1:3),'rows'),1) > 1
-                [A,C] = MinVolEllipse(score(i:nBins:nBins*3+i,1:3)',.03);
+            if size(unique(score(i:n_bins:n_bins*(size(Xnorm,3)-1)+i,1:3),'rows'),1) > 1
+                [A,C] = MinVolEllipse(score(i:n_bins:n_bins*3+i,1:3)',.03);
                 [~,D,~] = svd(A);
                 a = 1/sqrt(D(1,1));
                 b = 1/sqrt(D(2,2));
                 c = 1/sqrt(D(3,3));
-                binVol(i) = (4/3)*pi*a*b*c;
+                bin_vol(i) = (4/3)*pi*a*b*c;
                 
                 % this throwsout ellipsoids that are artificially high (points lie in a plane)
                 if D(3,3)/sum(diag(D)) < 1E-10      %D(3,3) < 1e-5
-                    binVol(i) = 0;
+                    bin_vol(i) = 0;
                 end
             end
         end
         
-        big_bins = binVol>prctile(binVol,50);
+        big_bins = bin_vol>prctile(bin_vol,50);
         
         %% plot ellipsoid
         figure, hold on,xlabel('PC1'),ylabel('PC2'),zlabel('PC3'),view(3)
-        colormapJet = jet;
-        for i = 1:nBins
+        colormap_jet = jet;
+        for i = 1:n_bins
             fprintf('plotting ellipsoid: %d\n',i)
             if big_bins(i)
-                [A ,C] = MinVolEllipse(score(i:nBins:nBins*(size(Xnorm,3)-1)+i,1:3)',.01);
-                Ellipse_plot(A,C,colormapJet(ceil((i/nBins)*length(colormapJet)),:));
+                [A ,C] = MinVolEllipse(score(i:n_bins:n_bins*(size(Xnorm,3)-1)+i,1:3)',.01);
+                Ellipse_plot(A,C,colormap_jet(ceil((i/n_bins)*length(colormap_jet)),:));
                 text(C(1),C(2),C(3),binNames(i,1),'Color','black','fontsize',15)
             end
         end

@@ -8,7 +8,7 @@
 % R: MATLAB Structure that contains all RNA-seq data
 % H: MATLAB Structure that contains all Hi-C data
 %
-% sampleData is included wihtin the "sampleData" folder
+% sampleData is included within the "sampleData" folder
 %
 % Scott Ronquist, 12/19/18
 

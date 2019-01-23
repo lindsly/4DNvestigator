@@ -1,20 +1,19 @@
 function [features,score] = fdnSfAnalysis(dataInfo,R,H,sampleSelect,goi,hExtract)
-%gsfatSfAnalysis Summary of this function goes here
-%   Detailed explanation goes here
+%fdnSfAnalysis Performs the 4DN feature Analyzer
 %
 %   Input
-%   dataInfo: 
-%   R: 
-%   H: 
-%   sampleSelect: 
-%   goi: 
-%   hExtract: 
+%   dataInfo:       Data structure with experiment sample info
+%   H:              Data structure containing all Hi-C data
+%   R:              Data structure containing all RNA-seq data
+%   sampleSelect:   Samples selected for analysis
+%   goi:            Gene set of interest
+%   hExtract:       Hi-C contact extraction method
 %
 %   Output
-%   features: 
-%   score: 
+%   features:       Feature matrix
+%   score:          4DN score
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/20/18
+%   Scott Ronquist, scotronq@umich.edu. 1/23/19
 
 %% set default parameters
 if ~exist('hExtract','var') || isempty(hExtract); hExtract = '1mb'; end

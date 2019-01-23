@@ -2,16 +2,16 @@ function [dataInfo] = fdnLoadUserInput(indexFile,projectName,outputPath)
 %gsfatUserInput loads User input data
 %   This function loads formats data structures for GSFAT analysis
 %
-%   Inputs
-%   indexFile: file that contains information on all samples to be
-%   processed (string)
-%   projectName: name of project
-%   outputPath: folder for project analysis output
+%   Input
+%   indexFile:      file that contains information on all samples to be
+%                   processed (string)
+%   projectName:    name of project
+%   outputPath:     folder for project analysis output
 %
-%   Outputs
-%   dataInfo: structure that contains all relevant experiment data information
+%   Output
+%   dataInfo:       structure that contains all relevant experiment data information
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/18/18
+%   Scott Ronquist, scotronq@umich.edu. 1/22/18
 
 %% get computer info
 if isunix
