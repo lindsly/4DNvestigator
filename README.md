@@ -38,9 +38,8 @@ structure and function for specified genomic regions by mapping all time
 points to a consistent low dimensional embedding, and quantifying the variance
 of each loci within this space over time. Method specifics can be found in:
 ["Genome Architecture Mediates Transcriptional Control of Human Myogenic Reprogramming"](https://www.cell.com/iscience/fulltext/S2589-0042(18)30114-7)
-- A/B switch RNA-seq: This function determines which genomic regions change
-their chromatin structure from compartment "A" to compartment "B", with a
-corresponding change in gene expression
+- A/B switching: This function determines which genomic regions change
+their chromatin structure from compartment "A" to compartment "B"
 
 
 
