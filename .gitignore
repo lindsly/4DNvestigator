@@ -9,6 +9,7 @@
 /sampleData/*
 /exampleScripts/dev
 /paperFiles
+/functions/dev
 
 # exceptions
 !/sampleData/indexFiles
