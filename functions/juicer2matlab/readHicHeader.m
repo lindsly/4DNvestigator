@@ -24,18 +24,29 @@ juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 %% get and format .hic header info
 % get "read_hic_header.py" file location
 juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
-    '\straw-master\python\read_hic_header.py'];
+    sprintf('straw-master%spython%sread_hic_header.py',folderSlash,folderSlash)];
 
 % run "read_hic_header.py"
 [status,cmdout] = system(sprintf('python %s %s',juicerReadHic,fn));
 
-% report an error if status~=0
+% ask for user input if error, could be due to no python installation
 if status~=0
-    error(cmdout)
+    prompt = 'No header detected, please input reference genome name';
+    opts = {'hg19','hg38'};
+    [indx,tf] = listdlg('PromptString',prompt,'SelectionMode','single',...
+        'ListString',opts);
+    
+    % get ref genome information
+    hicHeader.refGenome = opts{indx};
+    hicHeader.Chromosomes = readtable(sprintf('%s.chrom.sizes',opts{indx}),...
+        'fileType','text');
+    hicHeader.Chromosomes.Properties.VariableNames = {'chr','chrLength'};
+    hicHeader.Chromosomes.chr = cellfun(@(x) x(4:end), hicHeader.Chromosomes.chr, 'un', 0);
+    
+else
+    % parse header info
+    [hicHeader] = parseHicHeaderInfo(cmdout);
 end
-
-% parse header info
-[hicHeader] = parseHicHeaderInfo(cmdout);
 
 end
 

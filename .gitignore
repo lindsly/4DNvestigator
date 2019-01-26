@@ -3,6 +3,8 @@
 *.results
 *.mat
 *.pptx
+*.m~
+*.asv
 
 # folders
 functions/depreciated/
