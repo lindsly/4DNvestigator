@@ -1,4 +1,4 @@
-function [hicHeader] = readHicHeader(fn)
+function [hicHeader] = readHicHeader(fn, idxRefGenome)
 %readHicHeader reads the .hic header information
 %
 %   Input
@@ -29,15 +29,20 @@ juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
 % run "read_hic_header.py"
 [status,cmdout] = system(sprintf('python %s %s',juicerReadHic,fn));
 
-% ask for user input if error, could be due to no python installation
+% check alternate methods to obtain ref genome info
 if status~=0
-    prompt = 'No header detected, please input reference genome name';
-    opts = {'hg19','hg38'};
-    [indx,tf] = listdlg('PromptString',prompt,'SelectionMode','single',...
-        'ListString',opts);
+    if ~isempty(idxRefGenome)
+        hicHeader.refGenome = idxRefGenome;
+    else
+        prompt = 'No header detected, please input reference genome name';
+        opts = {'hg19','hg38'};
+        [indx,tf] = listdlg('PromptString',prompt,'SelectionMode','single',...
+            'ListString',opts);
+        
+        % get ref genome information
+        hicHeader.refGenome = opts{indx};
+    end
     
-    % get ref genome information
-    hicHeader.refGenome = opts{indx};
     hicHeader.Chromosomes = readtable(sprintf('%s.chrom.sizes',opts{indx}),...
         'fileType','text');
     hicHeader.Chromosomes.Properties.VariableNames = {'chr','chrLength'};

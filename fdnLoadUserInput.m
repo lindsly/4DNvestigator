@@ -73,8 +73,17 @@ hicSampleLocs = find(ismember(dataInfo.sampleInfo.dataType,'hic'));
 % read all .hic headers and get reference genome information
 hicHeader = cell(length(hicSampleLocs),1);
 refGenome = cell(length(hicSampleLocs),1);
+idxRefGenome = [];
 for iHicSample = 1:length(hicSampleLocs)
-    hicHeader{iHicSample} = readHicHeader(dataInfo.sampleInfo.path{hicSampleLocs(iHicSample)});
+    if ismember('refGenome',dataInfo.sampleInfo.Properties.VariableNames)
+        idxRefGenome = dataInfo.sampleInfo.refGenome{hicSampleLocs(iHicSample)};
+    else
+        idxRefGenome = [];
+    end
+    
+    % read .hic header
+    hicHeader{iHicSample} = readHicHeader(dataInfo.sampleInfo.path{hicSampleLocs(iHicSample)},...
+        idxRefGenome);
     refGenome{iHicSample} = hicHeader{iHicSample}.refGenome;
 end
 
@@ -86,7 +95,7 @@ if length(unique(refGenome)) == 1
     dataInfo.hicHeader.Chromosomes(ismember(upper(dataInfo.hicHeader.Chromosomes.chr),{'ALL','M'}),:) = [];
     
 else
-    error('.hic files have different reference genomes')
+    error('.hic files have different reference genomes, cannot compare')
 end
 
 %% Get Project Name
