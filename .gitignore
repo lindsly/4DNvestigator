@@ -9,7 +9,7 @@
 # folders
 functions/depreciated/
 functions/dev/
-sampleData/
+sampleData/*
 exampleScripts/dev/
 paperFiles/
 
