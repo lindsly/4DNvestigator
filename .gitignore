@@ -10,6 +10,7 @@
 functions/depreciated/
 functions/dev/
 sampleData/*
+sampleData/indexFiles/*
 exampleScripts/dev/
 paperFiles/
 
