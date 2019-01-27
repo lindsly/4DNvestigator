@@ -14,4 +14,4 @@ exampleScripts/dev/
 paperFiles/
 
 # exceptions
-!/sampleData/indexFiles
+!/sampleData/indexFiles/publicDataIndex.xlsx
