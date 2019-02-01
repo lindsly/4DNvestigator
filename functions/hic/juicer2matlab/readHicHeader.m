@@ -33,6 +33,8 @@ juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
 if status~=0
     if ~isempty(idxRefGenome)
         hicHeader.refGenome = idxRefGenome;
+        hicHeader.Chromosomes = readtable(sprintf('%s.chrom.sizes',hicHeader.refGenome),...
+            'fileType','text');
     else
         prompt = 'No header detected, please input reference genome name';
         opts = {'hg19','hg38'};
@@ -41,10 +43,10 @@ if status~=0
         
         % get ref genome information
         hicHeader.refGenome = opts{indx};
+        hicHeader.Chromosomes = readtable(sprintf('%s.chrom.sizes',opts{indx}),...
+            'fileType','text');
     end
     
-    hicHeader.Chromosomes = readtable(sprintf('%s.chrom.sizes',opts{indx}),...
-        'fileType','text');
     hicHeader.Chromosomes.Properties.VariableNames = {'chr','chrLength'};
     hicHeader.Chromosomes.chr = cellfun(@(x) x(4:end), hicHeader.Chromosomes.chr, 'un', 0);
     
