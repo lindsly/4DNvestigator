@@ -107,7 +107,8 @@ else
 end
 
 %% Create replicate identifier
-[uvals, ~, uidx] = unique(strcat(dataInfo.sampleInfo.sample,dataInfo.sampleInfo.dataType));
+[uvals, ~, uidx] = unique(strcat(dataInfo.sampleInfo.sample,...
+    cellstr(num2str(dataInfo.sampleInfo.timePoint)), dataInfo.sampleInfo.dataType));
 replicate = ones(height(dataInfo.sampleInfo),1);    % used to mostly to copy the class and size
 for K = 1 : length(uvals)
   mask = uidx == K;

@@ -1,19 +1,22 @@
 function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWeighted)
 %sfAnalysis analyzes Hi-C and RNA-seq through centrality and PCA
-%   sfAnalysis extracts centrality features from Hi-C, concatonates them
-%   with RNA-seq, then determines a low dimensional projection to extract
-%   regions that change significantly
+%   sfAnalysis extracts centrality features from Hi-C, concatenates these
+%   features with RNA-seq, then determines a low dimensional projection to
+%   extract regions that change significantly
 %
 %   Input
-%   hic:            Hi-C matrix, typically normalized (NxNxM double; default: N/A)
-%   rnaSeq:         Rnaseq values, (NxM double; default: N/A)
-%   binNames:       Bames associated with Hi-C and RNA-seq bins (string or cell array; default: empty cell)
-%   norm:           Normalize Hi-C flag ([0,1]; default: 0)
-%   binInfo:        Bin chr information necessary for normalization (array; default: [])
+%   hic:            Hi-C matrix, typically normalized (NxNxM double;
+%                   default: N/A)
+%   rnaSeq:         Rna-seq values, (NxM double; default: N/A)
+%   binNames:       Names associated with Hi-C and RNA-seq bins (string or
+%                   cell array; default: empty cell)
+%   norm:           Normalize Hi-C flag, observed over expected ([0,1]; default: 0)
+%   binInfo:        Bin chr information necessary for normalization (array;
+%                   default: [])
 %   graphWeighted:  Use graph weighted centrality analysis ([0,1]; default: 1)
 %
 %   Output
-%   features:       Concatonated feature array (Nx3 double)
+%   features:       Concatenated feature array (Nx3 double)
 %   score:          Location of bin in low dimensional projection (Nx3 double)
 %
 %   Scott Ronquist, 1/23/19
@@ -24,8 +27,10 @@ if nargin<5; binInfo=[]; end
 if nargin<4; norm=0; end
 if nargin<3; binNames=cellstr(num2str([1:length(rnaSeq)]')); end
 
-%% normalize (if necessary), remove centromere and extract centrality
+%% normalize, remove centromere and extract centrality (depreciated)
 if norm
+    error(['norm = 1 is currently a depreciated option, normalize Hi-C',...
+        'matrices prior to input'])
     hic = norm_hic_bins(hic,binInfo);
 end
 
