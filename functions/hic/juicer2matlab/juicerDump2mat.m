@@ -41,7 +41,6 @@ if ~isempty(specificBins)
 end
 
 %% create matrix
-% cheat fix for inter vs intra, probably should make more robust
 if intraFlag
     HSize = max(max(C(:,1:2)));
     
