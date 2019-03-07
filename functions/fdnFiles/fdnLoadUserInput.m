@@ -92,7 +92,8 @@ if length(unique(refGenome)) == 1
     dataInfo.hicHeader = hicHeader{iHicSample};
     
     % remove "ALL" and "M" chr
-    dataInfo.hicHeader.Chromosomes(ismember(upper(dataInfo.hicHeader.Chromosomes.chr),{'ALL','M'}),:) = [];
+    dataInfo.hicHeader.Chromosomes(ismember(upper(dataInfo.hicHeader.Chromosomes.chr),...
+        {'ALL','M'}),:) = [];
     
 else
     error('.hic files have different reference genomes, cannot compare')
@@ -123,7 +124,8 @@ dataInfo.sampleInfo.uniqueName = strcat(dataInfo.sampleInfo.dataType,...
     {'_r'},cellstr(num2str(dataInfo.sampleInfo.replicate)));
 
 % sort sampleInfo
-dataInfo.sampleInfo = sortrows(dataInfo.sampleInfo,{'dataType','sample','timePoint'},{'ascend','ascend','ascend'});
+dataInfo.sampleInfo = sortrows(dataInfo.sampleInfo,...
+    {'dataType','sample','timePoint'},{'ascend','ascend','ascend'});
 
 % Create sampleSlice (to be filled later as data is loaded)
 dataInfo.sampleInfo.index = [1:sum(ismember(dataInfo.sampleInfo.dataType,'hic')),...

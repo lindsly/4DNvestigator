@@ -49,12 +49,22 @@ juicerJarDirLevels = strfind(juicerJarDir,folderSlash);
 juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 
 %% run juicer Dump
-[status,cmdout] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
-    juicerJarDir,norm3d,norm1d,fn,chr1,chr2,bpFrag,binSize,fnOut));
-
-% report an error if status~=0
-if status~=0
-    error(cmdout)
+status = 0;
+attempts = 1;
+while status
+    [status,cmdout] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
+        juicerJarDir,norm3d,norm1d,fn,chr1,chr2,bpFrag,binSize,fnOut));
+    
+    % report an error if status~=0, and we've tried twice
+    if status~=0
+        
+        % try again if time out error
+        if contains(cmdout,'Read timed out') && attempts < 3
+            attempts = attempts+1;
+        else
+            error(cmdout)
+        end
+    end
 end
 
 %% get .hic file header
