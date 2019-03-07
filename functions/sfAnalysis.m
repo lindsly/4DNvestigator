@@ -21,7 +21,7 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %
 %   Scott Ronquist, 1/23/19
 
-%% set defulat parameters
+%% set default parameters
 if nargin<6; graphWeighted=1; end
 if nargin<5; binInfo=[]; end
 if nargin<4; norm=0; end
@@ -106,10 +106,7 @@ switch size(Xnorm,3)
         h(2) = plot(NaN,NaN,'r*');
         legend(h,'sample1','sample2');
         
-    %case 3
-        
-    otherwise
-        %% OTHERWISE
+    otherwise                   % dimension >= 3
         % calculate ellipse
         nBins = size(binNames,1);
         binVol = zeros(nBins,1);
