@@ -1,6 +1,6 @@
 function [hallmarkGsea] = readMSigDBHallmark()
-%readMSigDBHallmark data from the 
-%   Detailed explanation goes here
+%readMSigDBHallmark reads from MSig Database and formats output to
+%structure
 %
 %   Input
 %   (none)
