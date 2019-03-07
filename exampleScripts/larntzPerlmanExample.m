@@ -2,24 +2,20 @@
 %   matrices, as described in "4DNvestigator: a toolbox for the analysis of
 %   timeseries Hi-C and RNA-seq data"
 %
-%   Scott Ronquist, scotronq@umich.edu. 1/21/19
+%   Version 1.1 (3/7/19)
+%   Written by: Scott Ronquist
+%   Contact: scotronq@umich.edu
+%   Contributors:
+%   Created: 1/21/19
+%   Revision History:
+%   v1.1 (3/7/19)
+%   * Updated script with dialog box for sample selection
 
 %% Script set-up
 clear
 close all
 
-%% Hi-C type example
-% Define Hi-C extraction parameters
-%%% PARAMETERS vvv
-hicParam.binType = 'BP';
-hicParam.binSize = 1E6;
-hicParam.norm1d = 'KR';
-hicParam.norm3d = 'oe';
-hicParam.intraFlag = 1;
-hicParam.chr = 14;
-sampleSelect = {'HFFc6','H1-hESC','HFF-hTERT'};
-%%% PARAMETERS ^^^
-
+%% load data
 % Public Hi-C data locations
 sampleDataLoc = {'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015/WT-combined.hic',...
     'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic',...
@@ -31,6 +27,53 @@ sampleDataLoc = {'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015
     'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic',...
     'https://data.4dnucleome.org/files-processed/4DNFIZ4F74QR/@@download/4DNFIZ4F74QR.hic'};
 sampleNames = {'RPE1 WT','GM12878','IMR90','HMEC','NHEK','HUVEC','HFFc6','H1-hESC','HFF-hTERT'};
+
+%% User input for cell type select
+%%%% SETTING DIALOG OPTIONS
+title = 'Input Larntz-Perlman Analysis parameters';
+
+% Options.WindowStyle = 'modal';
+options.Resize = 'on';
+options.Interpreter = 'tex';
+options.CancelButton = 'on';
+options.ApplyButton = 'on';
+options.ButtonNames = {'Continue','Cancel'}; %<- default names, included here just for illustration
+options.Dim = 4; % Horizontal dimension in fields
+
+prompt = {};
+formats = {};
+defAns = struct([]);
+
+% Select cell type sample
+prompt(1,:) = {'Select samples for LP analysis:','sample',[]};
+formats(1,1).type = 'list';
+formats(1,1).style = 'listbox';
+formats(1,1).format = 'text'; % Answer will give value shown in items, disable to get integer
+formats(1,1).items = sampleNames;
+formats(1,1).limits = [0 4]; % multi-select
+formats(1,1).size = [140 80];
+defAns(1).sample = {'HFFc6','H1-hESC','HFF-hTERT'};
+
+% Select chromosome
+prompt(2,:) = {'Select chromosome:','chr',[]};
+formats(2,1).type   = 'list';
+formats(2,1).style  = 'popupmenu';
+formats(2,1).items  = 1:22;
+
+% get user inputs parameters
+[answer,Cancelled] = inputsdlg(prompt,title,formats,defAns,options);
+hicParam.chr = answer.chr;
+sampleSelect = answer.sample;
+
+%% Hi-C type example
+% Define Hi-C extraction parameters
+%%% PARAMETERS vvv
+hicParam.binType = 'BP';
+hicParam.binSize = 1E6;
+hicParam.norm1d = 'KR';
+hicParam.norm3d = 'oe';
+hicParam.intraFlag = 1;
+%%% PARAMETERS ^^^
 
 % Select samples of interest
 sampleDataLoc = sampleDataLoc(ismember(sampleNames,sampleSelect));
