@@ -1,21 +1,41 @@
-function [ABcomp,groupIdx,FdNum] = hicABcomp(A,method,rnaSeq,rnaSeqNorm,chrDivide,plotFlag,fdvSplitMethod)
-%hicABcomp determines hic AB compartments
-%   hicABcomp determines hic AB compartment partitioning through either the
-%   Fiedler vector or the first principal component of the hic correlation
+function [ABcomp,groupIdx,FdNum] = hicABcomp(A,method,rnaSeq,rnaSeqNorm,...
+    chrDivide,plotFlag,fdvSplitMethod,chrDivideLoc)
+%hicABcomp determines Hi-C A/B compartments
+%   hicABcomp determines Hi-C A/B compartment partitioning through either the
+%   Fiedler vector or the first principal component of the Hi-C correlation
 %   matrix.
 %
 %   Inputs
-%   A:          Hi-C matrix, typically normalized (NxN double; default: N/A)
-%   method:     method for AB compartment partitioning (string; default: 'fiedler')
-%   rnaSeq:     RNA-seq values associated with Hi-C matrix (Nx1 double.; default: zeros)
-%   rnaSeqNorm: RNA-seq normalization method (string; default: 'log2')
-%   chrDivide:  divide chromsome if arms are incorectly partitioned (string; default: 'yes')
-%   plotFlag:   plot chr once completed compartmentalization (string; default: 'yes')
+%   A:              Hi-C matrix, typically normalized (NxN double; default:
+%                   N/A)
+%   method:         method for AB compartment partitioning (string;
+%                   default: 'fiedler')
+%   rnaSeq:         RNA-seq values associated with Hi-C matrix (Nx1
+%                   double; default: zeros)
+%   rnaSeqNorm:     RNA-seq normalization method (string; default: 'log2')
+%   chrDivide:      divide chromsome if arms are incorectly partitioned
+%                   (string; default: 'yes')
+%   plotFlag:       plot chr once completed compartmentalization (string;
+%                   default: 'yes')
+%   chrDivideLoc:   predetermined location of chr centromere, relative to
+%                   Hi-C matrix
 %
 %   Outputs
-%   ABcomp:     AB designation for each compartment (Nx1 double)
+%   ABcomp:         AB designation for each compartment (Nx1 double)
+%   groupIdx:       Index for partition groups (Nx1 double)
+%   FdNum:          Fiedler number
 %
-%   Scott Ronquist, 1/22/19
+%
+%   Version 1.1 (3/8/19)
+%   Written by: Scott Ronquist
+%   Contact: scotronq@umich.edu
+%   Contributors:
+%   Created: 1/22/19
+%   Revision History:
+%   v1.0 (1/22/19)
+%   * created script
+%   v1.1 (3/8/19)
+%   * added input argument for chrDivideLoc
 
 %% default parameters
 if ~exist('fdvSplitMethod','var')||isempty(fdvSplitMethod);fdvSplitMethod='sign';end
@@ -24,6 +44,7 @@ if ~exist('chrDivide','var')||isempty(chrDivide);chrDivide='no';end
 if ~exist('rnaSeqNorm','var')||isempty(rnaSeqNorm);rnaSeqNorm='log2';end
 if ~exist('rnaSeq','var')||isempty(rnaSeq);rnaSeq=zeros(length(A),1);end
 if ~exist('method','var')||isempty(method);method='fiedler';end
+if ~exist('badLocs','var')||isempty(chrDivideLoc);chrDivideLoc=[];end
 
 method = lower(method);
 chrDivide = lower(chrDivide);
@@ -48,32 +69,44 @@ end
 switch chrDivide
     case 'no'
     case 'yes'
-        % t-test if to determine if partitioning is strictly by chr arm
-        abDiff = nan(length(ABcomp),1);
-        h = nan(length(ABcomp),1);
-        p = nan(length(ABcomp),1);
-        for i = round(length(ABcomp)*.25):round(length(ABcomp)*.75)
-            abDiff(i) = abs(mean(ABcomp(1:i-1))-mean(ABcomp(i:end)));
-            [h(i),p(i)] = ttest2(ABcomp(1:i-1),ABcomp(i:end));
-        end
         
-        % set threshold for t-test
-        switch method
-            case 'fiedler'
-                thresh = 1E-20;
-            case 'pc1'
-                thresh = 0;
-        end
-        
-        % repartition each arm if incorrect
-        if nanmin(p) <= thresh
-            [~,splitLoc] = max(abDiff);
+        if ~isempty(chrDivideLoc)
             fprintf('ab analysis split by chr arms, analyzying each individually\n')
-            [abComp1] = hic_abcomp(A(1:splitLoc-1,1:splitLoc-1),...
+            splitLoc = chrDivideLoc;
+            [abComp1] = hicABcomp(A(1:splitLoc-1,1:splitLoc-1),...
                 method,rnaSeq(1:splitLoc-1),rnaSeqNorm,'no');
-            [abComp2] = hic_abcomp(A(splitLoc:end,splitLoc:end),...
+            [abComp2] = hicABcomp(A(splitLoc:end,splitLoc:end),...
                 method,rnaSeq(splitLoc:end),rnaSeqNorm,'no');
             ABcomp = [abComp1;abComp2];
+            
+        else
+            % t-test if to determine if partitioning is strictly by chr arm
+            abDiff = nan(length(ABcomp),1);
+            h = nan(length(ABcomp),1);
+            p = nan(length(ABcomp),1);
+            for i = round(length(ABcomp)*.25):round(length(ABcomp)*.75)
+                abDiff(i) = abs(mean(ABcomp(1:i-1))-mean(ABcomp(i:end)));
+                [h(i),p(i)] = ttest2(ABcomp(1:i-1),ABcomp(i:end));
+            end
+            
+            % set threshold for t-test
+            switch method
+                case 'fiedler'
+                    thresh = 1E-20;
+                case 'pc1'
+                    thresh = 0;
+            end
+            
+            % repartition each arm if incorrect
+            if nanmin(p) <= thresh
+                [~,splitLoc] = max(abDiff);
+                fprintf('ab analysis split by chr arms, analyzying each individually\n')
+                [abComp1] = hicABcomp(A(1:splitLoc-1,1:splitLoc-1),...
+                    method,rnaSeq(1:splitLoc-1),rnaSeqNorm,'no');
+                [abComp2] = hicABcomp(A(splitLoc:end,splitLoc:end),...
+                    method,rnaSeq(splitLoc:end),rnaSeqNorm,'no');
+                ABcomp = [abComp1;abComp2];
+            end
         end
 end
 

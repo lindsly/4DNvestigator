@@ -69,6 +69,7 @@ for iChr = 1:numChr
         currentWait = currentWait+1;
         if iChr==1 && iSample==1;avTime = toc;end % for estimation of time to load
     end
+    
 end
 close(waitBar)
 
@@ -99,7 +100,7 @@ for iSample = 1:length(sampleFn)
             
             % update load bar
             waitbar(currentWait/totalWait,waitBar,...
-                sprintf('Loading 100kb Hi-C. Sample: (%d/%d), chr1:%s, chr2:%s, estimated time: %i secs...',...
+                sprintf('Loading 1Mb Hi-C. Sample: (%d/%d), chr1:%s, chr2:%s, estimated time: %i secs...',...
                 iSample,length(sampleFn),chrInfo.chr{iChr1},chrInfo.chr{iChr2},...
                 round(avTime*(totalWait-currentWait))));
             
@@ -145,6 +146,12 @@ for iChr = 1:numChr
     [H.s100kb.oeTrim{iChr},H.s100kb.oeTrimBadLocs{iChr}] = hicTrim(H.s100kb.oe{iChr},...
         hicParam.numDiag,hicParam.numSparse);
     H.s100kb.krTrim{iChr} = H.s100kb.kr{iChr}(~H.s100kb.oeTrimBadLocs{iChr},~H.s100kb.oeTrimBadLocs{iChr},:);
+    
+    % estimate centromere location
+    idx = 1:size(H.s100kb.oe{iChr},1);
+    idxTrim = idx(~H.s100kb.oeTrimBadLocs{iChr});
+    
+    [~,H.s100kb.centLocStart{iChr}] = max(diff(idxTrim));
 end
 
 % trim 1Mb all together
@@ -158,6 +165,8 @@ for iChr = 1:numChr
     H.s1mb.chrStartTrim(iChr) = H.s1mb.chrStart(iChr)-...
         sum(H.s1mb.oeTrimBadLocs(1:H.s1mb.chrStart(iChr)-1));
 end
+
+%% get centromere loc
 
 end
 
