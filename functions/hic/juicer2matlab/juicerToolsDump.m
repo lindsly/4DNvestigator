@@ -49,7 +49,7 @@ juicerJarDirLevels = strfind(juicerJarDir,folderSlash);
 juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 
 %% run juicer Dump
-status = 0;
+status = 1;
 attempts = 1;
 while status
     [status,cmdout] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
