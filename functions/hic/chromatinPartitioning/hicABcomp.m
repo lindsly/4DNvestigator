@@ -71,7 +71,7 @@ switch chrDivide
     case 'yes'
         
         if ~isempty(chrDivideLoc)
-            fprintf('ab analysis split by chr arms, analyzying each individually\n')
+            fprintf('A/B analysis split by chr arms, analyzing each individually\n')
             splitLoc = chrDivideLoc;
             [abComp1] = hicABcomp(A(1:splitLoc-1,1:splitLoc-1),...
                 method,rnaSeq(1:splitLoc-1),rnaSeqNorm,'no');
