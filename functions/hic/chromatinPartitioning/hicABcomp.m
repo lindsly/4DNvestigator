@@ -56,7 +56,6 @@ switch method
     case 'fiedler'
         [~,Fdv,~,FdNum] = hicLaplacianFdv(A);
         ABcomp = Fdv;
-        temp = corr(A);
     case 'pc1'
         temp = corr(A);
         temp(isnan(temp))=0;

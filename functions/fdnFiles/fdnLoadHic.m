@@ -2,12 +2,21 @@ function [H] = fdnLoadHic(dataInfo)
 %fdnLoadHic Loads and formats Hi-C data specified in dataInfo
 %
 %   Input
-%   dataInfo: structure containing all experiment metadata
+%   dataInfo:   structure containing all experiment metadata
 %
 %   Output
-%   H: structure containing all Hi-C data needed for 4DNvestigator
+%   H:          structure containing all Hi-C data needed for 4DNvestigator
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/13/18
+%   Version 1.1 (03/15/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    12/13/18
+%   
+%   Revision History:
+%   v1.0 (12/13/18)
+%   * fdnLoadHic.m created
+%   v1.1 (03/15/19)
+%   * formatted preamble
 
 %% get information dataInfo
 % get chr information from hic header

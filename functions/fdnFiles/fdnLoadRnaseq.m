@@ -1,12 +1,12 @@
 function [R] = fdnLoadRnaseq(dataInfo,H)
-%gsfatLoadRnaseq Loads and formats RNA-seq data specified in dataInfo
+%fdnLoadRnaseq Loads and formats RNA-seq data specified in dataInfo
 %   
 %   Inputs
-%   dataInfo:
-%   H: Hi-C data
+%   dataInfo:   structure containing all experiment metadata
+%   H:          Hi-C data structure
 %
 %   Outputs
-%   R: RNA-seq data structure
+%   R:          RNA-seq data structure
 %
 %   Scott Ronquist, scotronq@umich.edu. 12/19/18
 
