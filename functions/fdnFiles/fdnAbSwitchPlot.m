@@ -21,12 +21,10 @@ function [h] = fdnAbSwitchPlot(dataInfo,H,R,params)
 %   * fdnAbSwitchPlot.m created
 
 %% set default parameters
-%% get chr information from hic header
-chrInfo = dataInfo.hicHeader.Chromosomes;
-numChr = height(chrInfo);
-numHicSamps = length(find(ismember(dataInfo.sampleInfo.dataType,'hic')));
+
 
 %% plot
+h = cell(length(params.numChr),1);
 count = 1;
 for iChr = params.numChr
     tempVar = var(H.s100kb.ABcomp{iChr},[],2);
