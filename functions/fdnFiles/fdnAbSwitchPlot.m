@@ -26,7 +26,7 @@ numChr = height(chrInfo);
 numHicSamps = length(find(ismember(dataInfo.sampleInfo.dataType,'hic')));
 
 %% plot
-for iChr = 1:numChr
+for iChr = 1:params.numChr
     tempVar = var(H.s100kb.ABcomp{iChr},[],2);
     highVarLocs = tempVar > prctile(tempVar,params.varPerc);
     changeLocs = ~(all(H.s100kb.ABcomp{iChr}<0,2) | all(H.s100kb.ABcomp{iChr}>0,2));
