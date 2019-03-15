@@ -8,7 +8,16 @@ function [R] = fdnLoadRnaseq(dataInfo,H)
 %   Outputs
 %   R:          RNA-seq data structure
 %
-%   Scott Ronquist, scotronq@umich.edu. 12/19/18
+%   Version 1.1 (03/15/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    12/19/18
+%   
+%   Revision History:
+%   v1.0 (12/19/18)
+%   * fdnLoadRnaseq.m created
+%   v1.1 (03/15/19)
+%   * formatted preamble
 
 %% get information dataInfo
 % get chr information from hic header

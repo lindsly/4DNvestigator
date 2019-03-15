@@ -3,13 +3,23 @@ function [R] = fdnDiffExpGsaa(dataInfo,R)
 %creates files for GSAA
 %
 %   Input
-%   dataInfo: 4DNvestigator structure that contains information on samples input
-%   R: 4DNvestigator structure that contains RNA-seq data
+%   dataInfo:   4DNvestigator structure that contains information on samples input
+%   R:          4DNvestigator structure that contains RNA-seq data
 %
 %   Output 
-%   R: 4DNvestigator structure that contains RNA-seq data
+%   R:          4DNvestigator structure that contains RNA-seq data with
+%               differential expression table added
 %
-%   Scott Ronquist, scotronq@umich.edu. 1/22/19
+%   Version 1.1 (03/15/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    1/22/19
+%   
+%   Revision History:
+%   v1.0 (1/22/19)
+%   * fdnDiffExpGsaa.m created
+%   v1.1 (03/15/19)
+%   * formatted preamble
 
 %% start
 % create cell array with differential expression comparisons
