@@ -1,6 +1,6 @@
 function [h] = fdnAbSwitchPlot(dataInfo,H,R,params)
-%untitled Summary of this function goes here
-%   Detailed explanation goes here
+%fdnAbSwitchPlot plots all sample A/B compartments with switch locations
+%highlighted
 %   
 %   Inputs
 %   dataInfo:   data structure with experiment sample info
