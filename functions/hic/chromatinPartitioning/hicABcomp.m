@@ -44,7 +44,7 @@ if ~exist('chrDivide','var')||isempty(chrDivide);chrDivide='no';end
 if ~exist('rnaSeqNorm','var')||isempty(rnaSeqNorm);rnaSeqNorm='log2';end
 if ~exist('rnaSeq','var')||isempty(rnaSeq);rnaSeq=zeros(length(A),1);end
 if ~exist('method','var')||isempty(method);method='fiedler';end
-if ~exist('badLocs','var')||isempty(chrDivideLoc);chrDivideLoc=[];end
+if ~exist('chrDivideLoc','var')||isempty(chrDivideLoc);chrDivideLoc=[];end
 
 method = lower(method);
 chrDivide = lower(chrDivide);
@@ -70,7 +70,7 @@ switch chrDivide
     case 'yes'
         
         if ~isempty(chrDivideLoc)
-            fprintf('A/B analysis split by chr arms, analyzing each individually\n')
+            fprintf('splitting AB analysis by chr arm, user input...\n')
             splitLoc = chrDivideLoc;
             [abComp1] = hicABcomp(A(1:splitLoc-1,1:splitLoc-1),...
                 method,rnaSeq(1:splitLoc-1),rnaSeqNorm,'no');
@@ -99,7 +99,7 @@ switch chrDivide
             % repartition each arm if incorrect
             if nanmin(p) <= thresh
                 [~,splitLoc] = max(abDiff);
-                fprintf('ab analysis split by chr arms, analyzying each individually\n')
+                fprintf('splitting AB analysis by chr arm, computer estimation...\n')
                 [abComp1] = hicABcomp(A(1:splitLoc-1,1:splitLoc-1),...
                     method,rnaSeq(1:splitLoc-1),rnaSeqNorm,'no');
                 [abComp2] = hicABcomp(A(splitLoc:end,splitLoc:end),...
