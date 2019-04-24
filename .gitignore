@@ -5,14 +5,14 @@
 *.pptx
 *.m~
 *.asv
+*.DS_Store
 
 # folders
 functions/depreciated/
-functions/dev/
-sampleData/*
-sampleData/indexFiles/*
-exampleScripts/dev/
+data/sampleData/*
+data/sampleData/indexFiles/*
 paperFiles/
+classes/
 
 # exceptions
-!/sampleData/indexFiles/publicDataIndex.xlsx
+!/data/sampleData/indexFiles/publicDataIndex.xlsx

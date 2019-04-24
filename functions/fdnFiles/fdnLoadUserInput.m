@@ -1,6 +1,6 @@
 function [dataInfo] = fdnLoadUserInput(indexFile,projectName,outputPath)
-%gsfatUserInput loads User input data
-%   This function loads formats data structures for GSFAT analysis
+%fdnLoadUserInput loads User input data
+%   This function loads formats data structures for 4DNvestigator analysis
 %
 %   Input
 %   indexFile:      file that contains information on all samples to be
@@ -14,15 +14,17 @@ function [dataInfo] = fdnLoadUserInput(indexFile,projectName,outputPath)
 %   Scott Ronquist, scotronq@umich.edu. 1/22/18
 
 %% get computer info
-if isunix
-    dataInfo.delim = '/';
-else
-    dataInfo.delim = '\';
-end
+dataInfo.delim = filesep;
+dataInfo.hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
 
 %% load from input index file
 if exist('indexFile','var')
-    dataInfo.sampleInfo = indexFile;
+    if ischar(indexFile)
+        dataInfo.indexFile = indexFile;
+        dataInfo.sampleInfo = readtable(dataInfo.indexFile);
+    elseif istable(indexFile)
+        dataInfo.sampleInfo = indexFile;
+    end
 else
     answer = [];
     while ~strcmp(answer,'Yes')

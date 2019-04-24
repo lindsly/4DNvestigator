@@ -1,6 +1,6 @@
 function [juicerOut,hicHeader] = juicerToolsDump(norm3d,norm1d,fn,chr1,chr2,bpFrag,binSize,fnOut,headerFlag)
-%juicer_tools_dump_mat MATLAB version of juicertools "dump" to read .hic
-%   juicer_tools_dump_mat reads in .hic files and outputs contact matrices
+%juicerToolsDump MATLAB version of juicertools "dump" to read .hic
+%   juicerToolsDump reads in .hic files and outputs contact matrices
 %   for the input parameters. Functions inputs follow juicer_tools dump
 %   command input.
 %
@@ -8,14 +8,14 @@ function [juicerOut,hicHeader] = juicerToolsDump(norm3d,norm1d,fn,chr1,chr2,bpFr
 %   https://github.com/theaidenlab/juicer/wiki/Data-Extraction
 %
 %   Input
-%   norm1d:     2D normalization [observed/oe]
+%   norm3d:     3D normalization [observed/oe]
 %   norm1d:     1D normalization [NONE/VC/VC_SQRT/KR]
 %   fn:         HicFile(s) location
 %   chr1:       Chromosome # (eg 1-22,X,Y in human)
 %   chr2:       Chromosome # (eg 1-22,X,Y in human)
 %   bpFrag:     Bin units [BP/FRAG] (FRAG dependant on RE)
 %   binSize:    Bin size (ie 1E5 for 100kb resolution)
-%   fnOut:      Temporary file name to output. Reccomended that this not
+%   fnOut:      Temporary file name to output. Recommended that this not
 %               input this, and let it be default (this will create a
 %               temporary .txt file in your wd, which will be deleted
 %               automatically)
@@ -28,7 +28,9 @@ function [juicerOut,hicHeader] = juicerToolsDump(norm3d,norm1d,fn,chr1,chr2,bpFr
 %   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
 %% set default parameters
-if ~exist('fnOut','var')||isempty(fnOut);fnOut = 'juicer_temp.txt';end
+if ~exist('fnOut','var')||isempty(fnOut)
+    fnOut = [tempdir, 'juicer_temp.txt'];
+end
 if ~exist('headerFlag','var')||isempty(headerFlag);headerFlag = 0;end
 
 %% num2str if necessary
@@ -37,18 +39,13 @@ if isnumeric(chr2);chr2=num2str(chr2);end
 if isnumeric(binSize);binSize=num2str(binSize);end
 
 %% format juicer tools input info
-% find GSFAT juicer tools path
+% find 4DNvestigator juicertools path
 juicerJarDir = mfilename('fullpath');
 
-folderSlash = '\';
-if isunix
-    folderSlash = '/';
-end
-
-juicerJarDirLevels = strfind(juicerJarDir,folderSlash);
+juicerJarDirLevels = strfind(juicerJarDir,filesep);
 juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 
-%% run juicer Dump
+%% run juicer Dump - Matrix
 status = 1;
 attempts = 1;
 while status
@@ -72,7 +69,7 @@ end
 if headerFlag
     % get "read_hic_header.py" file location
     juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
-        '\straw-master\python\read_hic_header.py'];
+        sprintf('%sstraw-master%spython%sread_hic_header.py',filesep,filesep,filesep)];
     
     % run "read_hic_header.py"
     [status2,cmdout2] = system(sprintf('python %s %s',juicerReadHic,fn));
@@ -97,8 +94,8 @@ if ~isempty(fnOut)
     elseif ~strcmpi(chr1,'ALL')
         juicerOut(:,1:2) = round(juicerOut(:,1:2)/str2num(binSize));
     end
-    if strcmp(fnOut,'juicer_temp.txt')
-        delete juicer_temp.txt
+    if strcmp(fnOut,[tempdir, 'juicer_temp.txt'])
+        delete(fnOut)
     end
 else
     lineLocs = find(ismember(cmdout, char([10 13])));

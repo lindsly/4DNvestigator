@@ -19,24 +19,41 @@ function [Sd,Q] = hicSpector(A,B,r)
 %   reproducibility analysis of Hi-C contact maps." Bioinformatics 33.14
 %   (2017): 2199-2201.
 %
-%   Scott Ronquist, 6/27/18
+%   Version 1.0 (4/14/19)
+%   Written by: Scott Ronquist
+%   Contact: scotronq@umich.edu
+%   Contributors:
+%   Created: 4/14/19
+%   Revision History:
 
+%% set-up
 if nargin<3;r=20;end
 
-Ln_A = hic_laplacian_fdv(A);
-Ln_B = hic_laplacian_fdv(B);
+% calculate the laplacian from Hi-C
+LnA = mat2lap(A);
+LnB = mat2lap(B);
 
-[Ln_A_v,~] = eigs(Ln_A,r+1,'SM');
-[Ln_B_v,~] = eigs(Ln_B,r+1,'SM');
+% get the top r eigenvectors
+[LnAeigvec,~] = eigs(LnA,r+1,'SM');
+[LnBeigvec,~] = eigs(LnB,r+1,'SM');
 
+% distance metric
 Sd = 0;
 for i = 1:r
     % eigenvector direction is arbitrary to take min(vA-vB,vA+vB)
-    tempDist = min([norm(Ln_A_v(:,i+1)-Ln_B_v(:,i+1)),...
-        norm(Ln_A_v(:,i+1)+Ln_B_v(:,i+1))]);
+    tempDist = min([norm(LnAeigvec(:,i+1)-LnBeigvec(:,i+1)),...
+        norm(LnAeigvec(:,i+1)+LnBeigvec(:,i+1))]);
     Sd = Sd+tempDist;
 end
 
+% reproducibility score (bounded [0 1])
 Q=(1-(1/r)*(Sd/sqrt(2)));
+
+    % function to calculate the Laplcian matrix
+    function [L] = mat2lap(A)
+        D = diag(sum(A))^(-.5);
+        L = (D^(-.5))*(D-A)*(D^(-.5));
+    end
 end
+
 

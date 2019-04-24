@@ -2,14 +2,16 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %larntzPerlman Larntz-Perlman procedure for testing covariance matrix equivalence
 %
 %   Input
-%   R:          Sample covariance matrices, p x p x k
+%   R:          Sample correlation matrices, p x p x k
 %   n:          Sample size
 %   alphaParam: Alpha parameter to determine significance
 %   plotFlag:   Logical for plotting max(Sij) vs chi-squared distribution
 %   
 %   Output
 %   H0:         logical on whether the null hypothesis was rejected.
-%               0 = same, 1 = different
+%               H_0: R^(1)=...R^(k)
+%               0 = false, reject, data cannot be pooled
+%               1 = true, accept, data can be pooled
 %   P:          matrix with p-values, testing Sij in chi-squared
 %               distribution (depreciated, used for testing purposes)
 %   SMat:       S matrix
@@ -61,8 +63,15 @@ T = max(SVec);
 eAlpha = (1-alphaParam).^(2/(p*(p-1)));
 
 %% test null hypothesis
- % https://www.mathworks.com/matlabcentral/answers/74472-how-can-i-create-the-chisquare-table
-H0 = T > chi2inv(eAlpha,k-1);
+% Chi-square inverse cumulative distribution function
+fprintf('H_0 is rejected at level \x3B1 if T > X^2_((k-1),(\x3B5(\x3B1))\n')
+if T > chi2inv(eAlpha,k-1)
+    H0 = 0;
+    fprintf('%.4f > %.4f, therefore H_0 = %i\n',T,chi2inv(eAlpha,k-1),H0)
+else
+    H0 = 1;
+    fprintf('%.4f < %.4f, therefore H_0 = %i\n',T,chi2inv(eAlpha,k-1),H0)
+end
 
 % plot location in Chi-squared distribution
 if plotFlag

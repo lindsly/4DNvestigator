@@ -1,4 +1,4 @@
-function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWeighted)
+function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWeighted,dimReduc)
 %sfAnalysis analyzes Hi-C and RNA-seq through centrality and PCA
 %   sfAnalysis extracts centrality features from Hi-C, concatenates these
 %   features with RNA-seq, then determines a low dimensional projection to
@@ -14,6 +14,7 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %   binInfo:        Bin chr information necessary for normalization (array;
 %                   default: [])
 %   graphWeighted:  Use graph weighted centrality analysis ([0,1]; default: 1)
+%   dimReduc:       Type of dimension reduction (PCA, LapEigen)
 %
 %   Output
 %   features:       Concatenated feature array (Nx3 double)
@@ -22,10 +23,11 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %   Scott Ronquist, 1/23/19
 
 %% set default parameters
-if nargin<6; graphWeighted=1; end
-if nargin<5; binInfo=[]; end
-if nargin<4; norm=0; end
-if nargin<3; binNames=cellstr(num2str([1:length(rnaSeq)]')); end
+if ~exist('dimReduc','var')||isempty(dimReduc);dimReduc='pca';end
+if ~exist('graphWeighted','var')||isempty(graphWeighted);graphWeighted=1;end
+if ~exist('binInfo','var')||isempty(binInfo);binInfo=[];end
+if ~exist('norm','var')||isempty(norm);norm=0;end
+if ~exist('binNames','var')||isempty(binNames);binNames=cellstr(num2str([1:length(rnaSeq)]'));end
 
 %% normalize, remove centromere and extract centrality (depreciated)
 if norm
@@ -66,87 +68,126 @@ for i = 1:size(Xnorm,3)
     XnormStacked = [XnormStacked;Xnorm(:,:,i)];
 end
 
-% PCA
-[~,score,~,~,~] = pca(XnormStacked);
+% Dimension reduction
+dimReduc = lower(dimReduc);
+switch dimReduc
+    case 'pca'
+        [~,score,~,~,~] = pca(XnormStacked);
+    case 'lapeigen'
+        score = laplacian_eigen(XnormStacked,3);
+    case 'tsne'
+        score = tsne(XnormStacked,[],3);
+end
 
-%% distance measurement
-switch size(Xnorm,3)
-    case 1
+%% figure output
+if size(Xnorm,3) == 1
+    % plot features in low dimensional space
+    colorScale = jet(length(binNames));
+    figure('units','normalized','position',[.1 .1 .8 .8]), hold on
+    scatter3(score(:,1), score(:,2), score(:,3), 10, colorScale,'filled');
+    xlabel('PC 1'), ylabel('PC 2'), zlabel('PC 3')
+    view(2)
+    
+    % label top 10% or top 100 (min) furthest pts
+    numPts = min([round(size(score,1)*.1) 10]);
+    distMat = squareform(pdist(score(:,1:3)));
+    [~,labelLocs] = sort(sum(distMat),'descend');
+    text(score(labelLocs(1:numPts),1), score(labelLocs(1:numPts),2),...
+        score(labelLocs(1:numPts),3), binNames(labelLocs(1:numPts)))
+    
+    % format output
+    box on
+    title('Structure-Function Feature Space')
+    set(gca,'linewidth',2,'fontsize',15)
+    
+else
+    % reshape data, take first 3 dimensions
+    numSamples = size(Xnorm,3);
+    numBins = size(Xnorm,1);
+    scoreReshape = zeros(numBins,3,numSamples);
+    for iS = 1:numSamples
+        scoreReshape(:,:,iS) = score(numBins*(iS-1)+1:numBins*iS,1:3);
+    end
+    
+    % plot features in low dimensional space
+    colorScale = jet(numSamples);
+    figure('units','normalized','position',[.1 .1 .8 .8]), hold on
+    for iS = 1:numSamples
+        scatter3(scoreReshape(:,1,iS), scoreReshape(:,2,iS),...
+            scoreReshape(:,3,iS), 20,colorScale(iS,:),'filled');
+    end
+    xlabel('PC 1'), ylabel('PC 2'), zlabel('PC 3')
+    view(2)
+    
+    % add lines btw pts
+    for iS = 1:numSamples-1
+        plot3([scoreReshape(:,1,iS),scoreReshape(:,1,iS+1)]',...
+            [scoreReshape(:,2,iS),scoreReshape(:,2,iS+1)]',...
+            [scoreReshape(:,3,iS),scoreReshape(:,3,iS+1)]','k-')
+    end
+    
+    % get dist btw pts
+    allDist = zeros(numBins,numSamples-1);
+    for iS = 1:numSamples-1
+        allDist(:,iS) = diag(pdist2(scoreReshape(:,1:3,iS), scoreReshape(:,1:3,iS+1)));
+    end
+    
+    % label top 10% or top 20 (min) of genes to label and draw line
+    numPts = min([round(size(scoreReshape,1)*.1) 10]);
+    [~,labelLocs] = sort(sum(allDist,2),'descend');
+    meanLoc = mean(scoreReshape,3);
+    text(meanLoc(labelLocs(1:numPts),1), meanLoc(labelLocs(1:numPts),2),...
+        meanLoc(labelLocs(1:numPts),3), binNames(labelLocs(1:numPts)));
+    
+    % fit ellipse to points if = 3 pts available
+    if numSamples == 3
+        binArea = zeros(numBins,1);
         
-    case 2
-        %% CASE 2
-        nBins = length(binNames);
-        pcaDist = zeros(nBins,1);
-        for i = 1:nBins
-            fprintf('extracting PCA length: %d\n',i)
-            pcaDist(i) = pdist(score([i,nBins+i],1:3));
-        end
-        
-        %plot
-        figure, hold on
-        for i = 1:nBins
-            plot(score(i,1),score(i,2),'bo')
-        end
-        for i = 1:nBins
-            plot(score(i+nBins,1),score(i+nBins,2),'r*')
-        end
-        
-        % select top percentile of genes to label and draw line
-        for i = 1:nBins
-            if pcaDist(i) > prctile(pcaDist,90)
-                plot([score(i,1),score(i+nBins,1)],[score(i,2),score(i+nBins,2)],'k-')
-                text(score(i+nBins,1),score(i+nBins,2),binNames{i})
+        for iBin = 1:numBins
+            % fit ellipse
+            fprintf('Fitting ellipse to pts: %.2f%%\n',(iBin/numBins*100))
+            
+            % plot large distance pts
+            if ismember(iBin,labelLocs(1:numPts))
+                [X, binArea(iBin)] = fitEllipse3d(squeeze(scoreReshape(iBin,1:3,:))');
+                plot3(X(:,1),X(:,2),X(:,3),'r-')
             end
         end
-        xlabel('PC1'),ylabel('PC2'),title('S-F features PCA')
         
-        %custom legend
-        h = zeros(2, 1);
-        h(1) = plot(NaN,NaN,'bo');
-        h(2) = plot(NaN,NaN,'r*');
-        legend(h,'sample1','sample2');
+        % fit ellipsoid to points if > 3 pts available
+    elseif numSamples > 3
+        binVol = zeros(numBins,1);
         
-    otherwise                   % dimension >= 3
-        % calculate ellipse
-        nBins = size(binNames,1);
-        binVol = zeros(nBins,1);
-        temp = [];
-        
-        % ellipsoid volume
-        for i = 1:nBins
-            fprintf('extracting bin volume: %d\n',i)
-            if size(unique(score(i:nBins:nBins*(size(Xnorm,3)-1)+i,1:3),'rows'),1) > 1
-                [A,C] = MinVolEllipse(score(i:nBins:nBins*3+i,1:3)',.03);
+        for iBin = 1:numBins
+            fprintf('Fitting ellipsoid to pts: %.2f\n',(iBin/numBins*100))
+            
+            % plot large distance pts
+            if ismember(iBin,labelLocs(1:numPts))
+                % fit ellipse
+                [A,C] = MinVolEllipse(squeeze(scoreReshape(iBin,1:3,:)),.01);
+                
                 [~,D,~] = svd(A);
                 a = 1/sqrt(D(1,1));
                 b = 1/sqrt(D(2,2));
                 c = 1/sqrt(D(3,3));
-                binVol(i) = (4/3)*pi*a*b*c;
-                
-                % this throwsout ellipsoids that are artificially high (points lie in a plane)
-                if D(3,3)/sum(diag(D)) < 1E-10      %D(3,3) < 1e-5
-                    binVol(i) = 0;
-                end
+                binVol(iBin) = (4/3)*pi*a*b*c;
+                Ellipse_plot(A,C,[.5 0 0]);
             end
         end
-        
-        big_bins = binVol>prctile(binVol,50);
-        
-        %% plot ellipsoid
-        figure, hold on,xlabel('PC1'),ylabel('PC2'),zlabel('PC3'),view(3)
-        colormapJet = jet;
-        for i = 1:nBins
-            fprintf('plotting ellipsoid: %d\n',i)
-            if big_bins(i)
-                [A ,C] = MinVolEllipse(score(i:nBins:nBins*(size(Xnorm,3)-1)+i,1:3)',.01);
-                Ellipse_plot(A,C,colormapJet(ceil((i/nBins)*length(colormapJet)),:));
-                text(C(1),C(2),C(3),binNames(i,1),'Color','black','fontsize',15)
-            end
-        end
-        
-        %format2
-        view(gca,[0 90]);
-        set(gca,'fontsize',15,'linewidth',3)
+    end
+    
+    %custom legend
+    h = zeros(numSamples, 1);
+    for iS = 1:numSamples
+        h(iS) = plot(NaN,NaN,'.','color',colorScale(iS,:),'markersize',30);
+        sampleName{iS} = ['Sample',num2str(iS)];
+    end
+    legend(h,sampleName);
+    
+    % format output
+    box on
+    title('Structure-Function Feature Space')
+    set(gca,'linewidth',2,'fontsize',15)
 end
 
 end

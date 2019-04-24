@@ -27,7 +27,7 @@ function [pvalue,padj] = matlabNegbinDE(sampleCounts1,sampleCounts2,varLink,lowC
 
 %% default parameters
 if nargin<3; varLink='LocalRegression'; end
-if nargin<4; lowCountThreshold=10; end
+if nargin<4; lowCountThreshold=0; end
 if nargin<5; plotFlag=0; end
 
 countAll = [sampleCounts1, sampleCounts2];

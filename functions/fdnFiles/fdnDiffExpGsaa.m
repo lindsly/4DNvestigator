@@ -51,11 +51,11 @@ for i = 1:size(compIndex,1)
         tempALocs = ismember(R.TPM.Properties.VariableNames,...
             dataInfo.sampleInfo.name(not(cellfun('isempty',...
             regexp(dataInfo.sampleInfo.uniqueName,...
-            sprintf('rnaseq_s%s_t%i*',tempSampleA,tempTpA))))));
+            sprintf('rnaseq_s%s_t%i',tempSampleA,tempTpA))))));
         tempBLocs = ismember(R.TPM.Properties.VariableNames,...
             dataInfo.sampleInfo.name(not(cellfun('isempty',...
             regexp(dataInfo.sampleInfo.uniqueName,...
-            sprintf('rnaseq_s%s_t%i*',tempSampleB,tempTpB))))));
+            sprintf('rnaseq_s%s_t%i',tempSampleB,tempTpB))))));
         
         % create geneTable
         meanA = mean(R.TPM{:,tempALocs},2);
@@ -121,6 +121,10 @@ R.diffExpTable = cell2table(diffExpTable);
 % name R.diffExpTable rows and columns
 R.diffExpTable.Properties.VariableNames = nameAll;
 R.diffExpTable.Properties.RowNames = nameAll;
+
+%% Gene expression pattern grouping
+dec2bin(1)
+dec2bin(3)
 
 end
 
