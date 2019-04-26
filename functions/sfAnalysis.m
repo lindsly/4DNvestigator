@@ -20,23 +20,34 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %   features:       Concatenated feature array (Nx3 double)
 %   score:          Location of bin in low dimensional projection (Nx3 double)
 %
-%   Scott Ronquist, 1/23/19
+%   Version 1.1 (4/26/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    1/23/19
+%   
+%   Revision History:
+%   v1.0 (1/23/19)
+%   * sfAnalysis.m created
+%   v1.1 (4/26/19)
+%   * code commenting
+%   * fixed ellipse fitting
+%   * added dimReduc option
 
-%% set default parameters
+%% Set default parameters
 if ~exist('dimReduc','var')||isempty(dimReduc);dimReduc='pca';end
 if ~exist('graphWeighted','var')||isempty(graphWeighted);graphWeighted=1;end
 if ~exist('binInfo','var')||isempty(binInfo);binInfo=[];end
 if ~exist('norm','var')||isempty(norm);norm=0;end
 if ~exist('binNames','var')||isempty(binNames);binNames=cellstr(num2str([1:length(rnaSeq)]'));end
 
-%% normalize, remove centromere and extract centrality (depreciated)
+%% Normalize, remove centromere and extract centrality (depreciated)
 if norm
     error(['norm = 1 is currently a depreciated option, normalize Hi-C',...
         'matrices prior to input'])
     hic = norm_hic_bins(hic,binInfo);
 end
 
-%% extract centrality
+%% Extract centrality
 for tp  = 1:size(hic,3)
     G = graph(hic(:,:,tp),'OmitSelfLoops');
     
