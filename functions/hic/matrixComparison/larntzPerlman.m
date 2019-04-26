@@ -1,5 +1,5 @@
 function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
-%larntzPerlman Larntz-Perlman procedure for testing covariance matrix equivalence
+%larntzPerlman Larntz-Perlman procedure for testing correlation matrix equivalence
 %
 %   Input
 %   R:          Sample correlation matrices, p x p x k
@@ -34,35 +34,44 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 %
 %   "if homogeneity is not rejected, data can be pooled"
 %
-%   Scott Ronquist, 1/22/19. scotronq@umich.edu
+%   Version 1.1 (4/26/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    1/22/19
+%   
+%   Revision History:
+%   v1.0 (1/22/19)
+%   * larntzPerlman.m created
+%   v1.1 (4/26/19)
+%   * update: code commenting
 
-%% set default parameters
+%% Set default parameters
+% default alpha set to .95. No chi-squared plot by default
 if nargin < 3;alphaParam = .95;fprintf('default alpha=%.2f...\n',alphaParam),pause(1);end
 if nargin < 4;plotFlag = 0;fprintf('default plotFlag=%i...\n',plotFlag),pause(1);end
 
-%% get upper triangle of matrices to vector
+%% Perform Larntz-Perlman procedure
+% get input data dimensions
 p = size(R,1);
 k = size(R,3);
 
+% Fisher Z transform
 zLength = nchoosek(p,2);
 z = zeros(zLength,k);
-
 for iK = 1:k
     Rk = R(:,:,iK);
     mask = triu(true(size(Rk)),1);
     r = Rk(mask);
     z(:,iK) = .5*log((1+r)./(1-r));
-    
-    % Anderson-Darling test for normality % figure, histogram(z(:,iK))
-    [adtestH,adtestP] = adtest(z(:,iK)); % 1 = normality rejected
 end
 
+% calculate mean Z score, S, and Test statistic, and Sidak correction
 zBar = mean(z,2);
 SVec = (n-3)*sum((z-repmat(zBar,1,k)).^2,2);
 T = max(SVec);
 eAlpha = (1-alphaParam).^(2/(p*(p-1)));
 
-%% test null hypothesis
+%% Test null hypothesis
 % Chi-square inverse cumulative distribution function
 fprintf('H_0 is rejected at level \x3B1 if T > X^2_((k-1),(\x3B5(\x3B1))\n')
 if T > chi2inv(eAlpha,k-1)
@@ -80,6 +89,7 @@ if plotFlag
     plot([T T], [0 nanmax(chiTemp)],'r-')
 end
 
+%% Format output
 % P-Value matrix matrix
 P = zeros(p, p);
 P(triu(true(p),1)) = 1-chi2cdf(SVec,k-1);
