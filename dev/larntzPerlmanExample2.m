@@ -60,6 +60,7 @@ for iSample = 1:size(roiH,3)
     title(sprintf('corr(Hi-C), sample %i', iSample))
 end
 set(get(gcf,'children'),'linewidth',2,'fontsize',15)
+linkaxes(get(gcf,'children'))
 
 %% Larntz-Perlman procedure
 % Perform the Larntz-Perlman procedure on your correlation matrices
