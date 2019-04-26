@@ -47,21 +47,22 @@ if norm
     hic = norm_hic_bins(hic,binInfo);
 end
 
-%% Extract centrality
+%% Extract Features
+% extract centrality
 for tp  = 1:size(hic,3)
     G = graph(hic(:,:,tp),'OmitSelfLoops');
     
-    % from Sijia, inverse weights for closeness and betweeness
-    Ht_root = nthroot(hic(:,:,tp),2);
-    Ct = 1./Ht_root;
+    % Inverse weights for closeness and betweeness (MATLAB weight definition)
+    HtRoot = nthroot(hic(:,:,tp),2);
+    Ct = 1./HtRoot;
     Ct(isnan(Ct)) = 0;  Ct(isinf(Ct)) = 0;
-    G_inv = graph(Ct,'OmitSelfLoops');
+    GInv = graph(Ct,'OmitSelfLoops');
     
     % Extract features
     if graphWeighted % centrality measure cost/importance is edge weighted
         features(:,:,tp) = [centrality(G,'degree','Importance',G.Edges.Weight),...
-            centrality(G,'closeness','Cost',G_inv.Edges.Weight),...
-            centrality(G,'betweenness','Cost',G_inv.Edges.Weight),...
+            centrality(G,'closeness','Cost',GInv.Edges.Weight),...
+            centrality(G,'betweenness','Cost',GInv.Edges.Weight),...
             centrality(G,'eigenvector','Importance',G.Edges.Weight)];
     else
         features(:,:,tp) = [centrality(G,'degree'),centrality(G,'closeness'),...
@@ -69,17 +70,19 @@ for tp  = 1:size(hic,3)
     end
 end
 
-%% add RNA-seq
+% add RNA-seq
 features = cat(2,features,reshape(rnaSeq,size(rnaSeq,1),1,size(rnaSeq,2)));
+
+% normalize features
 Xnorm = FeatureNorm2(features);
 
-% stack time points
+% stack time points to project to same low dimensional space
 XnormStacked = [];
 for i = 1:size(Xnorm,3)
     XnormStacked = [XnormStacked;Xnorm(:,:,i)];
 end
 
-% Dimension reduction
+%% Dimension reduction
 dimReduc = lower(dimReduc);
 switch dimReduc
     case 'pca'
@@ -90,7 +93,7 @@ switch dimReduc
         score = tsne(XnormStacked,[],3);
 end
 
-%% figure output
+%% Figure output
 if size(Xnorm,3) == 1
     % plot features in low dimensional space
     colorScale = jet(length(binNames));
@@ -200,6 +203,5 @@ else
     title('Structure-Function Feature Space')
     set(gca,'linewidth',2,'fontsize',15)
 end
-
 end
 
