@@ -1,5 +1,4 @@
 # README for the 4DNvestigator toolbox
-
 Scott Ronquist, scotronq@umich.edu. 1/18/19
 
 # Overview
@@ -11,8 +10,7 @@ Paper: in preparation
 Availability: https://github.com/scotronq/4DNvestigator
 
 # Hi-C and RNA-seq data types
-
-the 4DNvestigator accepted the following input file formats:
+the 4DNvestigator accepts the following input file formats:
 
 |**Data Type**|**File Type**|**Program**|
 |----|----|----|
@@ -39,6 +37,10 @@ of each loci within this space over time. Method specifics can be found in:
 ["Genome Architecture Mediates Transcriptional Control of Human Myogenic Reprogramming"](https://www.cell.com/iscience/fulltext/S2589-0042(18)30114-7)
 - A/B switching: This function determines which genomic regions change
 their chromatin structure from compartment "A" to compartment "B"
+
+# Example
+- See "./exampleScripts/examples4DNvestigator.m" for an example of the 
+4DNvestigator analysis
 
 
 
