@@ -6,7 +6,7 @@ function [R] = fdnDiffExpGsaa(dataInfo,R,gseaFlag,rnaseqPatternFlag)
 %   dataInfo:   4DNvestigator structure that contains information on samples input
 %   R:          4DNvestigator structure that contains RNA-seq data
 %   gseaFlag:   flag for creating GSEA files
-%   rnaseqPatternFlag:   flag for creating rna-seq pattern heatmaps
+%   rnaseqPatternFlag:   flag for creating RNA-seq pattern heatmaps
 %
 %   Output 
 %   R:          4DNvestigator structure that contains RNA-seq data with
@@ -126,7 +126,7 @@ for iS = 1:length(samplesAll)
         'RowNames',strcat('tp',cellstr(num2str(sampleTps))),...
         'VariableNames',strcat('tp',cellstr(num2str(sampleTps))));
     
-    %% determine gene expresssion patterns over time
+    %% Determine gene expresssion patterns over time
     if rnaseqPatternFlag
         rnaseqPattern = diffExpCellSamp{iS,1}{1,2}{1}{:,8};
         for iTp = 2:length(sampleTps)
@@ -175,7 +175,6 @@ for iS = 1:length(samplesAll)
             tempDataAll = [tempDataAll; tempData];
             tempDataNormAll = [tempDataNormAll; tempDataNorm];
             tempGenesAll = [tempGenesAll;tempGenes];
-            
         end
         
         % plot image, all patterns together
@@ -184,7 +183,6 @@ for iS = 1:length(samplesAll)
         xticks(1:size(tempDataNorm,2)), xticklabels(sampleTps), xlabel('TP')
         ylabel('Normalized Gene Expression')
         title(sprintf('RNA-seq Patterns, TPM thresh=%i, Sample "%s"',rnaseqThresh,samplesAll{iS}))
-        
     end
 end
 

@@ -1,8 +1,11 @@
-% This script provides and overview of the methods described in the 
+%% Description
+% This script provides and overview of the methods described in the
+% "4DNvestigator: a toolbox for the analysis of timeseries Hi-C and RNA-seq
+% data"
 %
 % Scott Ronquist, scotronq@umich.edu. 4/23/19
 
-%% set up
+%% Set up
 clear
 close all
 
@@ -45,8 +48,9 @@ gseaFlag = 1;
 rnaseqPatternFlag = 1;
 [R] = fdnDiffExpGsaa(dataInfo,R,1,1);
 
-%% 4DN Feature Analyzer
+%% 4DN Feature Analyzer Example
 % select Regions of Interest
+% selecting chromosome 11
 chrSelect = 11;
 goiH = H.s100kb.oeTrim{chrSelect};
 goiR = R.s100kb.tpmMeanTrim{chrSelect};
