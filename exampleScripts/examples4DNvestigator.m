@@ -18,20 +18,30 @@ addpath(genpath('.'))
 %% Download data
 % Download the time series RNA-seq and Hi-C data to perform this analysis
 %
-% Data described in: Liu, Sijia, et al. "Genome architecture mediates
-% transcriptional control of human myogenic reprogramming." iScience 6
-% (2018): 232-246.
+% MYOD
+%   Paper:  Liu, Sijia, et al. "Genome architecture mediates
+%           transcriptional control of human myogenic reprogramming." iScience 6
+%           (2018): 232-246.
+%   Download link:  https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
 %
-% Link to download: https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
+% TCF7L2
+%   Paper: unpublished
+%   Download link:  
 
-if ~isfile('myodDataIndex.xlsx')
+if ~isfile('sampleMyodDataIndexTp-48_8_80.xlsx')
     error(['Please download the time series RNA-seq and Hi-C data available ',...
         '<a href="https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm">here</a>'])
 end
 
+
+% TEST (dropbox; delete later)
+temp = hic2mat('',hicParam.norm1d,sampleFn{iSample},...
+            chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
+hic2mat(
+
 %% Load data through the 4DNvestigator
 if ~isfile('./data/myodTsData.mat')
-    [dataInfo] = fdnLoadUserInput('myodDataIndex.xlsx','myod','.');
+    [dataInfo] = fdnLoadUserInput('sampleMyodDataIndexTp-48_8_80.xlsx','myod','.');
     [H] = fdnLoadHic(dataInfo);
     [R] = fdnLoadRnaseq(dataInfo,H);
     

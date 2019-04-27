@@ -5,8 +5,8 @@ function [H,hicHeader] = hic2mat(norm3d,norm1d,fn,chr1,chr2,bpFrag,binSize,intra
 %   https://github.com/theaidenlab/juicer/wiki/Data-Extraction
 %
 %   Inputs
-%   norm_2d:    2D normalization [observed/oe]
-%   norm_1d:    1D normalization [NONE/VC/VC_SQRT/KR]
+%   norm3d:     2D normalization [observed/oe]
+%   norm1d:     1D normalization [NONE/VC/VC_SQRT/KR]
 %   fn:         hicFile(s) location
 %   chr1:       chromosome # (eg 1-22,X,Y in human)
 %   chr2:       chromosome # (eg 1-22,X,Y in human)
