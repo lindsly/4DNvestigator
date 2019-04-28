@@ -60,7 +60,7 @@ end
 
 %% format normalization vector
 temp = readtable(fnOut,'Delimiter','\t');
-normVec = temp{:,1};
+normVec = temp{1:end-1,1};
 if strcmp(fnOut,[tempdir, 'juicer_temp.txt'])
     delete(fnOut)
 end

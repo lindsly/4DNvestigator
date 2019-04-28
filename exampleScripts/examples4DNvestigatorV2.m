@@ -22,11 +22,11 @@ end
 
 %% Load data through the 4DNvestigator functions
 [dataInfo] = fdnLoadUserInput(indexFile);
-[H] = fdnLoadHic(dataInfo);
+[H] = fdnLoadHic(dataInfo,'single');
 [R] = fdnLoadRnaseq(dataInfo,H);
 
 % save data
-save('./data/myodTsData','H','R','dataInfo','-v7.3')
+save([dataInfo.path.output,dataInfo.delim,dataInfo.projName,'Data.mat'],'H','R','dataInfo','-v7.3')
 
 %% Time series differential expression
 % run samples through differential expression analysis, with time gene

@@ -1,13 +1,15 @@
-function [H] = fdnLoadHic(dataInfo)
+function [H] = fdnLoadHic(dataInfo,numericType)
 %fdnLoadHic Loads and formats Hi-C data specified in dataInfo
 %
 %   Input
-%   dataInfo:   structure containing all experiment metadata
+%   dataInfo:       structure containing all experiment metadata
+%   numericType:    string specifying numeric type to save as ('double'
+%                   [default] or 'single')
 %
 %   Output
 %   H:          structure containing all Hi-C data needed for 4DNvestigator
 %
-%   Version 1.1 (03/15/19)
+%   Version 1.2 (04/28/19)
 %   Written by: Scott Ronquist
 %   Contact:    scotronq@umich.edu
 %   Created:    12/13/18
@@ -18,7 +20,12 @@ function [H] = fdnLoadHic(dataInfo)
 %   v1.1 (03/15/19)
 %   * formatted preamble
 %   v1.2 (04/28/19)
-%   * updated speed (only extract O/E once)
+%   * updated speed (only extract O/E once, intra and inter, use dump 'ALL')
+%   * added numericType for lower ram usage
+
+%% default parameters
+if ~exist('numericType','var')||isempty(numericType);numericType='double';end
+numericType = lower(numericType);
 
 %% get information dataInfo
 % get chr information from hic header
@@ -104,11 +111,12 @@ for iSample = 1:length(sampleFn)
         H.s100kb.oe{iChr}(1:length(tempKr),1:length(tempKr),iSample) = ...
             tempKr./tempKrE(1:length(tempKr),1:length(tempKr));
         
-%         % extract KR OE (for comparison)
-%         temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
-%             chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
-%         temp(isnan(temp)) = 0;
-%         temp = max(cat(3,temp,temp'),[],3);
+        % change data type
+        switch numericType
+            case 'single'
+                H.s100kb.kr{iChr} = single(H.s100kb.kr{iChr});
+                H.s100kb.oe{iChr} = single(H.s100kb.oe{iChr});
+        end
         
         % update load bar variable
         currentWait = currentWait+1;
@@ -137,8 +145,38 @@ H.s1mb.chrStart = [1;cumsum(ceil(chrInfo.chrLength/hicParam.binSize))+1];
 H.s1mb.oe = zeros(H.s1mb.chrStart(end)-1,H.s1mb.chrStart(end)-1,length(sampleFn));
 H.s1mb.kr = zeros(H.s1mb.chrStart(end)-1,H.s1mb.chrStart(end)-1,length(sampleFn));
 for iSample = 1:length(sampleFn)
+    
+    % inter All, raw (KR ALL, performs a new KR norm genome-wide)
+    fprintf('Extracting Hi-C, 1Mb, ALL...\n')
+    tempAllRaw = hic2mat('observed','NONE',sampleFn{iSample},...
+        'ALL','ALL',hicParam.binType,hicParam.binSize);
+    
+    % get norm vecs and intra matrices
+    normVec = cell(numChr,1);
+    for iChr = 1:numChr
+        fprintf('Extracting Hi-C, 1Mb, IntraChr:%i...\n',iChr)
+        
+        % Extract KR
+        temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
+            chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize);
+        H.s1mb.kr(H.s1mb.chrStart(iChr):H.s1mb.chrStart(iChr)+size(temp,1)-1,...
+            H.s1mb.chrStart(iChr):H.s1mb.chrStart(iChr)+size(temp,2)-1,iSample) = temp;
+        
+        % O/E
+        temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
+            chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize);
+        H.s1mb.oe(H.s1mb.chrStart(iChr):H.s1mb.chrStart(iChr)+size(temp,1)-1,...
+            H.s1mb.chrStart(iChr):H.s1mb.chrStart(iChr)+size(temp,2)-1,iSample) = temp;
+        
+        % Norm Vecs
+        normVec{iChr} = juicerToolsDumpNorm('KR',sampleFn{iSample},...
+            chrInfo.chr{iChr},hicParam.binType,hicParam.binSize);
+    end
+    
+    % KR and OE normalize - interChr
     for iChr1 = 1:numChr
-        for iChr2 = iChr1:numChr
+        for iChr2 = iChr1+1:numChr
+            fprintf('Extracting Hi-C, 1Mb, InterChr:%i vs %i...\n',iChr1,iChr2)
             % for estimation of time
             if iChr1==1 && iChr2==1 && iSample==1;tic;end
             
@@ -148,27 +186,30 @@ for iSample = 1:length(sampleFn)
                 iSample,length(sampleFn),chrInfo.chr{iChr1},chrInfo.chr{iChr2},...
                 round(avTime*(totalWait-currentWait))));
             
-            % o/e
-            temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
-                chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
-            H.s1mb.oe(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
-                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
+            % KR
+            tempChrRaw = tempAllRaw(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1+1)-1,...
+                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2+1)-1);
+            tempChrKr = diag(normVec{iChr1}.^-1)*tempChrRaw*diag(normVec{iChr2}.^-1);
+            H.s1mb.kr(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(tempChrKr,1)-1,...
+                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(tempChrKr,2)-1,iSample) = tempChrKr;
             
-            % observed
-            temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
-                chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
-            H.s1mb.kr(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
-                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
-            
-            % update load bar variable
-            currentWait = currentWait+1;
-            
-            % for estimation of time to load
-            if iChr1==1 && iChr2==1 && iSample==1;avTime = toc;end
+            % OE
+            H.s1mb.oe(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(tempChrKr,1)-1,...
+                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(tempChrKr,2)-1,iSample) =...
+                tempChrKr./nanmean(tempChrKr(:));
         end
     end
+    
+    % symmetrize
     H.s1mb.oe(:,:,iSample) = max(cat(3,H.s1mb.oe(:,:,iSample),H.s1mb.oe(:,:,iSample)'),[],3);
     H.s1mb.kr(:,:,iSample) = max(cat(3,H.s1mb.kr(:,:,iSample),H.s1mb.kr(:,:,iSample)'),[],3);
+    
+    % change data type
+    switch numericType
+        case 'single'
+            H.s1mb.kr = single(H.s1mb.kr);
+            H.s1mb.oe = single(H.s1mb.oe);
+    end
 end
 close(waitBar)
 
