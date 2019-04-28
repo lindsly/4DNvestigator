@@ -50,6 +50,7 @@ for iSample = 1:length(fn)
     if contains(fn{iSample},'http')
         outfilename = websave([tempdir,'temp.txt'],fn{iSample});
         dataIn = readtable(outfilename,'filetype', 'text');
+        delete(outfilename)
     else
         dataIn = readtable(fn{iSample},'filetype', 'text');
     end
