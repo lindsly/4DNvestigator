@@ -6,6 +6,8 @@
 *.m~
 *.asv
 *.DS_Store
+*.gct
+*.cls
 
 # folders
 functions/depreciated/

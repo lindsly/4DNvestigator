@@ -33,7 +33,7 @@ save([dataInfo.path.output,dataInfo.delim,dataInfo.projName,'Data.mat'],'H','R',
 % expression pattern analysis
 gseaFlag = 1;
 rnaseqPatternFlag = 1;
-[R] = fdnDiffExpGsaa(dataInfo,R,1,1);
+[R, rnaseqPatternAll] = fdnDiffExpGsaa(dataInfo,R,1,1);
 
 %% 4DN Feature Analyzer Example
 % select Regions of Interest

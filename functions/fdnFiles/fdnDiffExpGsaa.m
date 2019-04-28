@@ -1,18 +1,20 @@
-function [R] = fdnDiffExpGsaa(dataInfo,R,gseaFlag,rnaseqPatternFlag)
+function [R, rnaseqPatternAll] = fdnDiffExpGsaa(dataInfo,R,gseaFlag,rnaseqPatternFlag)
 %fdnDiffExpGsaa This function performs differential expression and
 %creates files for GSAA
 %
 %   Input
-%   dataInfo:   4DNvestigator structure that contains information on samples input
-%   R:          4DNvestigator structure that contains RNA-seq data
-%   gseaFlag:   flag for creating GSEA files
-%   rnaseqPatternFlag:   flag for creating RNA-seq pattern heatmaps
+%   dataInfo:           4DNvestigator structure that contains information
+%                       on samples input
+%   R:                  4DNvestigator structure that contains RNA-seq data
+%   gseaFlag:           flag for creating GSEA files
+%   rnaseqPatternFlag:  flag for creating RNA-seq pattern heatmaps
 %
 %   Output 
-%   R:          4DNvestigator structure that contains RNA-seq data with
-%               differential expression table added
+%   R:                  4DNvestigator structure that contains RNA-seq data
+%                       with differential expression table added
+%   rnaseqPatternAll:   Table containing RNA-seq time-series patterns
 %
-%   Version 2.0 (4/25/19)
+%   Version 2.1 (4/28/19)
 %   Written by: Scott Ronquist
 %   Contact:    scotronq@umich.edu
 %   Created:    1/22/19
@@ -26,6 +28,8 @@ function [R] = fdnDiffExpGsaa(dataInfo,R,gseaFlag,rnaseqPatternFlag)
 %   * reorganized function
 %       * new structure for diffExpTable (table in table)
 %       * added gsea flag
+%   v2.1 (4/28/19)
+%   * added rnaseqPatternAll output
 
 %% Set up
 if nargin < 3;gseaFlag = 0;end
@@ -36,6 +40,7 @@ samplesAll = unique(dataInfo.sampleInfo.sample);
 
 % create data table
 diffExpCellSamp = cell(length(samplesAll),1);
+rnaseqPatternAll = cell(length(samplesAll),1);
 
 %% Compare between all time points in a sample
 for iS = 1:length(samplesAll)
@@ -122,9 +127,11 @@ for iS = 1:length(samplesAll)
     end
     
     % add to diffExpCellSamp - level 1
+    tempName = strcat('tp',cellstr(num2str(sampleTps)));
+    tempName = genvarname(strrep(tempName,'-','_'));
     diffExpCellSamp{iS,1} = cell2table(diffExpCellTp,...
         'RowNames',strcat('tp',cellstr(num2str(sampleTps))),...
-        'VariableNames',strcat('tp',cellstr(num2str(sampleTps))));
+        'VariableNames',tempName);
     
     %% Determine gene expresssion patterns over time
     if rnaseqPatternFlag
@@ -174,8 +181,14 @@ for iS = 1:length(samplesAll)
             % add to master table
             tempDataAll = [tempDataAll; tempData];
             tempDataNormAll = [tempDataNormAll; tempDataNorm];
-            tempGenesAll = [tempGenesAll;tempGenes];
+            tempGenesAll = [tempGenesAll; tempGenes];
         end
+        % add NaN to master table
+        tempDataAll = [tempDataAll; rnaseqPattern(isnan(IC),:)];
+        tempDataNormAll = [tempDataNormAll; rnaseqPatternNorm(isnan(IC),:)];
+        tempGenesAll = [tempGenesAll; diffExpCellSamp{iS,1}{1,2}{1}{isnan(IC),4}];
+        
+        sort(IC,'ascend')
         
         % plot image, all patterns together
         figure, imagesc(tempDataNormAll)
@@ -183,6 +196,10 @@ for iS = 1:length(samplesAll)
         xticks(1:size(tempDataNorm,2)), xticklabels(sampleTps), xlabel('TP')
         ylabel('Normalized Gene Expression')
         title(sprintf('RNA-seq Patterns, TPM thresh=%i, Sample "%s"',rnaseqThresh,samplesAll{iS}))
+        
+        % create variable for output
+        rnaseqPatternAll{iS} = table(tempGenesAll,tempDataAll,tempDataNormAll,sort(IC,'ascend'));
+        rnaseqPatternAll{iS}.Properties.VariableNames = {'geneName','TpmMean','TpmMeanNorm','cluster'};
     end
 end
 
