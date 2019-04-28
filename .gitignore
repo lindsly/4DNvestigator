@@ -16,4 +16,4 @@ classes/
 dev/
 
 # exceptions
-!/data/sampleData/indexFiles/publicDataIndex.xlsx
+!data/sampleData/indexFiles/sample*.xlsx

@@ -17,6 +17,8 @@ function [H] = fdnLoadHic(dataInfo)
 %   * fdnLoadHic.m created
 %   v1.1 (03/15/19)
 %   * formatted preamble
+%   v1.2 (04/28/19)
+%   * updated speed (only extract O/E once)
 
 %% get information dataInfo
 % get chr information from hic header
@@ -48,10 +50,15 @@ chrBinSizes = ceil(chrInfo.chrLength/hicParam.binSize);
 H.s100kb.oe = cell(numChr,1);
 H.s100kb.kr = cell(numChr,1);
 
+% initialize intra-chr size
 for iChr = 1:numChr
     H.s100kb.oe{iChr} = zeros(chrBinSizes(iChr),chrBinSizes(iChr),length(sampleFn));
     H.s100kb.kr{iChr} = zeros(chrBinSizes(iChr),chrBinSizes(iChr),length(sampleFn));
-    for iSample = 1:length(sampleFn)
+end
+
+% load data from .hic file
+for iSample = 1:length(sampleFn)
+    for iChr = 1:numChr
         % for estimation of time
         if iChr==1 && iSample==1;tic;end
         
@@ -60,25 +67,53 @@ for iChr = 1:numChr
             sprintf('Loading 100kb Hi-C. Sample: (%d/%d), chr:%s, estimated time: %i secs...',...
             iSample,length(sampleFn),chrInfo.chr{iChr},round(avTime*(totalWait-currentWait))));
         
-        % extract o/e normalized
-        temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
+        % extract KR
+        tempKr = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
             chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
-        temp(isnan(temp)) = 0;
-        temp = max(cat(3,temp,temp'),[],3);
-        H.s100kb.oe{iChr}(1:length(temp),1:length(temp),iSample) = temp;
+        tempKr(isnan(tempKr)) = 0;
+        tempKr = max(cat(3,tempKr,tempKr'),[],3);
+        H.s100kb.kr{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempKr;
         
-        % extract observed as well
-        temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
-            chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
-        temp(isnan(temp)) = 0;
-        temp = max(cat(3,temp,temp'),[],3);
-        H.s100kb.kr{iChr}(1:length(temp),1:length(temp),iSample) = temp;
+        % if Chr1, get O/E KR vector
+        % O/E vector is consistent for all chromosomes
+        if iChr==1
+            tempKrOe = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
+                chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
+            tempKrOe(isnan(tempKrOe)) = 0;
+            tempKrOe = max(cat(3,tempKrOe,tempKrOe'),[],3);
+            tempKrE = tempKr./tempKrOe;
+            
+            % fix NaN locs derived from zero contacts in chr 1
+            tempKrEVec = zeros(length(tempKrE),1);
+            for iBin = 1:length(tempKrE)
+                tempKrEVec(iBin) = nanmax(diag(tempKrE,iBin-1));
+            end
+            
+            % interpolate NaN values
+            nanx = isnan(tempKrEVec);
+            t    = 1:numel(tempKrEVec);
+            tempKrEVec(nanx) = interp1(t(~nanx), tempKrEVec(~nanx), t(nanx));
+            
+            % fix NaNs at margin
+            nanx = isnan(tempKrEVec);
+            tempKrEVec(nanx) = tempKrEVec(find(nanx==0, 1, 'last' ));
+            tempKrE = toeplitz(tempKrEVec);
+        end
+        
+        % calculate O/E
+        H.s100kb.oe{iChr}(1:length(tempKr),1:length(tempKr),iSample) = ...
+            tempKr./tempKrE(1:length(tempKr),1:length(tempKr));
+        
+%         % extract KR OE (for comparison)
+%         temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
+%             chrInfo.chr{iChr},chrInfo.chr{iChr},hicParam.binType,hicParam.binSize,hicParam.intraFlag);
+%         temp(isnan(temp)) = 0;
+%         temp = max(cat(3,temp,temp'),[],3);
         
         % update load bar variable
         currentWait = currentWait+1;
         if iChr==1 && iSample==1;avTime = toc;end % for estimation of time to load
     end
-    
 end
 close(waitBar)
 
@@ -116,14 +151,12 @@ for iSample = 1:length(sampleFn)
             % o/e
             temp = hic2mat(hicParam.norm3d,hicParam.norm1d,sampleFn{iSample},...
                 chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
-            %if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
             H.s1mb.oe(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
                 H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
             
             % observed
             temp = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
                 chrInfo.chr{iChr1},chrInfo.chr{iChr2},hicParam.binType,hicParam.binSize);
-            %if chrSizesSorted(iChr2)>chrSizesSorted(iChr1); temp=temp';end
             H.s1mb.kr(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(temp,1)-1,...
                 H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(temp,2)-1,iSample) = temp;
             

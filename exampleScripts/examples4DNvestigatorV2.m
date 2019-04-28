@@ -3,17 +3,11 @@
 % "4DNvestigator: a toolbox for the analysis of timeseries Hi-C and RNA-seq
 % data"
 %
-% Scott Ronquist, scotronq@umich.edu. 4/23/19
+% Scott Ronquist, scotronq@umich.edu. 4/28/19
 
 %% Set up
 clear
 close all
-
-% get path and run from script path
-scriptPath = mfilename('fullpath');
-delimLoc = strfind(scriptPath,filesep);
-cd(scriptPath(1:delimLoc(end)-1))
-addpath(genpath('.'))
 
 %% Select Data set to Load
 % load publicly available Hi-C and RNA-seq datasets
@@ -23,20 +17,16 @@ switch datasetSelect
     case 'myod'
         indexFile = 'https://s3.us-east-2.amazonaws.com/4dnvestigator/sampleData/myod/sampleMyodDataIndexTp-48_8_80.xlsx';
     case 'tcf7l2'
-        
+        indexFile = 'https://s3.us-east-2.amazonaws.com/4dnvestigator/sampleData/tcf7l2/sampleTcf7l2DataIndexTp0_72.xlsx';
 end
 
-%% Load data through the 4DNvestigator
-if ~isfile('./data/myodTsData.mat')
-    [dataInfo] = fdnLoadUserInput('sampleMyodDataIndexTp-48_8_80.xlsx','myod','.');
-    [H] = fdnLoadHic(dataInfo);
-    [R] = fdnLoadRnaseq(dataInfo,H);
-    
-    % save data
-    save('./data/myodTsData','H','R','dataInfo','-v7.3')
-else
-    load('./data/myodTsData.mat')
-end
+%% Load data through the 4DNvestigator functions
+[dataInfo] = fdnLoadUserInput(indexFile);
+[H] = fdnLoadHic(dataInfo);
+[R] = fdnLoadRnaseq(dataInfo,H);
+
+% save data
+save('./data/myodTsData','H','R','dataInfo','-v7.3')
 
 %% Time series differential expression
 % run samples through differential expression analysis, with time gene

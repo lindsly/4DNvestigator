@@ -13,15 +13,44 @@ function [dataInfo] = fdnLoadUserInput(indexFile,projectName,outputPath)
 %
 %   Scott Ronquist, scotronq@umich.edu. 1/22/18
 
-%% get computer info
+%% Get computer info
 dataInfo.delim = filesep;
 dataInfo.hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
+
+%% Get Project Name
+if exist('projectName','var')
+    dataInfo.projName = projectName;
+else
+    temp = inputdlg('Input Project Name:','Project Name');
+    dataInfo.projName = temp{1};
+end
+
+%% Create analysis output directory
+if exist('outputPath','var')
+    dataInfo.path.output = outputPath;
+else
+    fprintf('Select Output folder\n')
+    dataInfo.path.output = uigetdir(pwd,'Select Output folder');
+end
+
+% make subdirectories
+mkdir([dataInfo.path.output,dataInfo.delim,'figures'])
+mkdir([dataInfo.path.output,dataInfo.delim,'tables'])
+mkdir([dataInfo.path.output,dataInfo.delim,'data'])
+mkdir([dataInfo.path.output,dataInfo.delim,'data',dataInfo.delim,'gsaa'])
 
 %% load from input index file
 if exist('indexFile','var')
     if ischar(indexFile)
         dataInfo.indexFile = indexFile;
-        dataInfo.sampleInfo = readtable(dataInfo.indexFile);
+        
+        % download and read file if AWS
+        if contains(indexFile,'http')
+            dataInfo.sampleInfo = webread(dataInfo.indexFile);
+        else
+            dataInfo.sampleInfo = readtable(dataInfo.indexFile);
+        end
+        
     elseif istable(indexFile)
         dataInfo.sampleInfo = indexFile;
     end
@@ -101,14 +130,6 @@ else
     error('.hic files have different reference genomes, cannot compare')
 end
 
-%% Get Project Name
-if exist('projectName','var')
-    dataInfo.projName = projectName;
-else
-    temp = inputdlg('Input Project Name:','Project Name');
-    dataInfo.projName = temp{1};
-end
-
 %% Create replicate identifier
 [uvals, ~, uidx] = unique(strcat(dataInfo.sampleInfo.sample,...
     cellstr(num2str(dataInfo.sampleInfo.timePoint)), dataInfo.sampleInfo.dataType));
@@ -132,20 +153,6 @@ dataInfo.sampleInfo = sortrows(dataInfo.sampleInfo,...
 % Create sampleSlice (to be filled later as data is loaded)
 dataInfo.sampleInfo.index = [1:sum(ismember(dataInfo.sampleInfo.dataType,'hic')),...
     1:sum(ismember(dataInfo.sampleInfo.dataType,'rnaseq'))]';
-
-%% Create analysis output directory
-if exist('outputPath','var')
-    dataInfo.path.output = outputPath;
-else
-    fprintf('Select Output folder\n')
-    dataInfo.path.output = uigetdir(pwd,'Select Output folder');
-end
-
-% make subdirectories
-mkdir([dataInfo.path.output,dataInfo.delim,'figures'])
-mkdir([dataInfo.path.output,dataInfo.delim,'tables'])
-mkdir([dataInfo.path.output,dataInfo.delim,'data'])
-mkdir([dataInfo.path.output,dataInfo.delim,'data',dataInfo.delim,'gsaa'])
 
 end
 
