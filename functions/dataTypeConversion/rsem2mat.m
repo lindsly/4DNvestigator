@@ -9,7 +9,16 @@ function [dataOut] = rsem2mat(fn,dataName,refGenome)
 %   Output
 %   dataOut:    formated RNA-seq data
 %
-%   Scott Ronquist, scotronq@umich.edu. 1/22/19
+%   Version 1.1 (04/28/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    01/22/19
+%   
+%   Revision History:
+%   v1.0 (01/22/19)
+%   * rsem2mat.m created
+%   v1.1 (04/28/19)
+%   * added websave/read option
 
 %% set default parameters
 if ~exist('refGenome','var') || isempty(refGenome); refGenome='hg19'; end
@@ -37,7 +46,13 @@ end
 for iSample = 1:length(fn)
     fprintf('formatting sample %d of %d\n',iSample,length(fn))
     
-    dataIn = readtable(fn{iSample},'filetype', 'text');
+    % read file if AWS
+    if contains(fn{iSample},'http')
+        outfilename = websave([tempdir,'temp.txt'],fn{iSample});
+        dataIn = readtable(outfilename,'filetype', 'text');
+    else
+        dataIn = readtable(fn{iSample},'filetype', 'text');
+    end
     
     if iSample==1
         % keep genes that are found in both RNA-seq and biomart

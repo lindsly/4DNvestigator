@@ -111,18 +111,21 @@ for iSample = 1:length(sampleFn)
         H.s100kb.oe{iChr}(1:length(tempKr),1:length(tempKr),iSample) = ...
             tempKr./tempKrE(1:length(tempKr),1:length(tempKr));
         
-        % change data type
-        switch numericType
-            case 'single'
-                H.s100kb.kr{iChr} = single(H.s100kb.kr{iChr});
-                H.s100kb.oe{iChr} = single(H.s100kb.oe{iChr});
-        end
-        
         % update load bar variable
         currentWait = currentWait+1;
         if iChr==1 && iSample==1;avTime = toc;end % for estimation of time to load
     end
 end
+
+% change data type
+for iChr = 1:numChr
+    switch numericType
+        case 'single'
+            H.s100kb.kr{iChr} = single(H.s100kb.kr{iChr});
+            H.s100kb.oe{iChr} = single(H.s100kb.oe{iChr});
+    end
+end
+
 close(waitBar)
 
 %% load Hi-C data - 1Mb
@@ -203,13 +206,13 @@ for iSample = 1:length(sampleFn)
     % symmetrize
     H.s1mb.oe(:,:,iSample) = max(cat(3,H.s1mb.oe(:,:,iSample),H.s1mb.oe(:,:,iSample)'),[],3);
     H.s1mb.kr(:,:,iSample) = max(cat(3,H.s1mb.kr(:,:,iSample),H.s1mb.kr(:,:,iSample)'),[],3);
-    
-    % change data type
-    switch numericType
-        case 'single'
-            H.s1mb.kr = single(H.s1mb.kr);
-            H.s1mb.oe = single(H.s1mb.oe);
-    end
+end
+
+% change data type
+switch numericType
+    case 'single'
+        H.s1mb.kr = single(H.s1mb.kr);
+        H.s1mb.oe = single(H.s1mb.oe);
 end
 close(waitBar)
 

@@ -44,7 +44,7 @@ if exist('indexFile','var')
     if ischar(indexFile)
         dataInfo.indexFile = indexFile;
         
-        % download and read file if AWS
+        % webread file if AWS
         if contains(indexFile,'http')
             dataInfo.sampleInfo = webread(dataInfo.indexFile);
         else
@@ -89,9 +89,9 @@ end
 % extract sample names from sample filename
 tempName = cell(height(dataInfo.sampleInfo),1);
 for iSample = 1:height(dataInfo.sampleInfo)
-    temp1 = strsplit(dataInfo.sampleInfo.path{iSample},dataInfo.delim);
-    temp2 = strsplit(temp1{end},{'.'});
-    tempName{iSample} = temp2{1};
+    [filepath,name,ext] = fileparts(dataInfo.sampleInfo.path{iSample});
+    nameSimple = strsplit(name,{'.'});
+    tempName{iSample} = nameSimple{1};
 end
 dataInfo.sampleInfo.name = tempName;
 
