@@ -3,60 +3,30 @@
 % "4DNvestigator: a toolbox for the analysis of timeseries Hi-C and RNA-seq
 % data"
 %
-% Scott Ronquist, scotronq@umich.edu. 4/23/19
+% Scott Ronquist, scotronq@umich.edu. 4/28/19
 
 %% Set up
 clear
 close all
 
-% get path and run from script path
-scriptPath = mfilename('fullpath');
-delimLoc = strfind(scriptPath,filesep);
-cd(scriptPath(1:delimLoc(end)-1))
-addpath(genpath('.'))
+%% Select Data set to Load
+% load publicly available Hi-C and RNA-seq datasets
 
-%% Download data
-% Download the time series RNA-seq and Hi-C data to perform this analysis
-%
-% MYOD
-%   Paper:  Liu, Sijia, et al. "Genome architecture mediates
-%           transcriptional control of human myogenic reprogramming." iScience 6
-%           (2018): 232-246.
-%   Download link:  https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
-%
-% TCF7L2
-%   Paper: unpublished
-%   Download link:  
-
-if ~isfile('sampleMyodDataIndexTp-48_8_80.xlsx')
-    error(['Please download the time series RNA-seq and Hi-C data available ',...
-        '<a href="https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm">here</a>'])
+datasetSelect = 'myod';
+switch datasetSelect
+    case 'myod'
+        indexFile = 'https://s3.us-east-2.amazonaws.com/4dnvestigator/sampleData/myod/sampleMyodDataIndexTp-48_8_80.xlsx';
+    case 'tcf7l2'
+        indexFile = 'https://s3.us-east-2.amazonaws.com/4dnvestigator/sampleData/tcf7l2/sampleTcf7l2DataIndexTp0_72.xlsx';
 end
 
+%% Load data through the 4DNvestigator functions
+[dataInfo] = fdnLoadUserInput(indexFile);
+[H] = fdnLoadHic(dataInfo,'single');
+[R] = fdnLoadRnaseq(dataInfo,H);
 
-% TEST (dropbox; delete later)
-%%% PARAMETERS vvv
-hicParam.binType = 'BP';
-hicParam.binSize = 1E5;
-hicParam.norm1d = 'KR';
-hicParam.norm3d = 'oe';
-hicParam.intraFlag = 1;
-%%% PARAMETERS ^^^
-temp = hic2mat(hicParam.norm3d,hicParam.norm1d,...
-    'https://s3.us-east-2.amazonaws.com/4dnvestigator/inter_30.hic',...
-    20,20,hicParam.binType,hicParam.binSize,hicParam.intraFlag);
-
-%% Load data through the 4DNvestigator
-if ~isfile('./data/myodTsData.mat')
-    [dataInfo] = fdnLoadUserInput('sampleMyodDataIndexTp-48_8_80.xlsx','myod','.');
-    [H] = fdnLoadHic(dataInfo);
-    [R] = fdnLoadRnaseq(dataInfo,H);
-    
-    % save data
-    save('./data/myodTsData','H','R','dataInfo','-v7.3')
-else
-    load('./data/myodTsData.mat')
-end
+% save data
+save([dataInfo.path.output,dataInfo.delim,dataInfo.projName,'Data.mat'],'H','R','dataInfo','-v7.3')
 
 %% Time series differential expression
 % run samples through differential expression analysis, with time gene
