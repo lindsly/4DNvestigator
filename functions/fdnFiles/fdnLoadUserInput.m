@@ -137,6 +137,7 @@ dataInfo.sampleInfo.index = [1:sum(ismember(dataInfo.sampleInfo.dataType,'hic'))
 if exist('outputPath','var')
     dataInfo.path.output = outputPath;
 else
+    fprintf('Select Output folder\n')
     dataInfo.path.output = uigetdir(pwd,'Select Output folder');
 end
 
