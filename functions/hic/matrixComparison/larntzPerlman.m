@@ -47,11 +47,17 @@ function [H0,P,SMat] = larntzPerlman(R,n,alphaParam,plotFlag)
 
 %% Set default parameters
 % default alpha set to .95. No chi-squared plot by default
-if nargin < 3;alphaParam = .95;fprintf('default alpha=%.2f...\n',alphaParam),pause(1);end
-if nargin < 4;plotFlag = 0;fprintf('default plotFlag=%i...\n',plotFlag),pause(1);end
+if nargin < 2
+    n = size(R,1);
+    fprintf('Default n=%i (size of input correlation matrices...\n',n)
+    fprintf('Note: this default is specific for Hi-C matrices\n')
+    pause(1);
+end
+if nargin < 3; alphaParam = .95; fprintf('Default alpha=%.2f...\n',alphaParam), pause(1); end
+if nargin < 4; plotFlag = 0; fprintf('Default plotFlag=%i...\n',plotFlag), pause(1); end
 
 %% Perform Larntz-Perlman procedure
-% get input data dimensions
+% Get input data dimensions
 p = size(R,1);
 k = size(R,3);
 
@@ -65,7 +71,7 @@ for iK = 1:k
     z(:,iK) = .5*log((1+r)./(1-r));
 end
 
-% calculate mean Z score, S, and Test statistic, and Sidak correction
+% Calculate mean Z score, S, and Test statistic, and Sidak correction
 zBar = mean(z,2);
 SVec = (n-3)*sum((z-repmat(zBar,1,k)).^2,2);
 T = max(SVec);

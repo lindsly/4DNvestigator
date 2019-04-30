@@ -27,7 +27,13 @@ function [Sd,Q] = hicSpector(A,B,r)
 %   Revision History:
 
 %% set-up
-if nargin<3;r=20;end
+% default number of eigenvectors
+if nargin<3; r=20; end
+
+% if matrix size >= r, r = matrix size-1
+if r >= size(A,1)
+    r = size(A,1)-1;
+end
 
 % calculate the laplacian from Hi-C
 LnA = mat2lap(A);
