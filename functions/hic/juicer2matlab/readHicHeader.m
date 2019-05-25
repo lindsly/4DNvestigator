@@ -13,18 +13,13 @@ function [hicHeader] = readHicHeader(fn, idxRefGenome)
 % find 4DNvestigator juicer tools path
 juicerJarDir = mfilename('fullpath');
 
-folderSlash = '\';
-if isunix
-    folderSlash = '/';
-end
-
-juicerJarDirLevels = strfind(juicerJarDir,folderSlash);
+juicerJarDirLevels = strfind(juicerJarDir,filesep);
 juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 
 %% get and format .hic header info
 % get "read_hic_header.py" file location
 juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
-    sprintf('straw-master%spython%sread_hic_header.py',folderSlash,folderSlash)];
+    sprintf('straw-master%spython%sread_hic_header.py',filesep,filesep)];
 
 % run "read_hic_header.py"
 [status,cmdout] = system(sprintf('python %s %s',juicerReadHic,fn));

@@ -9,6 +9,8 @@
 *.gct
 *.cls
 
+*Dev.m
+
 # folders
 functions/depreciated/
 data/sampleData/*

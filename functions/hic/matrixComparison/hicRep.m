@@ -20,13 +20,14 @@ function [ps] = hicRep(X,binSize)
 
 %% set up
 X(isnan(X)) = 0;
-N = length(X);
+n = size(X,1);
 T = size(X,3); % should always be 2 (pairwise comparison)
 
 % select h (smoothing parameter size, based on input Hi-c bin size)
 hMat = [20  10E3;...
         11  25E3;...
         5   40E3;...
+        5   50E3;...
         3   100E3;...
         1   500E3;...
         0   1E6];
@@ -34,11 +35,23 @@ h = hMat(hMat(:,2)==binSize,1);
 
 % smooth the matrix
 hSmoothMat = ones(2*h+1)/(2*h+1)^2;
-XSmooth = imfilter(X,hSmoothMat,'replicate');
+XSmooth = imfilter(X,hSmoothMat);%,'replicate');
+
+% manual smooth
+XSmooth = zeros(size(X));
+for iSamp = 1:T
+    for i = 1:n
+        for j = i:n
+            XSmooth(i,j,iSamp) = sum(sum(X(max([1 i-h]):min([i+h n]),...
+                max([1 j-h]):min([j+h n]),iSamp)))/(1+2*h)^2;
+        end
+    end
+    XSmooth(:,:,iSamp) = XSmooth(:,:,iSamp)+triu(XSmooth(:,:,iSamp),1)';
+end
 
 % remove counts > 5Mb from diagonal
-if N*binSize > 5E6
-    remMat = triu(ones(N),round(5E6*(1/binSize)));
+if n*binSize > 5E6
+    remMat = triu(ones(n),round(5E6*(1/binSize)));
     remMat = remMat+remMat';
     XSmooth(find(repmat(remMat,[1 1 T]))) = NaN;
 end
@@ -48,6 +61,7 @@ kTotal = sum(~isnan(XSmooth(1,:,1)));
 Nk = zeros(kTotal,1);
 r1k = zeros(kTotal,1);
 r2k = zeros(kTotal,1);
+r2kNorm = zeros(kTotal,1);
 pk = zeros(kTotal,1);
 
 for iK = 1:kTotal
@@ -60,13 +74,21 @@ for iK = 1:kTotal
     % calculate stratum mean and variance
     r1k(iK) = mean(Xk.*Yk)-(mean(Xk)*mean(Yk));
     r2k(iK) = sqrt(var(Xk)*var(Yk));
-    r2kNorm(iK) = sqrt(var(normalize(Xk,'range'))*var(normalize(Yk,'range')));
+    % r2kNorm(iK) = sqrt(var(normalize(Xk,'range'))*var(normalize(Yk,'range')));
+    
+    % https://github.com/qunhualilab/hicrep/blob/master/R/vstran.R
+    dataSorted = sort(Xk); [~, rnkXk] = ismember(Xk,dataSorted);
+    dataSorted = sort(Yk); [~, rnkYk] = ismember(Yk,dataSorted);
+    r2kNorm(iK) = sqrt(var(rnkXk/Nk(iK))*var(rnkYk/Nk(iK)));
     
     % stratum-specific correlation ?k
     pk(iK) = r1k(iK)/r2k(iK);
+    
+    %https://github.com/qunhualilab/hicrep/blob/master/R/get.scc.R
+    pk(iK) = corr(Xk,Yk);
 end
 
 % stratum-adjusted correlation coefficient (SCC)
-ps = sum(Nk.*r2kNorm.*pk)/sum(Nk.*r2kNorm);
+ps = nansum(Nk.*r2kNorm.*pk)/nansum(Nk.*r2kNorm);
 
 end

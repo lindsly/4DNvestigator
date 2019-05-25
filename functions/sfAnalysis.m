@@ -86,33 +86,32 @@ end
 dimReduc = lower(dimReduc);
 switch dimReduc
     case 'pca'
-        [~,score,~,~,~] = pca(XnormStacked);
+        [~,score,~] = pca(XnormStacked);
     case 'lapeigen'
-        score = laplacian_eigen(XnormStacked,3);
+        knn = 30*size(hic,3);%30*size(hic,3);
+        sigma = 100;
+        score = laplacian_eigen(XnormStacked, 3, knn, sigma);
     case 'tsne'
         score = tsne(XnormStacked,[],3);
+    otherwise
+        error('please select a valid dimension reduction method: pca, lapeigen, tsne')
 end
 
 %% Figure output
+% figure('units','normalized','position',[.1 .1 .8 .8]), hold on
+% figure, hold on
+figure('position',[50 50 750 550]), hold on
 if size(Xnorm,3) == 1
     % plot features in low dimensional space
     colorScale = jet(length(binNames));
-    figure('units','normalized','position',[.1 .1 .8 .8]), hold on
     scatter3(score(:,1), score(:,2), score(:,3), 10, colorScale,'filled');
-    xlabel('PC 1'), ylabel('PC 2'), zlabel('PC 3')
-    view(2)
     
-    % label top 10% or top 100 (min) furthest pts
+    % label top 10% or top 10 (min) furthest pts
     numPts = min([round(size(score,1)*.1) 10]);
     distMat = squareform(pdist(score(:,1:3)));
     [~,labelLocs] = sort(sum(distMat),'descend');
     text(score(labelLocs(1:numPts),1), score(labelLocs(1:numPts),2),...
         score(labelLocs(1:numPts),3), binNames(labelLocs(1:numPts)))
-    
-    % format output
-    box on
-    title('Structure-Function Feature Space')
-    set(gca,'linewidth',2,'fontsize',15)
     
 else
     % reshape data, take first 3 dimensions
@@ -125,19 +124,18 @@ else
     
     % plot features in low dimensional space
     colorScale = jet(numSamples);
-    figure('units','normalized','position',[.1 .1 .8 .8]), hold on
     for iS = 1:numSamples
         scatter3(scoreReshape(:,1,iS), scoreReshape(:,2,iS),...
             scoreReshape(:,3,iS), 20,colorScale(iS,:),'filled');
     end
-    xlabel('PC 1'), ylabel('PC 2'), zlabel('PC 3')
-    view(2)
     
     % add lines btw pts
+    if 1==1%~strcmp(dimReduc,'lapeigen')
     for iS = 1:numSamples-1
         plot3([scoreReshape(:,1,iS),scoreReshape(:,1,iS+1)]',...
             [scoreReshape(:,2,iS),scoreReshape(:,2,iS+1)]',...
             [scoreReshape(:,3,iS),scoreReshape(:,3,iS+1)]','k-')
+    end
     end
     
     % get dist btw pts
@@ -198,10 +196,19 @@ else
     end
     legend(h,sampleName);
     
-    % format output
-    box on
-    title('Structure-Function Feature Space')
-    set(gca,'linewidth',2,'fontsize',15)
 end
+
+% format output
+box on
+title(sprintf('Structure-Function Feature Space - %s',dimReduc))
+
+switch dimReduc
+    case 'pca'
+        xlabel('PC 1'), ylabel('PC 2'), zlabel('PC 3')
+    otherwise
+        xlabel('Component 1'), ylabel('Component 2'), zlabel('Component 3')
+end
+view(2)
+set(gca,'linewidth',2,'fontsize',15)
 end
 

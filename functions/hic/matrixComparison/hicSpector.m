@@ -28,7 +28,7 @@ function [Sd,Q] = hicSpector(A,B,r)
 
 %% set-up
 % default number of eigenvectors
-if nargin<3; r=20; end
+if nargin<3; r=min([20, size(A,1)]); end
 
 % if matrix size >= r, r = matrix size-1
 if r >= size(A,1)
