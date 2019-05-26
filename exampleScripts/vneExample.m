@@ -68,3 +68,37 @@ colormap(hicCMap), caxis([-2 2])
 
 set(get(gcf,'children'),'linewidth',2,'fontsize',20)
 linkaxes(get(gcf,'children'))
+
+%% Visualize Matrices with VNE - corr
+% figure
+figure('position',[50 50 1300 500])
+hicCMap = 1-((1-redblue(100))*.7);
+
+subplot(1,2,2)
+imagesc(corr(HTrim(:,:,1))), axis square
+caxis([-1 1])
+
+subplot(1,2,1)
+imagesc(corr(HTrim(:,:,2))), axis square
+caxis([-1 1]), colorbar
+ylabel('corr(log_2(O/E))')
+
+set(get(gcf,'children'),'linewidth',2,'fontsize',20)
+linkaxes(get(gcf,'children'))
+
+%% Visualize Matrices with VNE
+% figure
+figure('position',[50 50 1300 500])
+hicCMap = 1-((1-redblue(100))*.7);
+
+subplot(1,2,2)
+imagesc(HTrim(:,:,1)), axis square
+colormap(hicCMap), caxis([-2 2])
+
+subplot(1,2,1)
+imagesc(HTrim(:,:,2)), axis square
+colormap(hicCMap), caxis([-2 2]), colorbar
+ylabel('log_2(O/E)')
+
+set(get(gcf,'children'),'linewidth',2,'fontsize',20)
+linkaxes(get(gcf,'children'))

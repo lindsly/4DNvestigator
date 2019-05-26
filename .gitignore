@@ -16,7 +16,7 @@ functions/depreciated/
 data/sampleData/*
 data/sampleData/indexFiles/*
 paperFiles/
-classes/
+#classes/
 dev/
 
 # exceptions

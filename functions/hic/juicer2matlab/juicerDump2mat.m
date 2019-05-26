@@ -6,7 +6,7 @@ function [Hj] = juicerDump2mat(juicerFn,intraFlag,specificBins,dataType)
 %
 %   Input
 %   juicerFn:      Juicer file name or juicer_tools dump output (N x 3 matrix)
-%   intraFlag:      Denote intra-chr (1) vs inter-chr (0) (default: 0)
+%   intraFlag:     Denote intra-chr (1) vs inter-chr (0) (default: 0)
 %   specificBins:  Specify bins to output (default: all bins output)
 %   dataType:      Variable number type (default: double)
 %
@@ -15,12 +15,12 @@ function [Hj] = juicerDump2mat(juicerFn,intraFlag,specificBins,dataType)
 %
 %   Scott Ronquist, scotronq@umich.edu. 1/22/19
 
-%% set default parameters
+%% Set default parameters
 if ~exist('intraFlag','var')||isempty(intraFlag); intraFlag = 0; end
 if ~exist('specificBins','var')||isempty(specificBins); specificBins = []; end
 if ~exist('dataType','var')||isempty(dataType); dataType = 'double'; end
 
-%% extract juicer txt data
+%% Extract juicer txt data
 if ischar(juicerFn)
     fileID = fopen(juicerFn);
     C = textscan(fileID,'%d %d %d');
@@ -32,29 +32,20 @@ else
     C(:,1:2) = C(:,1:2)+1;
 end
 
-%% extra
+%% Keep specific bins
 if ~isempty(specificBins)
     [~,~,bin1] = histcounts(C(:,1),[specificBins(:,1);specificBins(end,2)]);
     [~,~,bin2] = histcounts(C(:,2),[specificBins(:,1);specificBins(end,2)]);
-    keep_idx = diff([bin1,bin2],1,2)==0;
-    C(~keep_idx,:)=[];
+    keepIdx = diff([bin1,bin2],1,2)==0;
+    C(~keepIdx,:)=[];
 end
 
-%% create matrix
+%% Create Hi-Cmatrix
 if intraFlag
-    HSize = max(max(C(:,1:2)));
-    
-    Hj = zeros(HSize,dataType);%,'int32');
-    idx = sub2ind(size(Hj),C(:,1),C(:,2));
-    Hj(idx) = C(:,3);
-    idx = sub2ind(size(Hj),C(:,2),C(:,1));
-    Hj(idx) = C(:,3);
+    Hj = full(sparse(C(:,1),C(:,2),C(:,3)));
+    Hj = Hj + triu(Hj,1)';
 else
-    HSize = max(C(:,1:2));
-    
-    Hj = zeros(HSize,dataType);%,'int32');
-    idx = sub2ind(size(Hj),C(:,1),C(:,2));
-    Hj(idx) = C(:,3);
+    Hj = full(sparse(C(:,1),C(:,2),C(:,3)));
 end
 
 % remove NaNs and Infs
@@ -62,4 +53,23 @@ Hj(isnan(Hj)) = 0;
 Hj(isinf(Hj)) = 0;
 
 end
+
+
+% EXTRA
+% %% Create Hi-Cmatrix
+% if intraFlag
+%     HSize = max(max(C(:,1:2)));
+%     
+%     Hj = zeros(HSize,dataType);%,'int32');
+%     idx = sub2ind(size(Hj),C(:,1),C(:,2));
+%     Hj(idx) = C(:,3);
+%     idx = sub2ind(size(Hj),C(:,2),C(:,1));
+%     Hj(idx) = C(:,3);
+% else
+%     HSize = max(C(:,1:2));
+%     
+%     Hj = zeros(HSize,dataType);%,'int32');
+%     idx = sub2ind(size(Hj),C(:,1),C(:,2));
+%     Hj(idx) = C(:,3);
+% end
 

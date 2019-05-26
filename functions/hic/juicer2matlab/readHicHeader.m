@@ -19,6 +19,7 @@ juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 %% get and format .hic header info
 % get "read_hic_header.py" file location
 juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
+    fullfile(
     sprintf('straw-master%spython%sread_hic_header.py',filesep,filesep)];
 
 % run "read_hic_header.py"
