@@ -1,17 +1,17 @@
-% this file will load all necessary information from the .hic file to the
+% This file will load all necessary information from the .hic file to the
 % hic class
 
 clear
 close all
 
 %% Start
-% eventual input parameters for this function
+% Eventual input parameters for this function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 juicer2matlabDir = fullfile('E:','MATLAB','4DNvestigator','functions','hic','juicer2matlab');
 hicPath = 'X:\projects\trisomy7_hcec\processed\hic\juicer\Sample_81952\inter_30.hic';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% initialize "hic" class variable
+% Initialize "hic" class variable
 hicData = hic;
 
 % Paths to juicer_tools scripts
@@ -23,7 +23,7 @@ norm3d = {'observed','oe'};
 norm1d = {'NONE','KR'};
 binSize = 100E3;
 
-% temp files to load to
+% Temp files to output .hic data to
 tempFnDump = [tempdir, 'tempDump.txt'];
 tempFnNormKr = [tempdir, 'tempNormKr.txt'];
 tempFnNormKrE = [tempdir, 'tempNormKrE.txt'];
@@ -35,7 +35,7 @@ if status
     error('Problem with reading hic header')
 end
 
-% Parse header info
+% Parse header info with 4DNvestigator function
 [hicData.hicHeader] = parseHicHeaderInfo(cmdout);
 
 %% Extract Hi-C header data
@@ -43,7 +43,7 @@ end
 for iChr = 1:height(hicData.hicHeader.Chromosomes)
     tempChr = hicData.hicHeader.Chromosomes.chr{iChr};
     
-    % inter vs intra resolution default
+    % Inter- vs intra-chr bp resolution default
     if strcmp(tempChr,'ALL')
         binSize = 1E6;
     else
@@ -102,19 +102,4 @@ for iChr = 1:height(hicData.hicHeader.Chromosomes)
     % Add to data table
     hicData.rawDataTable = [hicData.rawDataTable; {tempChr,binSize}];
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
