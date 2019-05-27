@@ -8,16 +8,11 @@
 *.DS_Store
 *.gct
 *.cls
-
-*Dev.m
+*~$*
 
 # folders
-functions/depreciated/
-data/sampleData/*
-data/sampleData/indexFiles/*
 paperFiles/
-#classes/
 dev/
 
 # exceptions
-!data/sampleData/indexFiles/sample*.xlsx
+# !data/sampleData/indexFiles/sample*.xlsx

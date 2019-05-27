@@ -36,13 +36,11 @@ dataInfo.biomart = dataInfo.biomart(IA,:);
 %% Select ROI parameters
 %%%%%%%%%%%%%
 roiGene = 'MYOD1';
-roiSamples = [1 2];         % select two samples to compare
+roiSamples = 1;         % select sample from "dataInfo.sampleInfo" to construct simulated data from
 roiBinsize = 50E3;          % 10E3,50E3
 roiBinFlank = 20;
-simulationType = 'compartment';    % compartment,loop
+simulationType = 'compartment';    % compartment, loop
 %%%%%%%%%%%%%
-fprintf('gene: %s, sample: [%i %i], bin size: %i, bin flank: %i...\n',...
-    roiGene,roiSamples(1),roiSamples(2),roiBinsize,roiBinFlank)
 
 % get roiGene TSS bin
 roiChrTss = [dataInfo.biomart.Chromosome_scaffoldName(ismember(dataInfo.biomart.HGNCSymbol,roiGene)),...
@@ -82,13 +80,13 @@ end
 roiHOeL2 = log2(roiHOe);
 
 %% Create Simulation data matrices
+sampSelect = 1;
 switch simulationType
     case 'loop'
         % loop data simulation
         % add "counts" to matrix in specific location
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         countLoc = sort([10 30],'ascend');%sort([5 10],'ascend');
-        sampSelect = 1;
         numMats = 10;
         totPcrt = 4;
         rng(1)
@@ -132,7 +130,6 @@ switch simulationType
         % change A/B structure "counts" to matrix in specific location
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         changeLoc = 16;
-        sampSelect = 1;
         numMats = 10;
         rng(1)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

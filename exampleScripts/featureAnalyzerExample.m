@@ -16,6 +16,9 @@
 %% Load Data
 % 4DNvestigator formatted Hi-C and RNA-seq data is available here:
 %   https://drive.google.com/open?id=11XQ0CudxRvM5P6aI57yes2h8XXLhxlRr
+
+% Raw data (.hic and .results) files can be found here:
+%   https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
 clear
 close all
 
