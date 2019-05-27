@@ -23,17 +23,16 @@ if ~exist('dataInfo','var')||isempty(dataInfo);dataInfo=[];end
 if ~exist('H','var')||isempty(H);H=[];end
 if ~exist('R','var')||isempty(R);R=[];end
 
-%% format and save
-% create new structure "saved Data"
-savedData.dataInfo = dataInfo;
-savedData.H = H;
-savedData.R = R;
+%% Format and save
+if isfield(dataInfo.path,'output')
+    selpath = dataInfo.path.output;
+else
+    selpath = uigetdir;
+end
 
-% save the data
+% Save the data
 try
-    save(sprintf('%s%sdata%s%sData.mat',dataInfo.path.output,...
-        dataInfo.delim,dataInfo.delim,...
-        dataInfo.projName),'savedData','-v7.3')
+    save(fullfile(selpath,'data',[dataInfo.projName,'Data.mat']),'H','R','dataInfo','-v7.3')
     h = 1;
 catch
     h = 0;

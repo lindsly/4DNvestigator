@@ -21,7 +21,15 @@ function [h] = fdnAbSwitchPlot(dataInfo,H,R,params)
 %   * fdnAbSwitchPlot.m created
 
 %% set default parameters
-
+if ~isfield(params,'varPerc')||isempty(params.varPerc)
+    params.varPerc = 90;
+end
+if ~isfield(params,'geneNames')||isempty(params.geneNames)
+    params.geneNames = 0;
+end
+if ~isfield(params,'numChr')||isempty(params.numChr)
+    params.numChr = 1;
+end
 
 %% plot
 h = cell(length(params.numChr),1);
@@ -41,9 +49,11 @@ for iChr = params.numChr
         % add roiLocs background
         yLims = [min(H.s100kb.ABcomp{iChr}(:)) max(H.s100kb.ABcomp{iChr}(:))];
         
-        bar(find(roiLocs),ones(sum(roiLocs),1)*yLims(1),'c',...
+        tempBack1 = zeros(1,length(roiLocs)); tempBack1(roiLocs) = yLims(1);
+        tempBack2 = zeros(1,length(roiLocs)); tempBack2(roiLocs) = yLims(2);
+        bar(1:length(roiLocs),tempBack1,'c',...
             'FaceColor','flat','EdgeColor','none'), hold on
-        bar(find(roiLocs),ones(sum(roiLocs),1)*yLims(2),'c',...
+        bar(1:length(roiLocs),tempBack2,'c',...
             'FaceColor','flat','EdgeColor','none')
         
         % plot A/B bar
@@ -55,7 +65,7 @@ for iChr = params.numChr
         
         % add gene names
         if 1==params.geneNames
-            text(find(roiLocs),H.s100kb.ABcomp{iChr}(roiLocs,iSamp),...
+            text(find(roiLocs),double(H.s100kb.ABcomp{iChr}(roiLocs,iSamp)),...
                 R.s100kb.geneTrim{iChr}(roiLocs))
         end
         

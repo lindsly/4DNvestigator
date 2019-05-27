@@ -1,14 +1,21 @@
 % This file will load all necessary information from the .hic file to the
 % hic class
+%
+% Scott Ronquist, scotronq@umich.edu. 5/27/19
 
+%% Set up
+% Raw data (.hic and .results) files can be found here:
+%   https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
 clear
 close all
+
+% add path to Hi-C and RNA-seq data
 
 %% Start
 % Eventual input parameters for this function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 juicer2matlabDir = fullfile('E:','MATLAB','4DNvestigator','functions','hic','juicer2matlab');
-hicPath = 'X:\projects\trisomy7_hcec\processed\hic\juicer\Sample_81952\inter_30.hic';
+hicPath = 'Sample_64585_trim.hic';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Initialize "hic" class variable
@@ -54,52 +61,71 @@ for iChr = 1:height(hicData.hicHeader.Chromosomes)
     
     %% Extract data usering juicer_tools
     % Extract raw data
-    [status,cmdout] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
+    [statusDump,cmdoutDump] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
         juicerToolsPath,'observed','NONE',hicPath,tempChr,tempChr,...
         'BP',num2str(binSize),tempFnDump));
-    if status~=0
-        error(cmdout)
-    end
     
     % Extract KR normalization vector
-    [status,cmdout] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
+    [statusNormKr,cmdoutNormKr] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
         juicerToolsPath,'norm','KR',hicPath,tempChr,...
         'BP',num2str(binSize),tempFnNormKr));
-    if status~=0
-        error(cmdout)
-    end
     
     % Extract E vector
-    [status,cmdout] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
+    [statusNormKrE,cmdoutNormKrE] = system(sprintf('java -jar "%s" dump %s %s %s %s %s %s %s %s',...
         juicerToolsPath,'expected','KR',hicPath,tempChr,...
         'BP',num2str(binSize),tempFnNormKrE));
-    if status~=0
-        error(cmdout)
-    end
     
     %% Save to hic class
     % Read extracted data
-    tempRawData = readtable(tempFnDump,'Delimiter','\t'); delete(tempFnDump)
-    if strcmp(tempChr,'ALL')
-        hicData.rawData{end+1} = sparse(tempRawData{:,1}+1,tempRawData{:,2}+1,tempRawData{:,3});
+    if statusDump~=0
+        warning(cmdoutDump)
+        hicData.rawData{end+1} = [];
     else
-        hicData.rawData{end+1} = sparse((tempRawData{:,1}/binSize)+1,...
-            (tempRawData{:,2}/binSize)+1,tempRawData{:,3});
+        tempRawData = readtable(tempFnDump,'Delimiter','\t'); delete(tempFnDump)
+        if strcmp(tempChr,'ALL')
+            hicData.rawData{end+1} = sparse(tempRawData{:,1}+1,tempRawData{:,2}+1,tempRawData{:,3});
+        else
+            hicData.rawData{end+1} = sparse((tempRawData{:,1}/binSize)+1,...
+                (tempRawData{:,2}/binSize)+1,tempRawData{:,3});
+        end
     end
     
     % Read extracted norm Kr
-    tempNormKr = readtable(tempFnNormKr,'Delimiter','\t'); delete(tempFnNormKr)
-    if strcmp(tempChr,'ALL')
-        hicData.krVec{end+1} = tempNormKr{2:end,1};
+    if statusNormKr~=0
+        warning(cmdoutNormKr)
+        hicData.krVec{end+1} = [];
     else
-        hicData.krVec{end+1} = tempNormKr{:,1};
+        tempNormKr = readtable(tempFnNormKr,'Delimiter','\t'); delete(tempFnNormKr)
+        if strcmp(tempChr,'ALL')
+            hicData.krVec{end+1} = tempNormKr{2:end,1};
+        else
+            hicData.krVec{end+1} = tempNormKr{:,1};
+        end
     end
     
     % Read extracted norm Kr E
-    tempNormKrE = readtable(tempFnNormKrE,'Delimiter','\t'); delete(tempFnNormKrE)
-    hicData.krEVec{end+1} = tempNormKrE{:,1};
+    if statusNormKrE~=0
+        warning(cmdoutNormKrE)
+        hicData.krEVec{end+1} = [];
+    else
+        tempNormKrE = readtable(tempFnNormKrE,'Delimiter','\t'); delete(tempFnNormKrE)
+        hicData.krEVec{end+1} = tempNormKrE{:,1};
+    end
     
     % Add to data table
     hicData.rawDataTable = [hicData.rawDataTable; {tempChr,binSize}];
 end
+
+%% Extract data from Hi-C class
+chrLoc1 = 21;
+chrLoc2 = 21;
+res = 100E3;
+norm1d = 'KR';
+norm3d = 'OE';
+
+figure, imagesc(log(hicData.mat(chrLoc1,chrLoc2,res,norm1d,norm3d)))
+
+
+
+
 

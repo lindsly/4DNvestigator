@@ -4,7 +4,9 @@
 We converted primary human fibroblasts into the myogenic lineage using the TF and master regulator MYOD1. Fibroblasts were transduced with a lentiviral construct that expressed human MYOD1 fused with a tamoxifen-inducible ER(T) domain (L-MYOD1). With 4-hydroxytamoxifen (4-OHT) treatment, transduced cells showed nuclear translocation of L-MYOD1, morphological changes consistent with expression of key myogenic genes downstream of MYOD1 (MYOG and MYH1), and myogenic differentiation. These data demonstrate the conversion of fibroblasts into the myogenic lineage by L-MYOD1 . Analyses were carried out on transduced, 4-OHT-treated cells, sampling at 8-hr intervals
 
 ## Data
-RNA-seq (3 replicates) and Hi-C at timepoints -48h, 8h, and 80h post-MYOD1 TF addition. Details in [sampleMyodDataIndexTp-48_8_80.xlsx](https://s3.us-east-2.amazonaws.com/4dnvestigator/sampleData/myod/sampleMyodDataIndexTp-48_8_80.xlsx)
+RNA-seq (3 replicates) and Hi-C at timepoints -48h, 8h, and 80h post-MYOD1 TF addition. Details in [sampleMyodDataIndexTp-48_8_80.xlsx](https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm)
+
+*NOTE: sampleMyodTrimDataIndexTp-48_8_80.xlsx data refers to the same samples, with less resolutions (100 kb and 1 Mb)
 
 ### Reference
 Liu, Sijia, et al. "Genome architecture mediates transcriptional control of human myogenic reprogramming." iScience 6 (2018): 232-246.

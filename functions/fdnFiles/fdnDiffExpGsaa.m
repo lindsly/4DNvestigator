@@ -35,31 +35,31 @@ function [R, rnaseqPatternAll] = fdnDiffExpGsaa(dataInfo,R,gseaFlag,rnaseqPatter
 if nargin < 3;gseaFlag = 0;end
 if nargin < 4;rnaseqPatternFlag = 0;end
 
-% determine number of samples
+% Determine number of samples
 samplesAll = unique(dataInfo.sampleInfo.sample);
 
-% create data table
+% Create data table
 diffExpCellSamp = cell(length(samplesAll),1);
 rnaseqPatternAll = cell(length(samplesAll),1);
 
 %% Compare between all time points in a sample
 for iS = 1:length(samplesAll)
     
-    % determine time points within each sample
+    % Determine time points within each sample
     sampleLocs = ismember(dataInfo.sampleInfo.sample,samplesAll{iS}) &...
         ismember(dataInfo.sampleInfo.dataType,'rnaseq');
     sampleTps = unique(dataInfo.sampleInfo.timePoint(sampleLocs));
     
-    % create data structure for sample time point comparisons
+    % Create data structure for sample time point comparisons
     diffExpCellTp = cell(length(sampleTps));
     
-    % loop through timepoints to compare between
+    % Loop through timepoints to compare between
     for iTp1 = 1:length(sampleTps)-1
         for iTp2 = iTp1+1:length(sampleTps)
             fprintf(['calculating Differential Expression for Sample "%s", ',...
                 'TP %i vs TP %i...\n'],samplesAll{iS},sampleTps(iTp1),sampleTps(iTp2))
             
-            % get sample time point locations
+            % Get sample time point locations
             sampleTpLoc1 = ismember(R.expected_count.Properties.VariableNames,...
                 dataInfo.sampleInfo.name(ismember(dataInfo.sampleInfo.sample,samplesAll{iS}) &...
                 ismember(dataInfo.sampleInfo.dataType,'rnaseq') &...
@@ -69,7 +69,7 @@ for iS = 1:length(samplesAll)
                 ismember(dataInfo.sampleInfo.dataType,'rnaseq') &...
                 ismember(dataInfo.sampleInfo.timePoint,sampleTps(iTp2))));
             
-            % create geneTable
+            % Create geneTable
             tpmMeanTp1 = mean(R.TPM{:,sampleTpLoc1},2);
             tpmMeanTp2 = mean(R.TPM{:,sampleTpLoc2},2);
             meanBase = (tpmMeanTp1 + tpmMeanTp2) / 2;
@@ -84,27 +84,32 @@ for iS = 1:length(samplesAll)
             geneTable.pvalue = pvalue;
             geneTable.padj = padj;
             
-            % add to diffExpCellTp - level 2
+            % Add to diffExpCellTp - level 2
             diffExpCellTp{iTp1,iTp2} = geneTable;
             
             %% GSAASeqSP analysis
             if gseaFlag
                 % http://gsaa.unc.edu/userguide_gsaaseqsp.html
-                % general info
+                % Get general info
                 FileName = sprintf('%s_vs_%s',...
                     sprintf('rnaseq_s%s_t%i',samplesAll{iS},sampleTps(iTp1)),...
                     sprintf('rnaseq_s%s_t%i',samplesAll{iS},sampleTps(iTp2)));
-                FileNameFull = fullfile(dataInfo.path.output,'data','gsaa',FileName);
+                if isfield(dataInfo.path,'output')
+                    FileNameFull = fullfile(dataInfo.path.output,'data','gsaa',FileName);
+                else
+                    selpath = uigetdir;
+                    FileNameFull = fullfile(selpath,FileName);
+                end
                 
                 % Create RNA-Seq Data Format (*.gct)
                 tempTable = sortrows(R.expected_count,'geneName','ascend');
                 tempTable = tempTable(:,[find(sampleTpLoc1),find(sampleTpLoc2)]);
                 
-                % create gct file
+                % Create gct file for GSEA
                 writetable(tempTable,sprintf('%s.gct',FileNameFull),...
                     'Delimiter','\t','WriteVariableNames',1,'FileType','text')
                 
-                % add line 1 and 2 to .gct
+                % Add line 1 and 2 to .gct
                 S = fileread(sprintf('%s.gct',FileNameFull));
                 S = [sprintf('%i',height(tempTable)),char(9),...
                     num2str(sum(sampleTpLoc1)+sum(sampleTpLoc2)), char(10), S];
@@ -126,7 +131,7 @@ for iS = 1:length(samplesAll)
         end
     end
     
-    % add to diffExpCellSamp - level 1
+    % Add to diffExpCellSamp - level 1
     tempName = strcat('tp',cellstr(num2str(sampleTps)));
     tempName = genvarname(strrep(tempName,'-','_'));
     diffExpCellSamp{iS,1} = cell2table(diffExpCellTp,...
@@ -140,70 +145,70 @@ for iS = 1:length(samplesAll)
             rnaseqPattern = [rnaseqPattern diffExpCellSamp{iS,1}{1,iTp}{1}{:,9}];
         end
         
-        % filter low expression genes and normalize over time
+        % Filter low expression genes and normalize over time
         rnaseqThresh = 1;
         rnaseqPatternNorm = rnaseqPattern;
         rnaseqPatternNorm(rnaseqPatternNorm<rnaseqThresh) = 0;
         rnaseqPatternNorm = normalize(rnaseqPatternNorm,2);
         
-        % get expression patterns
+        % Get expression patterns
         [C,IA,IC] = unique(diff(rnaseqPatternNorm,1,2)>0,'rows');
         
-        % add NaN cluster
+        % Add NaN cluster
         IC(isnan(rnaseqPatternNorm(:,1))) = nan;
         
-        % create red to green colormap
+        % Create red to green colormap
         n = 100;
         redGreen = colormap([linspace(1,0,n)', linspace(0,1,n)', zeros(n,1)] );  %// create colormap
         
-        % sort expression patterns
+        % Sort expression patterns
         tempDataAll = [];
         tempDataNormAll = [];
         tempGenesAll = [];
         for iIC = 1:nanmax(IC)
-            % get temp data
+            % Get temp data
             tempData = rnaseqPattern(IC==iIC,:);
             tempDataNorm = rnaseqPatternNorm(IC==iIC,:);
             tempGenes = diffExpCellSamp{iS,1}{1,2}{1}{IC==iIC,4};
             
-            % get total fold change
+            % Get total fold change
             tempFC = zeros(size(tempData,1),1);
             for iTp = 1:size(tempDataNorm,2)-1
                 tempFC = tempFC + abs(log2(tempData(:,iTp)./tempData(:,iTp+1)));
             end
             
-            % sort by total fold change
+            % Sort by total fold change
             [B,I] = sort(tempFC,'descend');
             tempData = tempData(I,:);
             tempDataNorm = tempDataNorm(I,:);
             tempGenes = tempGenes(I);
             
-            % add to master table
+            % Add to master table
             tempDataAll = [tempDataAll; tempData];
             tempDataNormAll = [tempDataNormAll; tempDataNorm];
             tempGenesAll = [tempGenesAll; tempGenes];
         end
-        % add NaN to master table
+        % Add NaN to master table
         tempDataAll = [tempDataAll; rnaseqPattern(isnan(IC),:)];
         tempDataNormAll = [tempDataNormAll; rnaseqPatternNorm(isnan(IC),:)];
         tempGenesAll = [tempGenesAll; diffExpCellSamp{iS,1}{1,2}{1}{isnan(IC),4}];
         
         sort(IC,'ascend')
         
-        % plot image, all patterns together
+        % Plot image, all patterns together
         figure, imagesc(tempDataNormAll)
         colormap(redGreen), colorbar
         xticks(1:size(tempDataNorm,2)), xticklabels(sampleTps), xlabel('TP')
         ylabel('Normalized Gene Expression')
         title(sprintf('RNA-seq Patterns, TPM thresh=%i, Sample "%s"',rnaseqThresh,samplesAll{iS}))
         
-        % create variable for output
+        % Create variable for output
         rnaseqPatternAll{iS} = table(tempGenesAll,tempDataAll,tempDataNormAll,sort(IC,'ascend'));
         rnaseqPatternAll{iS}.Properties.VariableNames = {'geneName','TpmMean','TpmMeanNorm','cluster'};
     end
 end
 
-% add to main diffExpTable
+% Add to main diffExpTable
 R.diffExpTableTp = cell2table(diffExpCellSamp,...
     'RowNames',samplesAll,...
     'VariableNames',{'samples'});
@@ -267,7 +272,12 @@ for iTp = 1:length(tpAll)
                 FileName = sprintf('%s_vs_%s',...
                     sprintf('rnaseq_s%s_t%i',tpSamples{iS1},tpAll(iTp)),...
                     sprintf('rnaseq_s%s_t%i',tpSamples{iS2},tpAll(iTp)));
-                FileNameFull = fullfile(dataInfo.path.output,'data','gsaa',FileName);
+                if isfield(dataInfo.path,'output')
+                    FileNameFull = fullfile(dataInfo.path.output,'data','gsaa',FileName);
+                else
+                    selpath = uigetdir;
+                    FileNameFull = fullfile(selpath,FileName);
+                end
                 
                 % Create RNA-Seq Data Format (*.gct)
                 tempTable = sortrows(R.expected_count,'geneName','ascend');
