@@ -9,14 +9,16 @@
 clear
 close all
 
-% add path to Hi-C and RNA-seq data
-
 %% Start
 % Eventual input parameters for this function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-juicer2matlabDir = fullfile('E:','MATLAB','4DNvestigator','functions','hic','juicer2matlab');
 hicPath = 'Sample_64585_trim.hic';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% get juicer2matlab directory path
+currentPath = mfilename('fullpath');
+currentPathSplitLoc = strfind(currentPath,filesep);
+juicer2matlabDir = fullfile(currentPath(1:currentPathSplitLoc(end-1)),'functions','hic','juicer2matlab');
 
 % Initialize "hic" class variable
 hicData = hic;
@@ -82,7 +84,9 @@ for iChr = 1:height(hicData.hicHeader.Chromosomes)
         hicData.rawData{end+1} = [];
     else
         tempRawData = readtable(tempFnDump,'Delimiter','\t'); delete(tempFnDump)
-        if strcmp(tempChr,'ALL')
+        if isempty(tempRawData)
+            hicData.rawData{end+1} = [];
+        elseif strcmp(tempChr,'ALL')
             hicData.rawData{end+1} = sparse(tempRawData{:,1}+1,tempRawData{:,2}+1,tempRawData{:,3});
         else
             hicData.rawData{end+1} = sparse((tempRawData{:,1}/binSize)+1,...
@@ -96,7 +100,9 @@ for iChr = 1:height(hicData.hicHeader.Chromosomes)
         hicData.krVec{end+1} = [];
     else
         tempNormKr = readtable(tempFnNormKr,'Delimiter','\t'); delete(tempFnNormKr)
-        if strcmp(tempChr,'ALL')
+        if isempty(tempRawData)
+            hicData.krVec{end+1} = [];
+        elseif strcmp(tempChr,'ALL')
             hicData.krVec{end+1} = tempNormKr{2:end,1};
         else
             hicData.krVec{end+1} = tempNormKr{:,1};
@@ -109,7 +115,11 @@ for iChr = 1:height(hicData.hicHeader.Chromosomes)
         hicData.krEVec{end+1} = [];
     else
         tempNormKrE = readtable(tempFnNormKrE,'Delimiter','\t'); delete(tempFnNormKrE)
-        hicData.krEVec{end+1} = tempNormKrE{:,1};
+        if isempty(tempNormKrE)
+            hicData.krEVec{end+1} = [];
+        else
+            hicData.krEVec{end+1} = tempNormKrE{:,1};
+        end
     end
     
     % Add to data table
@@ -117,8 +127,8 @@ for iChr = 1:height(hicData.hicHeader.Chromosomes)
 end
 
 %% Extract data from Hi-C class
-chrLoc1 = 21;
-chrLoc2 = 21;
+chrLoc1 = 1;
+chrLoc2 = 1;
 res = 100E3;
 norm1d = 'KR';
 norm3d = 'OE';
