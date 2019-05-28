@@ -50,7 +50,7 @@ for iSample = 1:size(roiHOeL2,3)
 end
 
 %% Larntz-Perlman procedure
-alphaParam = .95;
+alphaParam = .05;
 plotFlag = 0;
 [H0,P,S,pval] = larntzPerlman(Hcorr,size(Hcorr,1),alphaParam,plotFlag);
 
