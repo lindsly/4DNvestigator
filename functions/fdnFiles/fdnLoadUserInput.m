@@ -124,7 +124,7 @@ if length(unique(refGenome)) == 1
     
     % remove "ALL" and "M" chr
     dataInfo.hicHeader.Chromosomes(ismember(upper(dataInfo.hicHeader.Chromosomes.chr),...
-        {'ALL','M'}),:) = [];
+        {'ALL','M','MT'}),:) = [];
     
 else
     error('.hic files have different reference genomes, cannot compare')

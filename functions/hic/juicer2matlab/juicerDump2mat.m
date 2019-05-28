@@ -40,9 +40,10 @@ if ~isempty(specificBins)
     C(~keepIdx,:)=[];
 end
 
-%% Create Hi-Cmatrix
+%% Create Hi-C matrix
 if intraFlag
     Hj = full(sparse(C(:,1),C(:,2),C(:,3)));
+    Hj = padarray(Hj,length(Hj)-size(Hj),'post');
     Hj = Hj + triu(Hj,1)';
 else
     Hj = full(sparse(C(:,1),C(:,2),C(:,3)));
