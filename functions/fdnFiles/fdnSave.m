@@ -30,12 +30,18 @@ if ~isfield(dataInfo,'projName')
 end
 
 % Create analysis output directory
-if ~isfield(dataInfo.path,'output')
+if isfield(dataInfo,'path')
+    if isfield(dataInfo.path,'output')
+        selpath = dataInfo.path.output;
+    else
+        fprintf('Select Output folder\n')
+        dataInfo.path.output = uigetdir(pwd,'Select Output folder');
+        selpath = dataInfo.path.output;
+    end
+else
     fprintf('Select Output folder\n')
     dataInfo.path.output = uigetdir(pwd,'Select Output folder');
     selpath = dataInfo.path.output;
-else
-    selpath = uigetdir;
 end
 
 % make subdirectories
