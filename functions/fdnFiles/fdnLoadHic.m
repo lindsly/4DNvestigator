@@ -153,7 +153,8 @@ for iSample = 1:length(sampleFn)
     fprintf('Extracting Hi-C, 1Mb, ALL...\n')
     tempAllRaw = hic2mat('observed','NONE',sampleFn{iSample},...
         'ALL','ALL',hicParam.binType,hicParam.binSize);
-    tempAllRaw = padarray(tempAllRaw,length(tempAllRaw)-size(tempAllRaw),'post');
+    %     tempAllRaw = padarray(tempAllRaw,length(tempAllRaw)-size(tempAllRaw),'post');
+    tempAllRaw = [tempAllRaw;zeros(diff(size(tempAllRaw)), length(tempAllRaw))];
     
     % get norm vecs and intra matrices
     normVec = cell(numChr,1);

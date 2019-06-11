@@ -43,7 +43,8 @@ end
 %% Create Hi-C matrix
 if intraFlag
     Hj = full(sparse(C(:,1),C(:,2),C(:,3)));
-    Hj = padarray(Hj,length(Hj)-size(Hj),'post');
+%     Hj = padarray(Hj,length(Hj)-size(Hj),'post');
+    Hj = [Hj;zeros(diff(size(Hj)), length(Hj))];
     Hj = Hj + triu(Hj,1)';
 else
     Hj = full(sparse(C(:,1),C(:,2),C(:,3)));
