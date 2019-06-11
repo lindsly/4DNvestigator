@@ -36,9 +36,9 @@ numChr = height(chrInfo);
 sampleFn = dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'hic'));
 
 % Create the waitbar and determine intialization properties
-waitBar = waitbar(0,'loading 100kb Hi-C...','Name','Loading Data');
-set(findall(waitBar),'Units', 'normalized');    % Change the Units Property of the figure and all the children
-set(waitBar,'Position', [0.25 0.4 0.5 0.08]);   % Change the size of the figure
+% waitBar = waitbar(0,'loading 100kb Hi-C...','Name','Loading Data');
+% set(findall(waitBar),'Units', 'normalized');    % Change the Units Property of the figure and all the children
+% set(waitBar,'Position', [0.25 0.4 0.5 0.08]);   % Change the size of the figure
 totalWait = numChr*length(sampleFn);
 currentWait = 1;
 avTime = 0;
@@ -70,9 +70,11 @@ for iSample = 1:length(sampleFn)
         if iChr==1 && iSample==1;tic;end
         
         % update load bar
-        waitbar(currentWait/totalWait,waitBar,...
-            sprintf('Loading 100kb Hi-C. Sample: (%d/%d), chr:%s, estimated time: %i secs...',...
-            iSample,length(sampleFn),chrInfo.chr{iChr},round(avTime*(totalWait-currentWait))));
+%         waitbar(currentWait/totalWait,waitBar,...
+%             sprintf('Loading 100kb Hi-C. Sample: (%d/%d), chr:%s, estimated time: %i secs...',...
+%             iSample,length(sampleFn),chrInfo.chr{iChr},round(avTime*(totalWait-currentWait))));
+        fprintf('Loading 100kb Hi-C. Sample: (%d/%d), chr:%s, estimated time: %i secs...\n',...
+            iSample,length(sampleFn),chrInfo.chr{iChr},round(avTime*(totalWait-currentWait)));
         
         % extract KR
         tempKr = hic2mat('observed',hicParam.norm1d,sampleFn{iSample},...
@@ -126,7 +128,7 @@ for iChr = 1:numChr
     end
 end
 
-close(waitBar)
+% close(waitBar)
 
 %% load Hi-C data - 1Mb
 % this loads both intra- and inter-chr Hi-C
@@ -135,9 +137,9 @@ hicParam.binSize = 1E6;
 %%% PARAMETERS ^^^
 
 % Create the waitbar and determine intialization properties
-waitBar = waitbar(0,'loading 1Mb Hi-C...','Name','Loading Data');
-set(findall(waitBar),'Units', 'normalized');    % Change the Units Property of the figure and all the children
-set(waitBar,'Position', [0.25 0.4 0.5 0.08]);   % Change the size of the figure
+% waitBar = waitbar(0,'loading 1Mb Hi-C...','Name','Loading Data');
+% set(findall(waitBar),'Units', 'normalized');    % Change the Units Property of the figure and all the children
+% set(waitBar,'Position', [0.25 0.4 0.5 0.08]);   % Change the size of the figure
 totalWait = (nchoosek(numChr,2)+numChr)*length(sampleFn);
 currentWait = 1;
 avTime = 0;
@@ -186,10 +188,13 @@ for iSample = 1:length(sampleFn)
             if iChr1==1 && iChr2==1 && iSample==1;tic;end
             
             % update load bar
-            waitbar(currentWait/totalWait,waitBar,...
-                sprintf('Loading 1Mb Hi-C. Sample: (%d/%d), chr1:%s, chr2:%s, estimated time: %i secs...',...
+%             waitbar(currentWait/totalWait,waitBar,...
+%                 sprintf('Loading 1Mb Hi-C. Sample: (%d/%d), chr1:%s, chr2:%s, estimated time: %i secs...',...
+%                 iSample,length(sampleFn),chrInfo.chr{iChr1},chrInfo.chr{iChr2},...
+%                 round(avTime*(totalWait-currentWait))));
+            fprintf('Loading 1Mb Hi-C. Sample: (%d/%d), chr1:%s, chr2:%s, estimated time: %i secs...\n',...
                 iSample,length(sampleFn),chrInfo.chr{iChr1},chrInfo.chr{iChr2},...
-                round(avTime*(totalWait-currentWait))));
+                round(avTime*(totalWait-currentWait)))
             
             % KR
             tempChrRaw = tempAllRaw(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1+1)-1,...
@@ -216,7 +221,7 @@ switch numericType
         H.s1mb.kr = single(H.s1mb.kr);
         H.s1mb.oe = single(H.s1mb.oe);
 end
-close(waitBar)
+% close(waitBar)
 
 %% trim data (remove unmappable regions) - 100kb and 1Mb
 %%% PARAMETERS vvv
@@ -253,8 +258,5 @@ for iChr = 1:numChr
     H.s1mb.chrStartTrim(iChr) = H.s1mb.chrStart(iChr)-...
         sum(H.s1mb.oeTrimBadLocs(1:H.s1mb.chrStart(iChr)-1));
 end
-
-%% get centromere loc
-
 end
 

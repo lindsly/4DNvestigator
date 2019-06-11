@@ -23,13 +23,28 @@ if ~exist('dataInfo','var')||isempty(dataInfo);dataInfo=[];end
 if ~exist('H','var')||isempty(H);H=[];end
 if ~exist('R','var')||isempty(R);R=[];end
 
-%% Format and save
-if isfield(dataInfo.path,'output')
+%% Get Project Name
+if ~isfield(dataInfo,'projName')
+    temp = inputdlg('Input Project Name:','Project Name');
+    dataInfo.projName = temp{1};
+end
+
+% Create analysis output directory
+if ~isfield(dataInfo.path,'output')
+    fprintf('Select Output folder\n')
+    dataInfo.path.output = uigetdir(pwd,'Select Output folder');
     selpath = dataInfo.path.output;
 else
     selpath = uigetdir;
 end
 
+% make subdirectories
+mkdir(fullfile(dataInfo.path.output,'figures'))
+mkdir(fullfile(dataInfo.path.output,'tables'))
+mkdir(fullfile(dataInfo.path.output,'data'))
+mkdir(fullfile(dataInfo.path.output,'data','gsaa'))
+
+%% Save
 % Save the data
 try
     save(fullfile(selpath,'data',[dataInfo.projName,'Data.mat']),'H','R','dataInfo','-v7.3')

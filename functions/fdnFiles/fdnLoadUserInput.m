@@ -11,35 +11,43 @@ function [dataInfo] = fdnLoadUserInput(indexFile,projectName,outputPath)
 %   Output
 %   dataInfo:       structure that contains all relevant experiment data information
 %
-%   Scott Ronquist, scotronq@umich.edu. 1/22/18
+%   Version 1.1 (06/11/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    1/22/18
+%   
+%   Revision History:
+%   v1.0 (1/22/18)
+%   v1.1 (1/22/18)
+%   * removed projectName and outputPath sections (now in fdnSave.m)
 
 %% Get computer info
 dataInfo.delim = filesep;
 dataInfo.hicCMap = [ones(64,1),[1:-1/63:0]',[1:-1/63:0]'];
 
 %% Get Project Name
-if exist('projectName','var')
-    dataInfo.projName = projectName;
-else
-    temp = inputdlg('Input Project Name:','Project Name');
-    dataInfo.projName = temp{1};
-end
+% if exist('projectName','var')
+%     dataInfo.projName = projectName;
+% else
+%     temp = inputdlg('Input Project Name:','Project Name');
+%     dataInfo.projName = temp{1};
+% end
 
 %% Create analysis output directory
-if exist('outputPath','var')
-    dataInfo.path.output = outputPath;
-else
-    fprintf('Select Output folder\n')
-    dataInfo.path.output = uigetdir(pwd,'Select Output folder');
-end
+% if exist('outputPath','var')
+%     dataInfo.path.output = outputPath;
+% else
+%     fprintf('Select Output folder\n')
+%     dataInfo.path.output = uigetdir(pwd,'Select Output folder');
+% end
+% 
+% % make subdirectories
+% mkdir([dataInfo.path.output,dataInfo.delim,'figures'])
+% mkdir([dataInfo.path.output,dataInfo.delim,'tables'])
+% mkdir([dataInfo.path.output,dataInfo.delim,'data'])
+% mkdir([dataInfo.path.output,dataInfo.delim,'data',dataInfo.delim,'gsaa'])
 
-% make subdirectories
-mkdir([dataInfo.path.output,dataInfo.delim,'figures'])
-mkdir([dataInfo.path.output,dataInfo.delim,'tables'])
-mkdir([dataInfo.path.output,dataInfo.delim,'data'])
-mkdir([dataInfo.path.output,dataInfo.delim,'data',dataInfo.delim,'gsaa'])
-
-%% load from input index file
+%% Load from input index file
 if exist('indexFile','var')
     if ischar(indexFile)
         dataInfo.indexFile = indexFile;
@@ -95,7 +103,7 @@ for iSample = 1:height(dataInfo.sampleInfo)
 end
 dataInfo.sampleInfo.name = tempName;
 
-%% read .hic header files
+%% Read .hic header files
 fprintf('reading .hic header information...\n')
 
 % get .hic samples locations
