@@ -196,9 +196,23 @@ for iSample = 1:length(sampleFn)
                 iSample,length(sampleFn),chrInfo.chr{iChr1},chrInfo.chr{iChr2},...
                 round(avTime*(totalWait-currentWait)))
             
+            %%%%%%%%%%%%%%%%%%%%%%
+            % SRedit 7/8/19 - trim inter-chr 1Mb, if necessary
+            % TEMP FIX!!!!, check with juicer DUMP ALL chr lengths
+            chr1Diff = abs(abs(H.s1mb.chrStart(iChr1)-H.s1mb.chrStart(iChr1+1))-...
+                length(normVec{iChr1}));
+            chr2Diff = abs(abs(H.s1mb.chrStart(iChr2)-H.s1mb.chrStart(iChr2+1))-...
+                length(normVec{iChr2}));
+            
+            if chr1Diff > 0 || chr2Diff > 0
+                fprintf('trimming inter-chr %i-%i, 1Mb...\n',iChr1,iChr2)
+            end
+            %%%%%%%%%%%%%%%%%%%%%%
+            
             % KR
-            tempChrRaw = tempAllRaw(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1+1)-1,...
-                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2+1)-1);
+            fprintf('trimming inter-chr %i-%i, 1Mb...\n',iChr1,iChr2)
+            tempChrRaw = tempAllRaw(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1+1)-1-chr1Diff,...
+                H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2+1)-1-chr2Diff);
             tempChrKr = diag(normVec{iChr1}.^-1)*tempChrRaw*diag(normVec{iChr2}.^-1);
             H.s1mb.kr(H.s1mb.chrStart(iChr1):H.s1mb.chrStart(iChr1)+size(tempChrKr,1)-1,...
                 H.s1mb.chrStart(iChr2):H.s1mb.chrStart(iChr2)+size(tempChrKr,2)-1,iSample) = tempChrKr;

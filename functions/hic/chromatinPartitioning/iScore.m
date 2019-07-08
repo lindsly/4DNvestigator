@@ -28,26 +28,29 @@ if nargin<2; iBoxSize=5; end
 H = max(cat(3,H,H),[],3);
 
 % calculate i-score
-i_score = nan(length(H),1);
+iScore = nan(length(H),1);
 count = 1;
 for i = (1+iBoxSize):(length(H)-(iBoxSize))
-    box_locs_row = count:count+(iBoxSize-1);
-    box_locs_col = i+1:(i+1)+(iBoxSize-1);
-    temp = H(box_locs_row,box_locs_col);
-    i_score(i) = nanmean(temp(:));
+    boxLocsRow = count:count+(iBoxSize-1);
+    boxLocsCol = i+1:(i+1)+(iBoxSize-1);
+    temp = H(boxLocsRow,boxLocsCol);
+    iScore(i) = nanmean(temp(:));
     count = count+1;
 end
 
 %% delta
-i_score_norm = log2(i_score/nanmean(i_score));
-delta = nan(length(i_score),1);
+iScoreNorm = log2(iScore/nanmean(iScore));
+delta = nan(length(iScore),1);
 for i = ((1+iBoxSize)+1):((length(H)-(iBoxSize))-1)
-    delta(i) = nanmean(i_score_norm(i-deltaWindow:i-1))-...
-        nanmean(i_score_norm(i+1:i+deltaWindow));
+    delta(i) = nanmean(iScoreNorm(i-deltaWindow:i-1))-...
+        nanmean(iScoreNorm(i+1:i+deltaWindow));
 end
 
 % we want to find where delta is crossing zero, going down (i_score local minima)
 iScoreLocs = find(diff(delta>0)<0);
+
+% remove start and end
+iScoreLocs = iScoreLocs(2:end-1);
 
 % boundary strength
 [deltaLocalMax,deltaLocalMaxLoc] = findpeaks(delta);
@@ -56,28 +59,32 @@ deltaLocalMin = -deltaLocalMin;
 
 boundaryStrength = zeros(length(iScoreLocs),1);
 for i = 1:length(iScoreLocs)-1
+    
+    % find maxLoc left of iScoreLocs(i)
     temp = -(deltaLocalMaxLoc-iScoreLocs(i));
-    tempMaxLoc = find(deltaLocalMaxLoc==iScoreLocs(i)-min(temp(temp > 0)));
+    tempMaxLoc = find(deltaLocalMaxLoc==iScoreLocs(i)-min(temp(temp >= 0)));
     
+    % find minLoc right of iScoreLocs(i)
     temp = deltaLocalMinLoc-iScoreLocs(i);
-    tempMinLoc = find(deltaLocalMinLoc==iScoreLocs(i)+min(temp(temp > 0)));
+    tempMinLoc = find(deltaLocalMinLoc==iScoreLocs(i)+min(temp(temp >= 0)));
     
+    % determine boundary strength
     boundaryStrength(i) = deltaLocalMax(tempMaxLoc)-...
         deltaLocalMin(tempMinLoc);
 end
 
 % filter
-boundary_strength_thresh = .1;
-iScoreLocs(boundaryStrength<boundary_strength_thresh) = [];
+boundaryStrengthThresh = .1;
+iScoreLocs(boundaryStrength<boundaryStrengthThresh) = [];
 
 %% plot (optional)
 if 1==plotFlag
     figure, imagesc(log(H)), hold on
     for ii = 1:length(iScoreLocs)-1
-        plot([iScoreLocs(ii)-.5 iScoreLocs(ii+1)-.5],[iScoreLocs(ii)-.5 iScoreLocs(ii)-.5], 'r-')
-        plot([iScoreLocs(ii)-.5 iScoreLocs(ii+1)-.5],[iScoreLocs(ii+1)-.5 iScoreLocs(ii+1)-.5], 'r-')
-        plot([iScoreLocs(ii)-.5 iScoreLocs(ii)-.5],[iScoreLocs(ii)-.5 iScoreLocs(ii+1)-.5], 'r-')
-        plot([iScoreLocs(ii+1)-.5 iScoreLocs(ii+1)-.5],[iScoreLocs(ii)-.5 iScoreLocs(ii+1)-.5], 'r-')
+        plot([iScoreLocs(ii)+.5 iScoreLocs(ii+1)+.5],[iScoreLocs(ii)+.5 iScoreLocs(ii)+.5], 'r-')
+        plot([iScoreLocs(ii)+.5 iScoreLocs(ii+1)+.5],[iScoreLocs(ii+1)+.5 iScoreLocs(ii+1)+.5], 'r-')
+        plot([iScoreLocs(ii)+.5 iScoreLocs(ii)+.5],[iScoreLocs(ii)+.5 iScoreLocs(ii+1)+.5], 'r-')
+        plot([iScoreLocs(ii+1)+.5 iScoreLocs(ii+1)+.5],[iScoreLocs(ii)+.5 iScoreLocs(ii+1)+.5], 'r-')
     end
 end
 
