@@ -31,6 +31,7 @@ load('myodData.mat')
 chrSelect = 11;
 dimReduc = 'pca';
 binSizeSelect = 1E5;
+topEllipseFrac = .1;
 
 % extract region to analyze from Hi-C and RNA-seq
 switch binSizeSelect
@@ -48,4 +49,4 @@ switch binSizeSelect
 end
 
 % run the 4DNfeature analyzer
-[features,score] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],[],dimReduc);
+[features,score] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],[],dimReduc,topEllipseFrac);

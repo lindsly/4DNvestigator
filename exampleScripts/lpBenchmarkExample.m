@@ -35,11 +35,11 @@ dataInfo.biomart = dataInfo.biomart(IA,:);
 
 %% Select ROI parameters
 %%%%%%%%%%%%%
-roiGene = 'MYOD1';
-roiSamples = 1;         % select sample from "dataInfo.sampleInfo" to construct simulated data from
-roiBinsize = 50E3;          % 10E3,50E3
-roiBinFlank = 20;
-simulationType = 'compartment';    % compartment, loop
+roiGene = 'MYOD1';          % GOI to simulate from
+roiSamples = 1;             % select sample from "dataInfo.sampleInfo" to construct simulated data from
+roiBinsize = 10E3;          % 10E3,50E3
+roiBinFlank = 20;           % # of bins flanking GOI
+simulationType = 'loop';    % compartment, loop
 %%%%%%%%%%%%%
 
 % get roiGene TSS bin
@@ -86,11 +86,11 @@ switch simulationType
         % loop data simulation
         % add "counts" to matrix in specific location
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        countLoc = sort([10 30],'ascend');%sort([5 10],'ascend');
-        numMats = 10;
-        totPcrt = 4;
-        rng(1)
-        gaussAddFlag = 1;
+        countLoc = sort([10 30],'ascend');%sort([5 10],'ascend');           % location of additional counts
+        numMats = 10;           % number of simulated matrices, incremental up to max
+        totPcrt = 6;%4;         % times above mean that is added
+        rng(1)                  % random number generator
+        gaussAddFlag = 1;       % make additiona gaussian
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % get Expected matrix, percentages to add, and find average count for diag

@@ -1,4 +1,4 @@
-function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWeighted,dimReduc)
+function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWeighted,dimReduc,topEllipseFrac)
 %sfAnalysis analyzes Hi-C and RNA-seq through centrality and PCA
 %   sfAnalysis extracts centrality features from Hi-C, concatenates these
 %   features with RNA-seq, then determines a low dimensional projection to
@@ -15,6 +15,7 @@ function [features,score] = sfAnalysis(hic,rnaSeq,binNames,norm,binInfo,graphWei
 %                   default: [])
 %   graphWeighted:  Use graph weighted centrality analysis ([0,1]; default: 1)
 %   dimReduc:       Type of dimension reduction (PCA, LapEigen)
+%   topEllipseFrac: The top fraction of bins that are fit with an ellipse
 %
 %   Output
 %   features:       Concatenated feature array (Nx3 double)
@@ -39,6 +40,7 @@ if ~exist('graphWeighted','var')||isempty(graphWeighted);graphWeighted=1;end
 if ~exist('binInfo','var')||isempty(binInfo);binInfo=[];end
 if ~exist('norm','var')||isempty(norm);norm=0;end
 if ~exist('binNames','var')||isempty(binNames);binNames=cellstr(num2str([1:length(rnaSeq)]'));end
+if ~exist('topEllipseFrac','var')||isempty(topEllipseFrac);topEllipseFrac=.1;end
 
 %% Normalize, remove centromere and extract centrality (depreciated)
 if norm
@@ -107,7 +109,7 @@ if size(Xnorm,3) == 1
     scatter3(score(:,1), score(:,2), score(:,3), 10, colorScale,'filled');
     
     % label top 10% or top 10 (min) furthest pts
-    numPts = min([round(size(score,1)*.1) 10]);
+    numPts = min([round(size(score,1)*topEllipseFrac) 10]);
     distMat = squareform(pdist(score(:,1:3)));
     [~,labelLocs] = sort(sum(distMat),'descend');
     text(score(labelLocs(1:numPts),1), score(labelLocs(1:numPts),2),...
@@ -145,7 +147,7 @@ else
     end
     
     % label top 10% or top 20 (min) of genes to label and draw line
-    numPts = min([round(size(scoreReshape,1)*.1) 10]);
+    numPts = min([round(size(scoreReshape,1)*topEllipseFrac) 10]);
     [~,labelLocs] = sort(sum(allDist,2),'descend');
     meanLoc = mean(scoreReshape,3);
     text(meanLoc(labelLocs(1:numPts),1), meanLoc(labelLocs(1:numPts),2),...
