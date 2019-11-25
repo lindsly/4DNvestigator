@@ -44,7 +44,7 @@ if ~exist('topEllipseFrac','var')||isempty(topEllipseFrac);topEllipseFrac=.1;end
 
 %% Normalize, remove centromere and extract centrality (depreciated)
 if norm
-    error(['norm = 1 is currently a depreciated option, normalize Hi-C',...
+    error(['norm = 1 is currently a deprecated option, normalize Hi-C',...
         'matrices prior to input'])
     hic = norm_hic_bins(hic,binInfo);
 end
