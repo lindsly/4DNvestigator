@@ -21,11 +21,20 @@ juicerJarDir = [juicerJarDir(1:juicerJarDirLevels(end)),'juicer_tools.jar'];
 juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
     sprintf('straw-master%spython%sread_hic_header.py',filesep,filesep)];
 
+% Check if requests is available
+[status,cmdout] = system('python -c "import requests"');
+if status~=0
+    warning("python library 'requests' not detected")
+end
+
 % run "read_hic_header.py"
 [status,cmdout] = system(sprintf('python %s %s',juicerReadHic,fn));
 
 % check alternate methods to obtain ref genome info
 if status~=0
+    warning(sprintf(juicerReadHic+" exit status = "+status+...
+        ". Output given below:\n\n"+cmdout))
+    
     if ~isempty(idxRefGenome)
         hicHeader.refGenome = idxRefGenome;
         hicHeader.Chromosomes = readtable(sprintf('%s.chrom.sizes',hicHeader.refGenome),...

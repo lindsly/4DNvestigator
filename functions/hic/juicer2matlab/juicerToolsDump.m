@@ -71,6 +71,12 @@ if headerFlag
     juicerReadHic = [juicerJarDir(1:juicerJarDirLevels(end)),...
         sprintf('%sstraw-master%spython%sread_hic_header.py',filesep,filesep,filesep)];
     
+    % Check if requests is available
+    [status2,~] = system('python -c "import requests"');
+    if status2~=0
+        warning("python library 'requests' not detected")
+    end
+    
     % run "read_hic_header.py"
     [status2,cmdout2] = system(sprintf('python %s %s',juicerReadHic,fn));
     
