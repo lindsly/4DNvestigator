@@ -39,9 +39,10 @@ of each loci within this space over time. Method specifics can be found in:
 their chromatin structure from compartment "A" to compartment "B"
 
 # Example
-- See "./exampleScripts/*.m" for an examples of the 4DNvestigator analysis
+- See "./exampleScripts/*.m" for examples of 4DNvestigator analysis
 
 
 # Dependencies
 - The 4DNvestigator requires that [java](https://www.java.com/en/download/help/download_options.xml) and [python](https://www.python.org/downloads/) are installed to extract data from .hic files.
-- We recommend that the ["requests"](https://realpython.com/python-requests/) library is installed for python, and that it is added to the MATLAB path with "setenv"
+  - We recommend that the ["requests"](https://realpython.com/python-requests/) library is installed for python, and that it is added to the MATLAB path with "setenv"
+- The 4DNvestigator uses [juicertools](https://github.com/aidenlab/juicer) to read data from .hic files
