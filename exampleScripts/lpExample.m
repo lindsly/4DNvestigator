@@ -19,6 +19,12 @@
 clear
 close all
 
+% Add 4DNvestigator tools to path
+filepath = mfilename('fullpath');
+fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
+addpath(genpath(fdnPath))
+
+% Load MYOD data
 load('myodData.mat')
 
 %% Pre-processing Data

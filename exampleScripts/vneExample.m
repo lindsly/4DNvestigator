@@ -17,6 +17,11 @@
 clear
 close all
 
+% Add 4DNvestigator tools to path
+filepath = mfilename('fullpath');
+fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
+addpath(genpath(fdnPath))
+
 % paths to processed HFFc6 and H1-hESC data
 fn = {'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic',...
     'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic'};

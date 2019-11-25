@@ -18,13 +18,24 @@
 clear
 close all
 
+% Add 4DNvestigator tools to path
+filepath = mfilename('fullpath');
+fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
+addpath(genpath(fdnPath))
+
 % Paths to processed cell type data
 fileLoc = { 'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic';...
             'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic';...
-            'https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic'};
+            'https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic';...
+            'https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic';...
+            'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic';...
+            'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015/WT-combined.hic'};
 cellType = {'hHFFc6';...
             'hESC';...
-            'IMR90'};
+            'IMR90';...
+            'HUVEC';...
+            'GM12878';...
+            'RPE'};
 hicData = table(cellType,fileLoc);
 
 % Hi-C matrix parameters
@@ -78,5 +89,5 @@ for iCt = 1:height(hicData)
     colormap(hicCMap), caxis([-2 2]), colorbar
     ylabel('log_2(O/E)')
     
-    set(gca,'linewidth',2,'fontsize',20)
+    set(get(gcf,'children'),'linewidth',2,'fontsize',20)
 end

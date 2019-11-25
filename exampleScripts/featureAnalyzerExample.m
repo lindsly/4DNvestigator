@@ -19,9 +19,16 @@
 
 % Raw data (.hic and .results) files can be found here:
 %   https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
+
 clear
 close all
 
+% Add 4DNvestigator tools to path
+filepath = mfilename('fullpath');
+fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
+addpath(genpath(fdnPath))
+
+% Load data
 load('myodData.mat')
 
 %% 4DN Feature Analyzer Example

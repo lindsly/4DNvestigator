@@ -7,6 +7,11 @@
 clear
 close all
 
+% Add 4DNvestigator tools to path
+filepath = mfilename('fullpath');
+fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
+addpath(genpath(fdnPath))
+
 %% Select Data set to Load
 % Time Series Hi-C and RNA-seq data available at the following link:
 %   https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
