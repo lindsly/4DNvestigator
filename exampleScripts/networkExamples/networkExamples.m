@@ -1,3 +1,9 @@
+
+% The folder "networkData" and its contents must be downloaded to the current
+% directory to run this script. "networkData" can be downloaded here:
+%
+% https://drive.google.com/drive/folders/17XhveY8HDjeh3KWz43BBlCu1xN8yVs16?usp=sharing
+
 clc; clear all; close all;
 
 Folder_Data = sprintf('networkData');  %%%   CellTrans_Data data file name
