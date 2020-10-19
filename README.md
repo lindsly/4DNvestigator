@@ -2,7 +2,7 @@
 Scott Ronquist, scotronq@umich.edu. 1/18/19
 
 # Overview
-The 4DNvestigator is a MATLAB toolbox that analyzes time-series genome-wide chromosome
+HIC-CLASS TEST. The 4DNvestigator is a MATLAB toolbox that analyzes time-series genome-wide chromosome
 conformation capture (Hi-C) and gene expression (RNA-seq) data.
 
 Paper: in preparation
