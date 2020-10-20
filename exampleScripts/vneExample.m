@@ -23,9 +23,15 @@ fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
 addpath(genpath(fdnPath))
 
 % paths to processed HFFc6 and H1-hESC data
-fn = {'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic',...
-    'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic'};
+% fn = {'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic',...
+%     'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic'};
 
+% fn = {'https://drive.google.com/file/d/1ezQtUFWQMKAxry4web5Zm7mMilEUaw_6/view?usp=sharing',...
+%     'https://drive.google.com/file/d/1YsEgqRv8deXRxAujj_i8R4jT9TqMbedq/view?usp=sharing'};
+
+% TEMPORARY
+fn = {'\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\4DNFIFLJLIS5.hic',...
+      '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\4DNFIOX3BGNE.hic'};
 % Hi-C matrix parameters
 chrSelect = 14;
 bpFrag = 'BP';

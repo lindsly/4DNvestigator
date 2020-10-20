@@ -10,6 +10,7 @@
 *.cls
 *~$*
 .DS_Store
+*.ini
 
 # folders
 paperFiles/
