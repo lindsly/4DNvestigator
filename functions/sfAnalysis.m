@@ -102,7 +102,7 @@ end
 %% Figure output
 % figure('units','normalized','position',[.1 .1 .8 .8]), hold on
 % figure, hold on
-figure('position',[50 50 750 550]), hold on
+figure('Name',['Structure_Function_Feature_Space_', dimReduc],'position',[50 50 750 550]), hold on
 if size(Xnorm,3) == 1
     % plot features in low dimensional space
     colorScale = jet(length(binNames));
