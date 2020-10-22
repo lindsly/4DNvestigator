@@ -13,6 +13,9 @@ function [] = featureAnalyzerExample(Folder_Data, Folder_Result, chrSelect, dimR
     %   Revision History:
     %   v1.0 (5/24/19)
     %   * featureAnalyzerExample.m created
+    %
+    %   v2.0 (10/21/20)
+    %   * conversion to function, called from ExampleScript.m
 
     %% Load Data
     % 4DNvestigator formatted Hi-C and RNA-seq data is available here:
@@ -27,8 +30,7 @@ function [] = featureAnalyzerExample(Folder_Data, Folder_Result, chrSelect, dimR
 %     addpath(genpath(fdnPath))
 
     % Load data
-    load(fullfile(Folder_Data, 'myodData.mat'));
-%     load('myodData.mat')
+    load(Data_Loc);
 
     %% 4DN Feature Analyzer Example
     % Select 4DN Feature Analyzer parameters
@@ -59,6 +61,7 @@ function [] = featureAnalyzerExample(Folder_Data, Folder_Result, chrSelect, dimR
     %% Run the 4DNfeature analyzer
     [features,score] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],[],dimReduc,topEllipseFrac);
 
+    %% Save figure
     FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
     for iFig = 1:length(FigList)
       FigHandle = FigList(iFig);
