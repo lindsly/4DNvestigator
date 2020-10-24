@@ -1,4 +1,4 @@
-function [H] = fdnLoadHic(dataInfo,numericType)
+function [H] = fdnLoadHic(Data_Loc,dataInfo,numericType)
 %fdnLoadHic Loads and formats Hi-C data specified in dataInfo
 %
 %   Input
@@ -32,8 +32,12 @@ numericType = lower(numericType);
 chrInfo = dataInfo.hicHeader.Chromosomes;
 numChr = height(chrInfo);
 
+File_Name = dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'hic'))
+
 % get Hi-C sample Locations
-sampleFn = dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'hic'));
+for i = 1:size(File_Name)
+    sampleFn{i} = [Data_Loc, 'hic\', File_Name{i}];
+end
 
 % Create the waitbar and determine intialization properties
 % waitBar = waitbar(0,'loading 100kb Hi-C...','Name','Loading Data');

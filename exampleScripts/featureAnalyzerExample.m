@@ -1,4 +1,4 @@
-function [] = featureAnalyzerExample(Folder_Data, Folder_Result, chrSelect, dimReduc, binSize)
+function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
     %% 4DN Feature Analyzer example
     % This example shows how the "4DN feature analyzer" can be used to find
     % genes which change significantly in both structure and function over time

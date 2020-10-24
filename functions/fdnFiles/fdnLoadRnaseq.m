@@ -1,4 +1,4 @@
-function [R] = fdnLoadRnaseq(dataInfo,H)
+function [R] = fdnLoadRnaseq(Data_Loc,dataInfo,H)
 %fdnLoadRnaseq Loads and formats RNA-seq data specified in dataInfo
 %   
 %   Inputs

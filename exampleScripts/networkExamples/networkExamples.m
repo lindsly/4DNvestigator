@@ -3,6 +3,9 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     load(fullfile(Folder_Data, 'GeneTADinfo.mat')); %%% gene info.
     load(fullfile(Folder_Data, 'MyoD_gene_Rna_raw.mat')); %%% RNAseq
     load(fullfile(Folder_Data, 'MyoD_Mb_HiC_raw.mat')); %%% HiC 1mb; wrong time order
+%     load(Folder_Data{1}); %%% gene info.
+%     load(Folder_Data{2}); %%% RNAseq
+%     load(Folder_Data{3}); %%% HiC 1mb; wrong time order
     run_samps_old = {'64585','64584','71530','71533','71535','71537','71538','71536'...
         '71534','71532','71529','71531'};
     run_samps = {'64584','64585','71530','71529','71533','71532','71531','71536'...
@@ -49,7 +52,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     Gene_Names_skin_muscle = unique(union(Gene_Names_skin_muscle,go.myoblast));
 
     %%% Fib Gnetwork
-    load(fullfile(Folder_Data, sprintf('MyoD_GHiC_raw_all_Fib.mat')));
+    load(fullfile(Folder_Data, 'MyoD_GHiC_raw_all_Fib.mat'));
     GeneInfo_sort_Fib = GeneInfo_sort;
     idx_sel_Fib_tmp = cell2mat( cellfun(@(x) find(strcmp(x,GeneInfo_sort_Fib(:,1))), Gene_Names_skin_muscle,'UniformOutput',false) );
     idx_sel_Fib_tmp = sort(idx_sel_Fib_tmp,'ascend');
@@ -57,7 +60,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     HiC_G_Fib = HiC_G_Raw( idx_sel_Fib_tmp,idx_sel_Fib_tmp,: );
 
     %%% MyoD Gnetwork
-    load(fullfile(Folder_Data, sprintf('MyoD_GHiC_raw_skin_muscle.mat')));
+    load(fullfile(Folder_Data, 'MyoD_GHiC_raw_skin_muscle.mat'));
     GeneInfo_sort_MyoD = GeneInfo_sort;
     idx_sel_MyoD_tmp = cell2mat( cellfun(@(x) find(strcmp(x,GeneInfo_sort_MyoD(:,1))), Gene_Names_skin_muscle,'UniformOutput',false) );
     idx_sel_MyoD_tmp  = sort(idx_sel_MyoD_tmp,'ascend');
@@ -213,7 +216,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     idx_sel_str = find(diff_str>=thr_str);
     [~,idx_sort]= sort(diff_str(idx_sel_str),'descend');
     idx_sel_str = idx_sel_str(idx_sort);
-    hfig = figure;
+    hfig = figure('name','Degree vs Multiplex Participation Coefficient - All Genes');
     plot(p_muli_binary_norm{1,1},odeg_binary_norm{1,1} ,'Marker','^', 'MarkerSize',4,'MarkerFaceColor','m','MarkerEdgeColor','m','LineStyle','none'); hold on;
     plot(p_muli_binary_norm{2,1},odeg_binary_norm{2,1}  ,'Marker','s', 'MarkerSize',4,'MarkerFaceColor','g','MarkerEdgeColor','g','LineStyle','none'); hold on;
     plot(p_muli_binary_norm{1,1}(idx_sel_str) ,odeg_binary_norm{1,1}(idx_sel_str),'Marker','^','MarkerSize',12,'MarkerEdgeColor','k','MarkerFaceColor','none','LineStyle','none'); hold on;
@@ -230,7 +233,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     ylabel('Overlapping degree');
 
     %%%% shift
-    hfig = figure;
+    hfig = figure('name','Degree vs Multiplex Participation Coefficient - Selected Genes');
     plot(p_muli_binary_norm{1,1}(idx_sel_str) ,odeg_binary_norm{1,1}(idx_sel_str) ,'Marker','^', 'MarkerSize',4,'MarkerFaceColor','m','MarkerEdgeColor','m','LineStyle','none'); hold on;
     plot(p_muli_binary_norm{2,1}(idx_sel_str),odeg_binary_norm{2,1}(idx_sel_str),'Marker','s', 'MarkerSize',4,'MarkerFaceColor','g','MarkerEdgeColor','g','LineStyle','none'); hold on;
     plot([p_muli_binary_norm{1,1}(idx_sel_str).';p_muli_binary_norm{2,1}(idx_sel_str).'],[odeg_binary_norm{1,1}(idx_sel_str).';odeg_binary_norm{2,1}(idx_sel_str).'],'LineStyle','--','Color',rgb('darkgrey'),'LineWidth',1); hold on;
@@ -304,7 +307,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     GroupTnew = [1,2,3,4;5,6,7,8];
     for j = 1:size(GroupTnew,1)
         T_group = GroupTnew(j,:); lenT = length(T_group);
-        hfig = figure;
+        hfig = figure('name',['Network Visualization ', num2str(j)]);
         for i = 1:lenT
             subplot(2,2,i);
             Adj_t = HiC_multiplex_clean(:,:,T_group(i));
@@ -459,7 +462,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
         gene_name_sel{ii} = sprintf('%d: %s',temp(1),Genes_network_clean{idx_sel(ii),1});
     end
 
-    hfig = figure;
+    hfig = figure('name','Inter- and Intra-Chromosomal Contacts');
 
     plot(1:length(idx_sel), Deg_in_out_chrs(idx_sel,1,1),'Marker','o','MarkerSize',7, 'LineStyle','-','Color','r','MarkerFaceColor','r','MarkerEdgeColor','r' );
     hold on;
@@ -487,4 +490,11 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     ylabel('Contact density per gene');
 
 
+    %% Save figures
+    FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+    for iFig = 1:length(FigList)
+      FigHandle = FigList(iFig);
+      FigName   = get(FigHandle, 'Name');
+      savefig(FigHandle, [Folder_Result, '\',FigName, '.fig']);
+    end
 end
