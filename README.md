@@ -1,16 +1,15 @@
 # README for the 4DNvestigator toolbox
-Scott Ronquist, scotronq@umich.edu. 1/18/19
 
 # Overview
-TEST. The 4DNvestigator is a MATLAB toolbox that analyzes time-series genome-wide chromosome
+The 4DNvestigator is a MATLAB toolbox that analyzes time-series genome-wide chromosome
 conformation capture (Hi-C) and gene expression (RNA-seq) data.
 
 Paper: in preparation
 
-Availability: https://github.com/scotronq/4DNvestigator
+Availability: https://github.com/lindsly/4DNvestigator
 
 # Hi-C and RNA-seq data types
-the 4DNvestigator accepts the following input file formats:
+The 4DNvestigator accepts the following input file formats:
 
 |**Data Type**|**File Type**|**Program**|
 |----|----|----|
