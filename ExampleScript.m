@@ -71,11 +71,7 @@ close all
 % directory to run this function. "networkData" can be downloaded here:
 % https://drive.google.com/drive/folders/17XhveY8HDjeh3KWz43BBlCu1xN8yVs16?usp=sharing
 
-Data_Loc = '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\networkData\';
-% Data_Loc = {'\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\networkData\GeneTADinfo.mat'...
-%             '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\networkData\MyoD_gene_Rna_raw.mat'...
-%             '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\networkData\MyoD_Mb_HiC_raw.mat'...
-%             '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\networkData\ChromosomeNumbers.mat'}; 
+Data_Loc = '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\networkData\'; %%% data input folder
 Folder_Result = 'results\networkExamplesResults'; %%% output result file name
 
 networkExamples(Data_Loc, Folder_Result);
