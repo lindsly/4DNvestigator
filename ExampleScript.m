@@ -17,7 +17,7 @@ Data_Loc = '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\myodData\';
 
 if exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')==2
     [dataInfo] = fdnLoadUserInput(Index_Loc);
-%     [H] = fdnLoadHic(Data_Loc,dataInfo,'single');
+    [H] = fdnLoadHic(Data_Loc,dataInfo,'single');
     [R] = fdnLoadRnaseq(Data_Loc,dataInfo,H);
 end
 
