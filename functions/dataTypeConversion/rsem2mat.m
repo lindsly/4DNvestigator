@@ -37,9 +37,9 @@ end
 %% load geneinfo
 switch refGenome
     case 'hg19'
-        biomart = readtable('mart_export_ensembl_hg37_info.txt');
+        biomart = readtable('mart_export_ensembl_hg37_info.txt','Format','auto');
     case 'hg38'
-        biomart = readtable('mart_export_ensembl_hg38_info.txt');
+        biomart = readtable('mart_export_ensembl_hg38_info.txt','Format','auto');
 end
 
 %% load and compare biomart info
