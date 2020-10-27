@@ -24,14 +24,8 @@ addpath(genpath(fdnPath))
 
 %% Load data samples
 % samples and file locations
-[dataInfo] = fdnLoadUserInput('benchmarkHicDataIndex.xlsx','lpBenchmark',...
+[dataInfo] = fdnLoadUserInput('data\indexFiles\benchmarkHicDataIndex.xlsx','lpBenchmark',...
     fullfile('.',filesep,'lpBenchmarkOutput'));
-
-% Hi-C header check
-hicHeader = cell(height(dataInfo.sampleInfo),1);
-for iSample = 1:height(dataInfo.sampleInfo)
-    hicHeader{iSample} = readHicHeader(dataInfo.sampleInfo.path{iSample});
-end
 
 % genome information - keep HGNC synmbols
 dataInfo.biomart = readtable('mart_export_ensembl_hg37_info.txt');
