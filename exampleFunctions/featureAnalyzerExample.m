@@ -67,6 +67,7 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
       FigHandle = FigList(iFig);
       FigName   = get(FigHandle, 'Name');
       savefig(FigHandle, [Folder_Result, '\',FigName, '.fig']);
+      saveas(FigHandle, [Folder_Result, '\',FigName, '.png']);
     end
     
 end

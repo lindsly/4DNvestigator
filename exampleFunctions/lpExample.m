@@ -95,5 +95,6 @@ function [] = lpExample(Data_Loc, Folder_Result)
       FigHandle = FigList(iFig);
       FigName   = get(FigHandle, 'Name');
       savefig(FigHandle, [Folder_Result, '\',FigName, '.fig']);
+      saveas(FigHandle, [Folder_Result, '\',FigName, '.png']);
     end
 end

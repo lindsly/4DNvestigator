@@ -75,7 +75,7 @@ function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
     subplot(1,2,2)
     imagesc(HTrim(:,:,2)), axis square
     title(sprintf('H1-hESC, VNE: %.2f',vnEntropy(2)))
-    colormap(hicCMap), caxis([-2 2])
+    colormap(hicCMap), caxis([-2 2]), colorbar
 
     set(get(gcf,'children'),'linewidth',2,'fontsize',20)
     linkaxes(get(gcf,'children'))
@@ -103,5 +103,6 @@ function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
       FigHandle = FigList(iFig);
       FigName   = get(FigHandle, 'Name');
       savefig(FigHandle, [Folder_Result, '\',FigName, '.fig']);
+      saveas(FigHandle, [Folder_Result, '\',FigName, '.png']);
     end
 end
