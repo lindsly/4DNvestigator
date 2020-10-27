@@ -15,6 +15,7 @@
 # folders
 paperFiles/
 dev/
+exampleData/*
 
 # exceptions
 # !data/sampleData/indexFiles/sample*.xlsx
