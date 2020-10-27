@@ -16,28 +16,6 @@ function [] = vneExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, bin
     %   * vneExampleExpanded.m created
 
     %% Load Data
-    % clear
-    % close all
-
-    % Add 4DNvestigator tools to path
-    % filepath = mfilename('fullpath');
-    % fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
-    % addpath(genpath(fdnPath))
-
-    % Paths to processed cell type data
-    % Data_Loc = { 'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic';...
-    %             'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic';...
-    %             'https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic';...
-    %             'https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic';...
-    %             'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic';...
-    %             'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015/WT-combined.hic'};
-    % TEMPORARY
-%     Data_Loc = { '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\4DNFIFLJLIS5.hic';...
-%                 '\\172.17.109.24\internal_4dn\projects\4DNvestigator_data\4DNFIOX3BGNE.hic';...
-%                 'https://hicfiles.s3.amazonaws.com/hiseq/imr90/in-situ/combined.hic';...
-%                 'https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic';...
-%                 'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic';...
-%                 'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015/WT-combined.hic'};
     cellType = {'hHFFc6';...
                 'hESC';...
                 'IMR90';...
@@ -62,7 +40,6 @@ function [] = vneExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, bin
     % remove disconnected nodes (genomic regions with a low number of aligned
     % reads)
 
-    % [HTrim,badLocs] = hicTrim(cat(3,hHFFc6,hESC),2,.1);
     HTrim = cell(height(hicData));
     for iCt = 1:height(hicData)
         [HTrim{iCt},badLocs] = hicTrim(H{iCt},2,.1);
@@ -87,8 +64,6 @@ function [] = vneExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, bin
     end
 
     %% Visualize Matrices with VNE
-    % figure
-
     hicCMap = 1-((1-redblue(100))*.7);
     for iCt = 1:height(hicData)
         figure('name',hicData.cellType{iCt},'position',[50 50 700 500])

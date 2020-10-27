@@ -3,13 +3,12 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     load(fullfile(Folder_Data, 'GeneTADinfo.mat')); %%% gene info.
     load(fullfile(Folder_Data, 'MyoD_gene_Rna_raw.mat')); %%% RNAseq
     load(fullfile(Folder_Data, 'MyoD_Mb_HiC_raw.mat')); %%% HiC 1mb; wrong time order
-%     load(Folder_Data{1}); %%% gene info.
-%     load(Folder_Data{2}); %%% RNAseq
-%     load(Folder_Data{3}); %%% HiC 1mb; wrong time order
+
     run_samps_old = {'64585','64584','71530','71533','71535','71537','71538','71536'...
         '71534','71532','71529','71531'};
     run_samps = {'64584','64585','71530','71529','71533','71532','71531','71536'...
         '71535','71534','71538','71537'};
+    
     [LIA,time_order] = ismember(run_samps,run_samps_old) ;
     numReads = numReads(time_order);
     HiC_raw_1Mb = HiC_raw(:,:,time_order);

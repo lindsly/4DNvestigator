@@ -18,24 +18,7 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     %   * conversion to function, called from ExampleScript.m
 
     %% Load Data
-    % 4DNvestigator formatted Hi-C and RNA-seq data is available here:
-    %   https://drive.google.com/open?id=11XQ0CudxRvM5P6aI57yes2h8XXLhxlRr
-
-    % Raw data (.hic and .results) files can be found here:
-    %   https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm
-
-    % Add 4DNvestigator tools to path
-%     filepath = mfilename('fullpath');
-%     fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
-%     addpath(genpath(fdnPath))
-
-    % Load data
     load(Data_Loc);
-
-    %% 4DN Feature Analyzer Example
-    % Select 4DN Feature Analyzer parameters
-    % This example is set up to analyze an entire genome at 1 Mb or 100 kb
-    % resolution
 
     %% Set default 4DN Feature Analyzer parameters
     if ~exist('chrSelect','var')||isempty(chrSelect);chrSelect = 11;end
@@ -61,7 +44,7 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     %% Run the 4DNfeature analyzer
     [features,score] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],[],dimReduc,topEllipseFrac);
 
-    %% Save figure
+    %% Save figures
     FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
     for iFig = 1:length(FigList)
       FigHandle = FigList(iFig);

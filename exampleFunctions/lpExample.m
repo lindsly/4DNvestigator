@@ -15,11 +15,6 @@ function [] = lpExample(Data_Loc, Folder_Result)
     %   * lpExample.m created
 
     %% Load Data
-    % 4DNvestigator formatted Hi-C and RNA-seq data is available here:
-    %   https://drive.google.com/open?id=11XQ0CudxRvM5P6aI57yes2h8XXLhxlRr
-    % clear
-    % close all
-
     % Add 4DNvestigator tools to path
     filepath = mfilename('fullpath');
     fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);

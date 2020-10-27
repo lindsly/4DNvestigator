@@ -14,25 +14,7 @@ function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
     %   v1.0 (5/24/19)
     %   * vneExample.m created
 
-    %% Load Data
-    % clear
-    % close all
-    % 
-    % % Add 4DNvestigator tools to path
-    % filepath = mfilename('fullpath');
-    % fdnPath = filepath(1:strfind(filepath,'4DNvestigator')+12);
-    % addpath(genpath(fdnPath))
-
-    % paths to processed HFFc6 and H1-hESC data
-    % fn = {'https://data.4dnucleome.org/files-processed/4DNFIFLJLIS5/@@download/4DNFIFLJLIS5.hic',...
-    %     'https://data.4dnucleome.org/files-processed/4DNFIOX3BGNE/@@download/4DNFIOX3BGNE.hic'};
-
-    % fn = {'https://drive.google.com/file/d/1ezQtUFWQMKAxry4web5Zm7mMilEUaw_6/view?usp=sharing',...
-    %     'https://drive.google.com/file/d/1YsEgqRv8deXRxAujj_i8R4jT9TqMbedq/view?usp=sharing'};
-
-    % Hi-C matrix parameters
-
-    %% Set default 4DN Feature Analyzer parameters
+    %% Set default VNE parameters
     if ~exist('chrSelect','var')||isempty(chrSelect);chrSelect = 14;end
     if ~exist('bpFrag','var')||isempty(bpFrag);bpFrag='BP';end
     if ~exist('binSize','var')||isempty(binSize);binSize=1E5;end
@@ -62,7 +44,6 @@ function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
     vnEntropy = hicVnEntropy(HTrim,[],[],preProcess);
 
     %% Visualize Matrices with VNE
-    % figure
     figure('name','VNE Example', 'position',[50 50 1300 500])
     hicCMap = 1-((1-redblue(100))*.7);
 

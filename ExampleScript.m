@@ -1,3 +1,12 @@
+%% 4DN Feature Analyzer example
+% This example script shows how each of the core functionalities of the
+% 4DNvestigator can be called using default parameters
+%
+%   link to paper: (In preparation)
+%
+%   Written by: Scott Ronquist, Stephen Lindsly
+%   Contact:    scotronq@umich.edu, lindsly@umich.edu
+
 close all, clear all
 restoredefaultpath
 addpath(genpath(pwd))
@@ -12,7 +21,6 @@ end
 Index_Loc = 'data\exampleData\myodData\sampleMyodDataIndexTp-48_8_80.xlsx';
 Data_Loc = 'data\exampleData\myodData\';
 
-
 if exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')==2
     [dataInfo] = fdnLoadUserInput(Index_Loc);
     [H] = fdnLoadHic(Data_Loc,dataInfo,'single');
@@ -26,6 +34,7 @@ Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
 dimReduc = 'pca';
 binSize = 1E5;
+
 featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
 
 %% Simple Von Neumann Entropy Example
@@ -53,7 +62,6 @@ bpFrag = 'BP';
 binSize = 1E5;
 
 vneExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
-
 
 %% Larntz-Perlman Example
 close all
