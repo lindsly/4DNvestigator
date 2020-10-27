@@ -2,13 +2,11 @@ close all, clear all
 restoredefaultpath
 addpath(genpath(pwd))
 
-% TEMPORARY
-addpath(genpath('data\exampleData'))
-
 %% Load Data Example through the 4DNvestigator functions
 if exist('myodData.mat','file')~=2 || exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')~=2
-    error(['Download time series Hi-C and RNA-seq data ',...
-        '<a href="https://drive.google.com/open?id=1lSyU-7I0ME3X70Mt_-HjLMtPc-BMKHxm">here</a>'])
+    error(['Download all Hi-C and RNA-seq data ',...
+        '<a href="https://drive.google.com/drive/folders/1xVjX7yqiOIPV_IfVKVDJJ79Ee0xMHGr8?usp=sharing">here</a>',...
+        ' and save to the directory data\exampleData\'])
 end
 
 Index_Loc = 'data\exampleData\myodData\sampleMyodDataIndexTp-48_8_80.xlsx';
@@ -23,7 +21,6 @@ end
 
 %% Feature Analyzer Example
 close all
-% *v* Temporary storage solution *v*
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
 Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
@@ -67,10 +64,6 @@ lpExample(Data_Loc, Folder_Result);
 
 %% Network Example
 close all
-% The folder "networkData" and its contents must be downloaded to the current
-% directory to run this function. "networkData" can be downloaded here:
-% https://drive.google.com/drive/folders/17XhveY8HDjeh3KWz43BBlCu1xN8yVs16?usp=sharing
-
 Data_Loc = 'data\exampleData\networkData\'; %%% data input folder
 Folder_Result = 'results\networkExamplesResults'; %%% output result file name
 
