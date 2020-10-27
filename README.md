@@ -64,3 +64,9 @@ provides further details for each core function and their respective output.
   - We recommend that the ["requests"](https://realpython.com/python-requests/) library is installed for python, and that it is added to the MATLAB path with "setenv"
 - The 4DNvestigator uses [juicertools](https://github.com/aidenlab/juicer) to read data from .hic files
 - The 4DNvestigator requires the following MATLAB Toolboxes for proper functionality: [Statistics and Machine Learning](https://www.mathworks.com/products/statistics.html), [Computer Vision](https://www.mathworks.com/products/computer-vision.html), [Bioinformatics](https://www.mathworks.com/products/bioinfo.html), and [Image Processing](https://www.mathworks.com/products/image.html)
+
+# System Requirements
+We recommend the following system properties for all 4DNvestigator functionalities to run properly:
+- Windows 10
+- At least 8 Gb RAM (highly dependent on the amount data being analyzed) 
+- A current version of MATLAB (2019 or later)
