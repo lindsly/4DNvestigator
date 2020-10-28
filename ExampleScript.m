@@ -28,11 +28,11 @@ if exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')==2
 end
 
 %% Feature Analyzer Example
-close all
+% close all
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
 Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
-dimReduc = 'pca';
+dimReduc = 'tsne';
 binSize = 1E5;
 
 featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)

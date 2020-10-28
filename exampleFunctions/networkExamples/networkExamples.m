@@ -228,7 +228,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
     legend(hcolor,{'0-24 hrs', '32-56 hrs','Selected genes (0-24 hrs)','Selected genes (32-56 hrs)'});  legend('boxoff');
     ax = gca;
     ax.XDir = 'reverse';
-    xlabel('Multiplex participation coeff.');
+    xlabel('Multiplex participation coefficient');
     ylabel('Overlapping degree');
 
     %%%% shift

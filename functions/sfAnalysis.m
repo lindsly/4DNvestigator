@@ -86,34 +86,43 @@ end
 
 %% Dimension reduction
 dimReduc = lower(dimReduc);
+dimReducLabel = [];
 switch dimReduc
     case 'pca'
         [~,score,~] = pca(XnormStacked);
+        dimReducLabel = 'PCA';
     case 'lapeigen'
         knn = 30*size(hic,3);%30*size(hic,3);
         sigma = 100;
         score = laplacian_eigen(XnormStacked, 3, knn, sigma);
+        dimReducLabel = 'Laplacian Eigenmaps';
     case 'tsne'
         score = tsne(XnormStacked,[],3);
+        dimReducLabel = 't-SNE';
     otherwise
-        error('please select a valid dimension reduction method: pca, lapeigen, tsne')
+        error('please select a valid dimension reduction method: pca, lapeigen, or tsne')
 end
 
 %% Figure output
 % figure('units','normalized','position',[.1 .1 .8 .8]), hold on
 % figure, hold on
-figure('Name',['Structure_Function_Feature_Space_', dimReduc],'position',[50 50 750 550]), hold on
+figure('Name',['Structure_Function_Feature_Space_', dimReducLabel],'position',[50 50 750 550]), hold on
 if size(Xnorm,3) == 1
     % plot features in low dimensional space
     colorScale = jet(length(binNames));
     scatter3(score(:,1), score(:,2), score(:,3), 10, colorScale,'filled');
     
     % label top 10% or top 10 (min) furthest pts
-    numPts = min([round(size(score,1)*topEllipseFrac) 10]);
+    if strcmp(dimReduc,'tsne') || strcmp(dimReduc,'lapeigen')
+        numPts_label = 0;
+    else
+        numPts_label = min([round(size(score,1)*topEllipseFrac) 10]);
+    end
+    
     distMat = squareform(pdist(score(:,1:3)));
     [~,labelLocs] = sort(sum(distMat),'descend');
-    text(score(labelLocs(1:numPts),1), score(labelLocs(1:numPts),2),...
-        score(labelLocs(1:numPts),3), binNames(labelLocs(1:numPts)))
+    text(score(labelLocs(1:numPts_label),1), score(labelLocs(1:numPts_label),2),...
+        score(labelLocs(1:numPts_label),3), binNames(labelLocs(1:numPts_label)))
     
 else
     % reshape data, take first 3 dimensions
@@ -124,34 +133,43 @@ else
         scoreReshape(:,:,iS) = score(numBins*(iS-1)+1:numBins*iS,1:3);
     end
     
-    % plot features in low dimensional space
-    colorScale = jet(numSamples);
-    for iS = 1:numSamples
-        scatter3(scoreReshape(:,1,iS), scoreReshape(:,2,iS),...
-            scoreReshape(:,3,iS), 20,colorScale(iS,:),'filled');
-    end
-    
-    % add lines btw pts
-    if 1==1%~strcmp(dimReduc,'lapeigen')
-    for iS = 1:numSamples-1
-        plot3([scoreReshape(:,1,iS),scoreReshape(:,1,iS+1)]',...
-            [scoreReshape(:,2,iS),scoreReshape(:,2,iS+1)]',...
-            [scoreReshape(:,3,iS),scoreReshape(:,3,iS+1)]','k-')
-    end
-    end
-    
     % get dist btw pts
     allDist = zeros(numBins,numSamples-1);
     for iS = 1:numSamples-1
         allDist(:,iS) = diag(pdist2(scoreReshape(:,1:3,iS), scoreReshape(:,1:3,iS+1)));
     end
     
-    % label top 10% or top 20 (min) of genes to label and draw line
-    numPts = min([round(size(scoreReshape,1)*topEllipseFrac) 10]);
+    numPts_plot = round(size(scoreReshape,1)*topEllipseFrac);
     [~,labelLocs] = sort(sum(allDist,2),'descend');
+    
+    % plot features in low dimensional space
+    colorScale = jet(numSamples);
+    for iS = 1:numSamples
+        scatter3(scoreReshape(labelLocs(1:numPts_plot),1,iS), ...
+                 scoreReshape(labelLocs(1:numPts_plot),2,iS), ...
+                 scoreReshape(labelLocs(1:numPts_plot),3,iS), ...
+                 25,colorScale(iS,:),'filled');
+    end
+    
+    % add lines btw pts
+    if 1==1%~strcmp(dimReduc,'lapeigen')
+    for iS = 1:numSamples-1
+        plot3([scoreReshape(labelLocs(1:numPts_plot),1,iS),scoreReshape(labelLocs(1:numPts_plot),1,iS+1)]',...
+            [scoreReshape(labelLocs(1:numPts_plot),2,iS),scoreReshape(labelLocs(1:numPts_plot),2,iS+1)]',...
+            [scoreReshape(labelLocs(1:numPts_plot),3,iS),scoreReshape(labelLocs(1:numPts_plot),3,iS+1)]','-','Color',[.5 .5 .5])
+    end
+    end
+    
+    % label top 10% or top 20 (min) of genes to label and draw line
+    if strcmp(dimReduc,'tsne') || strcmp(dimReduc,'lapeigen')
+        numPts_label = 0;
+    else
+        numPts_label = min([round(size(score,1)*topEllipseFrac) 10]);
+    end
+%     [~,labelLocs] = sort(sum(allDist,2),'descend');
     meanLoc = mean(scoreReshape,3);
-    text(meanLoc(labelLocs(1:numPts),1), meanLoc(labelLocs(1:numPts),2),...
-        meanLoc(labelLocs(1:numPts),3), binNames(labelLocs(1:numPts)));
+    text(meanLoc(labelLocs(1:numPts_label),1), meanLoc(labelLocs(1:numPts_label),2),...
+        meanLoc(labelLocs(1:numPts_label),3), binNames(labelLocs(1:numPts_label)));
     
     % fit ellipse to points if = 3 pts available
     if numSamples == 3
@@ -162,7 +180,7 @@ else
             fprintf('Fitting ellipse to pts: %.2f%%\n',(iBin/numBins*100))
             
             % plot large distance pts
-            if ismember(iBin,labelLocs(1:numPts))
+            if ismember(iBin,labelLocs(1:numPts_label))
                 [X, binArea(iBin)] = fitEllipse3d(squeeze(scoreReshape(iBin,1:3,:))');
                 plot3(X(:,1),X(:,2),X(:,3),'r-')
             end
@@ -176,7 +194,7 @@ else
             fprintf('Fitting ellipsoid to pts: %.2f\n',(iBin/numBins*100))
             
             % plot large distance pts
-            if ismember(iBin,labelLocs(1:numPts))
+            if ismember(iBin,labelLocs(1:numPts_label))
                 % fit ellipse
                 [A,C] = MinVolEllipse(squeeze(scoreReshape(iBin,1:3,:)),.01);
                 
@@ -202,7 +220,7 @@ end
 
 % format output
 box on
-title(sprintf('Structure-Function Feature Space - %s',dimReduc))
+title(sprintf('Structure-Function Feature Space - %s',dimReducLabel))
 
 switch dimReduc
     case 'pca'
