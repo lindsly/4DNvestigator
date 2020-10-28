@@ -72,4 +72,4 @@ We recommend the following system properties for all 4DNvestigator functionaliti
   - This is highly dependent on the size of the data being analyzed (data used in "ExampleScript.m" peaks at 9.5 Gb RAM usage) 
 - A current version of MATLAB (2019 or later)
 
-*4DNvestigator was written and compiled on a Windows 10 machine with an Intel Core i7-8700 CPU and 32 Gb RAM using MATLAB R2019b.*
+*4DNvestigator was written and tested on a Windows 10 machine with an Intel Core i7-8700 CPU and 32 Gb RAM using MATLAB R2019b.*
