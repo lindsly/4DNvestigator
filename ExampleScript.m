@@ -28,7 +28,6 @@ if exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')==2
     [R] = fdnLoadRnaseq(Data_Loc,dataInfo,H);
 end
 
-memory
 %% Feature Analyzer Example
 % close all
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
