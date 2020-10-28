@@ -230,5 +230,6 @@ switch dimReduc
 end
 view(2)
 set(gca,'linewidth',2,'fontsize',15)
+
 end
 

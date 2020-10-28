@@ -84,4 +84,5 @@ function [] = vneExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, bin
       savefig(FigHandle, [Folder_Result, '\',FigName, '.fig']);
       saveas(FigHandle, [Folder_Result, '\',FigName, '.png']);
     end
+    
 end

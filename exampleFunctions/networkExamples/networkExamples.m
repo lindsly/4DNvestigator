@@ -497,4 +497,5 @@ function [] = networkExamples(Folder_Data, Folder_Result)
       savefig(FigHandle, [Folder_Result, '\',FigName, '.fig']);
       saveas(FigHandle, [Folder_Result, '\',FigName, '.png']);
     end
+    
 end
