@@ -34,7 +34,7 @@ memory
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
 Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
-dimReduc = 'tsne';
+dimReduc = 'pca';
 binSize = 1E5;
 
 featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
