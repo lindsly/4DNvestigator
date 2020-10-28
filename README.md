@@ -1,4 +1,4 @@
-# README for the 4DNvestigator toolbox
+# 4DNvestigator Toolbox
 
 # Overview
 The 4DNvestigator is a MATLAB toolbox that analyzes time-series genome-wide chromosome
