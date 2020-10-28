@@ -68,5 +68,6 @@ provides further details for each core function and their respective output.
 # System Requirements
 We recommend the following system properties for all 4DNvestigator functionalities to run properly:
 - Windows 10
-- At least 8 Gb RAM (highly dependent on the amount data being analyzed) 
+- At least 12 Gb RAM 
+  - This is highly dependent on the size of the data being analyzed. Example data used in "ExampleScript.m" peaks at 9.2 Gb RAM usage. 
 - A current version of MATLAB (2019 or later)
