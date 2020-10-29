@@ -4,8 +4,8 @@
 %
 %   link to paper: (In preparation)
 %
-%   Written by: Scott Ronquist, Stephen Lindsly
-%   Contact:    scotronq@umich.edu, lindsly@umich.edu
+%   Written by: Stephen Lindsly, Scott Ronquist 
+%   Contact:    lindsly@umich.edu, scotronq@umich.edu
 
 close all
 clear
