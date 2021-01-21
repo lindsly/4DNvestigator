@@ -2,9 +2,10 @@ function [vnEntropy,AInputEigs] = hicVnEntropy(AInput,numEigs,normEigs,preProces
 %hicVnEntropy computes the Von Neumann graph entropy of the matrix A
 %
 %   Inputs
-%   AInput:     Input matrix for Von Neumann entropy calculation (NxN double; default: N/A)
-%   numEigs:    number of eigenvalues to consider for compuation (integer;
-%   default:    size(AInput,1)
+%   AInput:     Input matrix for Von Neumann entropy calculation 
+%               (NxN double; default: N/A)
+%   numEigs:    number of eigenvalues to consider for compuation 
+%               (integer; default: size(AInput,1))
 %   normEigs:   normalize eigenvalues flag ([0,1]; default: 1)
 %   preProcess: arguments for preprocessing methods (string; default: 'none')
 %
@@ -45,7 +46,7 @@ for iA = 1:size(AInput,3)
         case 'none'
             A = AInput(:,:,iA);
         case 'laplacian'
-            A = hicLaplacianFdv(AInput(:,:,iA));
+            [Ln,Fdv,A,FdNum] = hicLaplacianFdv(AInput(:,:,iA));
         case 'corr'
             A = corr(AInput(:,:,iA));
             A(isnan(A))=0;
@@ -53,6 +54,7 @@ for iA = 1:size(AInput,3)
     
     % eigen decomposition
     tempEigs = eig(A);
+    tempEigs = sort(tempEigs,'ascend');
     
     % normalize eigenvalues
     if normEigs == 1
@@ -62,8 +64,8 @@ for iA = 1:size(AInput,3)
     % take a subset of eigenvalues
     AInputEigs(:,iA) = tempEigs(1:numEigs);
     
-    % get non-zero eigs
-    tempEigs = AInputEigs(AInputEigs(:,iA)~=0,iA);
+    % get non-zero eis
+    tempEigs = AInputEigs(AInputEigs(:,iA)>1E-6,iA); % 1E-6 used to avoid roundoff error near zero
     
     % Von Neumann Entropy
     vnEntropy(iA) = real(-sum(tempEigs.*log(tempEigs)));

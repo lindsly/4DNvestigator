@@ -28,10 +28,19 @@ numChr = height(chrInfo);
 repGrp = findgroups(strcat(dataInfo.sampleInfo.sample(strcmp(dataInfo.sampleInfo.dataType,'rnaseq')),...
     num2str(dataInfo.sampleInfo.timePoint(strcmp(dataInfo.sampleInfo.dataType,'rnaseq')))));
 
-% RSEM to mat
-R = rsem2mat(dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
-    dataInfo.sampleInfo.name(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
-    dataInfo.hicHeader.refGenome);
+filetype = dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'rnaseq'));
+
+if strcmp(filetype{1}(end-3:end), 'rpkm')
+   % RPKM to mat
+    R = rpkm2mat(dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
+        dataInfo.sampleInfo.name(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
+        dataInfo.hicHeader.refGenome); 
+else
+    % RSEM to mat
+    R = rsem2mat(dataInfo.sampleInfo.path(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
+        dataInfo.sampleInfo.name(ismember(dataInfo.sampleInfo.dataType,'rnaseq')),...
+        dataInfo.hicHeader.refGenome);
+end
 
 Rfields = fields(R);
 

@@ -1,4 +1,4 @@
-%% 4DN Feature Analyzer example
+%% 4DN example
 % This example script shows how each of the core functionalities of the
 % 4DNvestigator can be called using default parameters
 %
@@ -33,7 +33,7 @@ end
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
 Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
-dimReduc = 'pca';
+dimReduc = 'umap';
 binSize = 1E5;
 
 featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
@@ -71,9 +71,6 @@ Folder_Result = 'results\lpExampleResults';
 
 lpExample(Data_Loc, Folder_Result);
 
-%% Network Example
-close all
-Data_Loc = 'data\exampleData\networkData\'; %%% data input folder
-Folder_Result = 'results\networkExamplesResults'; %%% output result file name
+%% Tensor Entropy Example
 
-networkExamples(Data_Loc, Folder_Result);
+

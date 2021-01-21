@@ -36,7 +36,7 @@ function [mappedX, mapping] = laplacian_eigen(X, no_dims, k, sigma, eig_impl)
     
     % Construct neighborhood graph
     disp('Constructing neighborhood graph...');
-    if size(X, 1) < 4000
+    if size(X, 1) < 15000 % 4000 % SL EDIT
         G = L2_distance(X', X');
         
         % Compute neighbourhood graph

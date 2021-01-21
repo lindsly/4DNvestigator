@@ -132,7 +132,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
 
         thr_cut_max = quantile(vec(Ht(Ht>0)),1-thr_max_norm);
         thr_cut_min = quantile(vec(Ht(Ht>0)),thr_min_norm);
-        Ht(Ht>Ht) = thr_cut_max;
+        Ht(Ht>thr_cut_max) = thr_cut_max; % SML Edit from: Ht(Ht>Ht) = thr_cut_max;
         Ht(Ht<thr_cut_min) = 0;
 
         HiC_G_Fib_common_norm(:,:,t) =Ht;
@@ -148,7 +148,7 @@ function [] = networkExamples(Folder_Data, Folder_Result)
         %%%
         thr_cut_max = quantile(vec(Ht(Ht>0)),1-thr_max_norm);
         thr_cut_min = quantile(vec(Ht(Ht>0)),thr_min_norm);
-        Ht(Ht>Ht) = thr_cut_max;
+        Ht(Ht>thr_cut_max) = thr_cut_max; % SML Edit from: Ht(Ht>Ht) = thr_cut_max;
         Ht(Ht<thr_cut_min) = 0;
         HiC_G_MyoD_common_norm(:,:,t) =Ht;
     end

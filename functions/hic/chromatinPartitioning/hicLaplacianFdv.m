@@ -23,12 +23,12 @@ Ln = Dn*(D-A)*Dn;
 
 %% calculate eigenvalue and eigenvector
 try
-    [F,D] = eigs(Ln,2,'SM');
+    [F,D] = eigs(L,2,'SM');
     Fdv = F(:,2);
     FdNum = D(2,2);
 catch
     fprintf('eigs ERROR: First input matrix is singular. trying full eig \n')
-    [V,D] = eig(Ln);
+    [V,D] = eig(L);
     [~,I] = sort(diag(D),'ascend');
     Fdv = V(:,I(2));
     FdNum = D(I(2),I(2));

@@ -19,6 +19,7 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
 
     %% Load Data
     load(Data_Loc);
+    load('ncbi_gene_info.mat');
 
     %% Set default 4DN Feature Analyzer parameters
     if ~exist('chrSelect','var')||isempty(chrSelect);chrSelect = 11;end
@@ -41,8 +42,29 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
             error('please select a correct bin size (1E6 or 1E5)')
     end
 
-    %% Run the 4DNfeature analyzer
-    [features,score] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],[],dimReduc,topEllipseFrac);
+    %% Run the 4DNfeature analyzer visualization
+    [features,score,genes] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],dimReduc,topEllipseFrac);
+    
+    %% Format genes in loci with largest structure-function changes
+    genes = unique(genes,'stable');
+    ID=ncbi_gene_info.GeneID(genes);
+    for i = 1:length(genes)
+        url_ncbi{i,1}=sprintf("https://www.ncbi.nlm.nih.gov/gene/%d",ID(i));
+        url_genecards{i,1}=sprintf("https://www.genecards.org/cgi-bin/carddisp.pl?gene=%s",genes{i});
+    end
+
+    idx = ismember(R.TPM.geneName,genes);
+    genes_table = R.TPM(idx,1:5);
+    [~,order] = ismember(genes, genes_table.geneName);
+    genes_table = genes_table(order,:);
+    genes_table = movevars(genes_table,'geneName','Before','chr');
+    genes_table.Properties.RowNames = genes_table.geneName;
+    genes_table.NCBI_web = url_ncbi;
+    genes_table.GeneCards_web = url_genecards;
+
+    % Launch webpage via genes_table URL
+%     web(genes_table.NCBI_web{'PDGFD'})
+%     web(genes_table.GeneCards_web{'PDGFD'})
 
     %% Save figures
     FigList = findobj(allchild(0), 'flat', 'Type', 'figure');

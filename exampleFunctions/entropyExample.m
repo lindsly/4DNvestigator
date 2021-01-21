@@ -29,16 +29,18 @@ function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
     [HTrim,badLocs] = hicTrim(cat(3,hHFFc6,hESC),2,.1);
 
     % compute the log2, change -inf values to minimum
-    HTrim = log2(HTrim);
-    for iA = 1:length(Data_Loc)
-        tempH = HTrim(:,:,iA);
-        tempH(tempH==-inf) = min(tempH(isfinite(tempH)));
-        HTrim(:,:,iA) = tempH;
-    end
+%     HTrim = log2(HTrim);
+%     for iA = 1:length(Data_Loc)
+%         tempH = HTrim(:,:,iA);
+%         tempH(tempH==-inf) = min(tempH(isfinite(tempH)));
+% %         tempH = corr(tempH);
+% %         tempH(isnan(tempH))=0;
+%         HTrim(:,:,iA) = tempH;
+%     end
 
     %% VNE Computation
     % set VNE parameters
-    preProcess = 'corr';
+    preProcess = 'laplacian';
 
     % calculate VNE
     vnEntropy = hicVnEntropy(HTrim,[],[],preProcess);
@@ -49,13 +51,13 @@ function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
 
     subplot(1,2,1)
     imagesc(HTrim(:,:,1)), axis square
-    title(sprintf('HFFc6, VNE: %.2f',vnEntropy(1)))
+    title(sprintf('Fibroblast, VNE: %.2f',vnEntropy(1)))
     colormap(hicCMap), caxis([-2 2]), colorbar
     ylabel('log_2(O/E)')
 
     subplot(1,2,2)
     imagesc(HTrim(:,:,2)), axis square
-    title(sprintf('H1-hESC, VNE: %.2f',vnEntropy(2)))
+    title(sprintf('Embryonic Stem Cell, VNE: %.2f',vnEntropy(2)))
     colormap(hicCMap), caxis([-2 2]), colorbar
 
     set(get(gcf,'children'),'linewidth',2,'fontsize',20)
