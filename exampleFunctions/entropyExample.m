@@ -1,4 +1,4 @@
-function [] = vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
+function [] = entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
     %% Quantifying Structural Order through Network Entropy (VNE)
     % This example shows how von Neumann Entropy (VNE) can be used to quantify
     % chromatin structural order in Hi-C data.
