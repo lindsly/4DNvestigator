@@ -1,6 +1,6 @@
 function [] = entropyExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
-    % Quantifying Structural Order through Network Entropy (VNE)
-    % This example shows how von Neumann Entropy (VNE) can be used to quantify
+    % Quantifying Structural Order through Network Entropy
+    % This example shows how entropy can be used to quantify
     % chromatin structural order in Hi-C data. This example includes addtional
     % samples and cell types to demonstrate the robustness of this measure.
     %
