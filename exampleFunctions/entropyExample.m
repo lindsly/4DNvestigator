@@ -12,9 +12,9 @@ function [] = entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize
     %
     %   Revision History:
     %   v1.0 (5/24/19)
-    %   * vneExample.m created
+    %   * entropyExample.m created
 
-    %% Set default VNE parameters
+    %% Set default Entropy parameters
     if ~exist('chrSelect','var')||isempty(chrSelect);chrSelect = 14;end
     if ~exist('bpFrag','var')||isempty(bpFrag);bpFrag='BP';end
     if ~exist('binSize','var')||isempty(binSize);binSize=1E5;end
@@ -45,8 +45,8 @@ function [] = entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize
     % calculate Entropy
     entropy = hicEntropy(HTrim,[],[],preProcess);
 
-    %% Visualize Matrices with VNE
-    figure('name','VNE Example', 'position',[50 50 1300 500])
+    %% Visualize Matrices with Entropy
+    figure('name','Entropy Example', 'position',[50 50 1300 500])
     hicCMap = 1-((1-redblue(100))*.7);
 
     subplot(1,2,1)
@@ -63,7 +63,7 @@ function [] = entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize
     set(get(gcf,'children'),'linewidth',2,'fontsize',20)
     linkaxes(get(gcf,'children'))
 
-    %% Visualize Matrices with VNE - corr
+    %% Visualize Matrices with Entropy - corr
     % figure
 %     figure('position',[50 50 1300 500])
 %     hicCMap = 1-((1-redblue(100))*.7);

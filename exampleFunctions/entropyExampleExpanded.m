@@ -13,7 +13,7 @@ function [] = entropyExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag,
     %
     %   Revision History:
     %   v1.0 (8/13/19)
-    %   * vneExampleExpanded.m created
+    %   * entropyExampleExpanded.m created
 
     %% Load Data
     cellType = {'hHFFc6';...
@@ -46,17 +46,17 @@ function [] = entropyExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag,
     end
     
     
-   for iCt = 1:height(hicData)
-        eigvals{iCt} = eig(HTrim{iCt});
-        eigvals{iCt} = sort(eigvals{iCt},'descend');
-    end
-    
-    figure
-    for iCt = 1:height(hicData)
-        plot(eigvals{iCt})
-        hold on
-    end
-    legend(cellType)
+%    for iCt = 1:height(hicData)
+%         eigvals{iCt} = eig(HTrim{iCt});
+%         eigvals{iCt} = sort(eigvals{iCt},'descend');
+%     end
+%     
+%     figure
+%     for iCt = 1:height(hicData)
+%         plot(eigvals{iCt})
+%         hold on
+%     end
+%     legend(cellType)
 
     % compute the log2, change -inf values to minimum
 %     for iCt = 1:height(hicData)
@@ -68,7 +68,7 @@ function [] = entropyExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag,
 %         HTrim{iCt} = tempH;
 %     end
 
-    %% VNE Computation
+    %% Entropy Computation
     % Set Entropy Parameters
     preProcess = 'corr';
 
@@ -85,7 +85,7 @@ function [] = entropyExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag,
         figure('name',hicData.cellType{iCt},'position',[50 50 700 500])
 
         imagesc(HTrim{iCt}), axis square
-        title(sprintf('%s, VNE: %.2f', hicData.cellType{iCt}, entropy(iCt)))
+        title(sprintf('%s, Entropy: %.2f', hicData.cellType{iCt}, entropy(iCt)))
         colormap(hicCMap), caxis([-2 2]), colorbar
         ylabel('log_2(O/E)')
 
