@@ -38,12 +38,12 @@ function [] = entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize
 %         HTrim(:,:,iA) = tempH;
 %     end
 
-    %% VNE Computation
-    % set VNE parameters
-    preProcess = 'laplacian';
+    %% Entropy Computation
+    % set Entropy parameters
+    preProcess = 'corr';
 
-    % calculate VNE
-    vnEntropy = hicVnEntropy(HTrim,[],[],preProcess);
+    % calculate Entropy
+    entropy = hicEntropy(HTrim,[],[],preProcess);
 
     %% Visualize Matrices with VNE
     figure('name','VNE Example', 'position',[50 50 1300 500])
@@ -51,13 +51,13 @@ function [] = entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize
 
     subplot(1,2,1)
     imagesc(HTrim(:,:,1)), axis square
-    title(sprintf('Fibroblast, VNE: %.2f',vnEntropy(1)))
+    title(sprintf('Fibroblast, Entropy: %.2f',entropy(1)))
     colormap(hicCMap), caxis([-2 2]), colorbar
     ylabel('log_2(O/E)')
 
     subplot(1,2,2)
     imagesc(HTrim(:,:,2)), axis square
-    title(sprintf('Embryonic Stem Cell, VNE: %.2f',vnEntropy(2)))
+    title(sprintf('Embryonic Stem Cell, Entropy: %.2f',entropy(2)))
     colormap(hicCMap), caxis([-2 2]), colorbar
 
     set(get(gcf,'children'),'linewidth',2,'fontsize',20)

@@ -1,8 +1,8 @@
 function [vnEntropy,AInputEigs] = hicVnEntropy(AInput,numEigs,normEigs,preProcess)
-%hicVnEntropy computes the Von Neumann graph entropy of the matrix A
+%hicVnEntropy computes the graph entropy of the matrix A
 %
 %   Inputs
-%   AInput:     Input matrix for Von Neumann entropy calculation 
+%   AInput:     Input matrix for entropy calculation 
 %               (NxN double; default: N/A)
 %   numEigs:    number of eigenvalues to consider for compuation 
 %               (integer; default: size(AInput,1))
@@ -10,7 +10,7 @@ function [vnEntropy,AInputEigs] = hicVnEntropy(AInput,numEigs,normEigs,preProces
 %   preProcess: arguments for preprocessing methods (string; default: 'none')
 %
 %   Outputs
-%   vnEntropy: Von Neumann Entropy of the input matrix (double)
+%   vnEntropy: Entropy of the input matrix (double)
 %   AInputEigs: eigenvalues of the input matrix (numEigsx1 double)
 %
 %   Example
@@ -48,7 +48,12 @@ for iA = 1:size(AInput,3)
         case 'laplacian'
             [Ln,Fdv,A,FdNum] = hicLaplacianFdv(AInput(:,:,iA));
         case 'corr'
-            A = corr(AInput(:,:,iA));
+            %compute the log2, change -inf values to minimum
+            AInput(:,:,iA) = log2(AInput(:,:,iA));
+            tempAInput = AInput(:,:,iA);
+            tempAInput(tempAInput==-inf) = min(tempAInput(isfinite(tempAInput)));
+            A = corr(tempAInput(:,:,iA));
+%             A = corr(AInput(:,:,iA));
             A(isnan(A))=0;
     end
     

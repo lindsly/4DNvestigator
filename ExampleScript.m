@@ -47,7 +47,7 @@ chrSelect = 14;
 bpFrag = 'BP';
 binSize = 1E5;
 
-vneExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
+entropyExample(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
 
 %% Expanded Von Neumann Entropy Example
 close all
@@ -62,7 +62,7 @@ chrSelect = 14;
 bpFrag = 'BP';
 binSize = 1E5;
 
-vneExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
+entropyExampleExpanded(Data_Loc, Folder_Result, chrSelect, bpFrag, binSize)
 
 %% Larntz-Perlman Example
 close all
