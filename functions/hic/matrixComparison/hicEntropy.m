@@ -52,7 +52,7 @@ for iA = 1:size(AInput,3)
             AInput(:,:,iA) = log2(AInput(:,:,iA));
             tempAInput = AInput(:,:,iA);
             tempAInput(tempAInput==-inf) = min(tempAInput(isfinite(tempAInput)));
-            A = corr(tempAInput(:,:,iA));
+            A = corr(tempAInput);
 %             A = corr(AInput(:,:,iA));
             A(isnan(A))=0;
     end
@@ -77,6 +77,3 @@ for iA = 1:size(AInput,3)
 end
 
 end
-
-
-

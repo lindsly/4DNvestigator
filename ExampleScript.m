@@ -42,7 +42,7 @@ featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
 close all
 Data_Loc = {'data\exampleData\4DNFIFLJLIS5.hic',...
             'data\exampleData\4DNFIOX3BGNE.hic'};
-Folder_Result = 'results\vneExampleResults';
+Folder_Result = 'results\entropyExampleResults';
 chrSelect = 14;
 bpFrag = 'BP';
 binSize = 1E5;
@@ -57,7 +57,7 @@ Data_Loc = {'data\exampleData\4DNFIFLJLIS5.hic';...
             'https://hicfiles.s3.amazonaws.com/hiseq/huvec/in-situ/combined.hic';...
             'https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic';...
             'http://hicfiles.s3.amazonaws.com/hiseq/rpe1/DarrowHuntley-2015/WT-combined.hic'};
-Folder_Result = 'results\vneExampleExpandedResults';
+Folder_Result = 'results\entropyExampleExpandedResults';
 chrSelect = 14;
 bpFrag = 'BP';
 binSize = 1E5;
@@ -72,5 +72,8 @@ Folder_Result = 'results\lpExampleResults';
 lpExample(Data_Loc, Folder_Result);
 
 %% Tensor Entropy Example
+close all
+Data_Loc = 'data\exampleData\tensorData\myodEntropy.mat';
+Folder_Result = 'results\tensorEntropyExampleResults';
 
-
+tensorEntropyExample(Data_Loc, Folder_Result);
