@@ -33,10 +33,12 @@ end
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
 Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
-dimReduc = 'umap';
+dimReduc = 'pca';
 binSize = 1E5;
+sfType = 'sfmatrix';
+% sfType = 'phaseplane';
 
-featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
+featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType)
 
 %% Simple Von Neumann Entropy Example
 close all
@@ -72,7 +74,7 @@ Folder_Result = 'results\lpExampleResults';
 lpExample(Data_Loc, Folder_Result);
 
 %% Tensor Entropy Example
-close all
+% close all
 Data_Loc = 'data\exampleData\tensorData\myodEntropy.mat';
 Folder_Result = 'results\tensorEntropyExampleResults';
 

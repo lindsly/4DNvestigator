@@ -61,32 +61,37 @@ function [] = tensorEntropyExample(Data_Loc, Folder_Result)
     figure('Position', [391 453 1023 420])
     subplot(1,2,1)
         data = tensorEntropy_A1;
-        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'spline');
-        plot(1:.1:size(data,2),dataMeanSmooth,'Color',color_opts(1,:),'LineWidth',1.5) % Reprogramming
+        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'makima');
+        p(1) = plot(1:.1:size(data,2),dataMeanSmooth,'Color',color_opts(1,:),'LineWidth',1.5); % Reprogramming
         hold on
+        plot(1:size(data,2),data,'.','Color',color_opts(1,:),'MarkerSize',20)
         data = tensorEntropy_A2;
-        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'spline');
-        plot(1:.1:size(data,2),dataMeanSmooth,'Color',color_opts(2,:),'LineWidth',1.5) % Proliferation
+        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'makima');
+        p(2) =  plot(1:.1:size(data,2),dataMeanSmooth,'Color',color_opts(2,:),'LineWidth',1.5); % Proliferation
+        plot(1:size(data,2),data,'.','Color',color_opts(2,:),'MarkerSize',20)
 
         ylim_temp = get(gca,'YLim');
         xlim_temp = get(gca,'XLim');
-        set(gca,'LineWidth',1.25,'FontSize',12,'YLim',[ylim_temp(1)*.95 ylim_temp(2)*1.05],'xLim',[0 xlim_temp(2)+1]);
+%         set(gca,'LineWidth',1.25,'FontSize',12,'YLim',[ylim_temp(1)*.95 ylim_temp(2)*1.05],'xLim',[0 xlim_temp(2)+1]);
         title('Tensor Entropy')
-        legend({'Reprogramming','Proliferation'},'Location','southwest')
+        legend(p,{'Reprogramming','Proliferation'},'Location','southwest')
         axis square
 
     % Plot von Neumann entropy for comparison
     subplot(1,2,2)    
         data = entropyMatrix(1,1:8);
-        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'spline');
+        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'makima');
         plot(1:.1:size(data,2),dataMeanSmooth,'Color',color_opts(2,:),'LineWidth',1.5) % Proliferation
         hold on
+        plot(1:size(data,2),data,'.','Color',color_opts(2,:),'MarkerSize',20)
         data = entropyMatrix(1,9:16);
-        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'spline');
+        dataMeanSmooth = interp1(1:size(data,2),data,1:.1:size(data,2),'makima');
         plot(1:.1:size(data,2),dataMeanSmooth,'Color',color_opts(1,:),'LineWidth',1.5) % Reprogramming
+        plot(1:size(data,2),data,'.','Color',color_opts(1,:),'MarkerSize',20)
+        
         ylim_temp = get(gca,'YLim');
         xlim_temp = get(gca,'XLim');
-        set(gca,'LineWidth',1.25,'FontSize',12,'YLim',[ylim_temp(1)*.95 ylim_temp(2)*1.05],'xLim',[0 xlim_temp(2)+1]);
+%         set(gca,'LineWidth',1.25,'FontSize',12,'YLim',[ylim_temp(1)*.95 ylim_temp(2)*1.05],'xLim',[0 xlim_temp(2)+1]);
         title('Network Entropy')
 %         legend({'Proliferation','Reprogramming'})
         axis square

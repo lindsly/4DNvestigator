@@ -1,4 +1,4 @@
-function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize)
+function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType)
     %% 4DN Feature Analyzer example
     % This example shows how the "4DN feature analyzer" can be used to find
     % genes which change significantly in both structure and function over time
@@ -26,6 +26,8 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     if ~exist('dimReduc','var')||isempty(dimReduc);dimReduc='pca';end
     if ~exist('binSize','var')||isempty(binSize);binSize=1E5;end
     topEllipseFrac = .1;
+    if ~exist('sfType','var')||isempty(sfType);sfType='sfmatrix';end
+
     
     %% Extract region to analyze from Hi-C and RNA-seq
     switch binSize
@@ -43,10 +45,11 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     end
 
     %% Run the 4DNfeature analyzer visualization
-    [features,score,genes] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],dimReduc,topEllipseFrac);
+    [features,score,genes] = sfAnalysis_temp(goiH,log2(goiR+1),goi,[],[],dimReduc,topEllipseFrac,sfType);
     
     %% Format genes in loci with largest structure-function changes
     genes = unique(genes,'stable');
+    genes = intersect(genes, ncbi_gene_info.Symbol,'stable');
     ID=ncbi_gene_info.GeneID(genes);
     for i = 1:length(genes)
         url_ncbi{i,1}=sprintf("https://www.ncbi.nlm.nih.gov/gene/%d",ID(i));
