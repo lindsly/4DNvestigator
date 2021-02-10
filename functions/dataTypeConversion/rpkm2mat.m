@@ -1,0 +1,115 @@
+function [dataOut] = rpkm2mat(fn,dataName,refGenome)
+%rpkm2mat takes the rpkm raw data and formats it for MATLAB
+%
+%   Input
+%   fn:         cell array of file names for RNA-seq samples
+%   dataName:   names for each sample
+%   refGenome:  references genome information
+%
+%   Output
+%   dataOut:    formated RNA-seq data
+%
+%   Version 1.1 (04/28/19)
+%   Written by: Scott Ronquist
+%   Contact:    scotronq@umich.edu
+%   Created:    01/22/19
+%   
+%   Revision History:
+%   v1.0 (01/22/19)
+%   * rsem2mat.m created
+%   v1.1 (04/28/19)
+%   * added websave/read option
+
+%% set default parameters
+if ~exist('refGenome','var') || isempty(refGenome); refGenome='hg19'; end
+
+% use file names if no specified names given
+if ~exist('dataName','var') || isempty(dataName)
+    dataName = cell(length(fn),1);
+    for iSample = 1:length(fn)
+        slashLoc = regexp(fn{iSample},'[\\/]');
+        temp = fn{iSample}(slashLoc(end)+1:end);
+        dotLoc = regexp(temp,'\.');
+        dataName{iSample} = temp(1:dotLoc(1)-1);
+    end
+end
+
+%% load geneinfo
+switch refGenome
+    case 'hg19'
+        biomart = readtable('mart_export_ensembl_hg37_info.txt','Format','auto');
+    case 'hg38'
+        biomart = readtable('mart_export_ensembl_hg38_info.txt','Format','auto');
+end
+
+%% load and compare biomart info
+for iSample = 1:length(fn)
+    fprintf('formatting sample %d of %d\n',iSample,length(fn))
+    
+    % read file if AWS
+    if contains(fn{iSample},'http')
+        outfilename = websave([tempdir,'temp.txt'],fn{iSample});
+        dataIn = readtable(outfilename,'filetype', 'text');
+        delete(outfilename)
+    else
+        dataIn = readtable(fn{iSample},'filetype', 'text');
+    end
+    
+    % Get TPM from RPKM file
+    dataIn.TPM = dataIn{:,7}./sum(dataIn{:,7})*10^6; 
+    
+    dataIn.Properties.VariableNames{7} = 'RPKM';
+    
+    if iSample==1
+        % keep genes that are found in both RNA-seq and biomart
+        [C,IA,IB] = intersect(dataIn.Geneid,biomart.HGNCSymbol);
+%         if ~isequal(dataIn.Geneid(IA),C)
+%             error('biomart-RSEM gene incompatible')
+%         end
+        geneName = biomart.HGNCSymbol(IB);
+        geneDescription = biomart.GeneDescription(IB);
+        chr = biomart.Chromosome_scaffoldName(IB);
+        geneStart = biomart.GeneStart_bp_(IB);
+        geneEnd = biomart.GeneEnd_bp_(IB);
+        geneStrand = biomart.Strand(IB);
+        
+        % create table of gene information
+        baseTable = [table(chr) table(geneStart) table(geneEnd),...
+            table(geneName) table(geneDescription) table(geneStrand)]; % like .bed file (sort-of)
+        
+%         dataOut.expected_count = baseTable;
+        dataOut.TPM = baseTable;
+        dataOut.RPKM = baseTable;
+    end
+    
+%     if ~isequal(dataIn.Geneid,C)
+%         error('biomart-RSEM gene incompatible')
+%     end
+    
+    dataIn = dataIn(IA,:);
+    dataOutFields = fields(dataOut);
+    
+    % add to tables with RNA-seq sample information
+    for ii = 1:length(dataOutFields)
+        dataOut.(dataOutFields{ii}) = [dataOut.(dataOutFields{ii}),table(dataIn.(dataOutFields{ii}))];
+        dataOut.(dataOutFields{ii}).Properties.VariableNames{end} = dataName{iSample};
+    end
+    
+end
+
+for iField = 1:length(dataOutFields)
+    fprintf('formatting RNAseq field: %s\n',dataOutFields{iField})
+    
+    %remove empty gene names
+    dataOut.(dataOutFields{iField})(cellfun(@isempty,dataOut.(dataOutFields{iField}).geneName),:) = [];
+    
+    % chr str2num
+    chrNums = cellfun(@str2num,dataOut.(dataOutFields{iField}).chr,'UniformOutput',0);
+    dataOut.(dataOutFields{iField}).chr(~cellfun(@isempty,chrNums)) = chrNums(~cellfun(@isempty,chrNums));
+    
+    % sort
+    dataOut.(dataOutFields{iField}) = sortrows(dataOut.(dataOutFields{iField}),'geneName');
+end
+
+end
+
