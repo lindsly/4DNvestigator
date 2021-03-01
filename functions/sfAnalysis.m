@@ -1,4 +1,4 @@
-function [features,score,genes_change] = sfAnalysis_temp(hic,rnaSeq,binNames,binInfo,graphWeighted,dimReduc,topEllipseFrac,sfType)
+function [features,score,genes_change] = sfAnalysis_temp(hic,feature1D,binNames,binInfo,graphWeighted,dimReduc,topEllipseFrac,sfType,featureType)
 %sfAnalysis analyzes Hi-C and RNA-seq through centrality and PCA
 %   sfAnalysis extracts centrality features from Hi-C, concatenates these
 %   features with RNA-seq, then determines a low dimensional projection to
@@ -39,7 +39,7 @@ if ~exist('dimReduc','var')||isempty(dimReduc);dimReduc='pca';end
 if ~exist('graphWeighted','var')||isempty(graphWeighted);graphWeighted=1;end
 if ~exist('binInfo','var')||isempty(binInfo);binInfo=[];end
 % if ~exist('norm','var')||isempty(norm);norm=0;end
-if ~exist('binNames','var')||isempty(binNames);binNames=cellstr(num2str([1:length(rnaSeq)]'));end
+if ~exist('binNames','var')||isempty(binNames);binNames=cellstr(num2str([1:length(feature1D)]'));end
 if ~exist('topEllipseFrac','var')||isempty(topEllipseFrac);topEllipseFrac=.1;end
 
 load('ncbi_gene_info.mat')
@@ -75,8 +75,13 @@ for tp  = 1:size(hic,3)
     end
 end
 
-% add RNA-seq
-features = cat(2,features,reshape(rnaSeq,size(rnaSeq,1),1,size(rnaSeq,2)));
+% use log scale to make better visualizations of RNA-seq
+% adding .5 and 1 prevents negative RNA-seq values after log2 
+if strcmp(featureType,'rna')
+    feature1D = log2(feature1D+.5)+1;
+end
+% add extra feature to centrality measures (default is RNA-seq)
+features = cat(2,features,reshape(feature1D,size(feature1D,1),1,size(feature1D,2)));
 
 % normalize features
 Xnorm = FeatureNorm2(features);
@@ -217,9 +222,9 @@ elseif strcmp(sfType,'phaseplane')
     for iS = 1:numSamples
         [~, pca_score{iS}] = pca((hic(:,:,iS)));
         x(:,iS) = pca_score{iS}(:,1);
-        y(:,iS) = log2(rnaSeq(:,iS)+1);
+        y(:,iS) = log2(feature1D(:,iS)+1);
     end
-    idx = sum(log2(rnaSeq)+1 > 0,2)>0;
+    idx = sum(log2(feature1D)+1 > 0,2)>0;
     x = x(idx,:);
     y = y(idx,:);
 

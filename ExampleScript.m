@@ -35,10 +35,10 @@ Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
 dimReduc = 'tsne';
 binSize = 1E5;
-% sfType = 'sfmatrix';
-sfType = 'phaseplane';
+sfType = 'sfmatrix'; % 'phaseplane' can replace 'sfmatrix' to plot a phase plane
+featureType = 'rna'; % 'other' can replace 'rna' for other 1D genomic features
 
-featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType)
+featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType, featureType)
 
 %% Simple Von Neumann Entropy Example
 close all

@@ -1,4 +1,4 @@
-function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType)
+function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType,featureType)
     %% 4DN Feature Analyzer example
     % This example shows how the "4DN feature analyzer" can be used to find
     % genes which change significantly in both structure and function over time
@@ -27,6 +27,7 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     if ~exist('binSize','var')||isempty(binSize);binSize=1E5;end
     topEllipseFrac = .1;
     if ~exist('sfType','var')||isempty(sfType);sfType='sfmatrix';end
+    if ~exist('featureType','var')||isempty(sfType);sfType='rna';end
 
     
     %% Extract region to analyze from Hi-C and RNA-seq
@@ -34,18 +35,28 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
         case 1E6
             goiH = H.s1mb.oeTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1,...
                 H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1,:);
-            goiR = R.s1mb.tpmMeanTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1,:);
-            goi = R.s1mb.geneTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1);
+            if strcmp(featureType,'rna')
+                goiR = R.s1mb.tpmMeanTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1,:);
+                goi = R.s1mb.geneTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1);
+            elseif strcmp(featureType,'other')
+                goi = input_data_genes;
+                goiR = input_data_signal;
+            end
         case 1E5
             goiH = H.s100kb.oeTrim{chrSelect};
-            goiR = R.s100kb.tpmMeanTrim{chrSelect};
-            goi = R.s100kb.geneTrim{chrSelect};
+            if strcmp(featureType,'rna')
+                goiR = R.s100kb.tpmMeanTrim{chrSelect};
+                goi = R.s100kb.geneTrim{chrSelect};
+            elseif strcmp(featureType,'other')
+                goi = input_data_genes;
+                goiR = input_data_signal;
+            end
         otherwise
             error('please select a correct bin size (1E6 or 1E5)')
     end
 
     %% Run the 4DNfeature analyzer visualization
-    [features,score,genes] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],dimReduc,topEllipseFrac,sfType);
+    [features,score,genes] = sfAnalysis(goiH,goiR,goi,[],[],dimReduc,topEllipseFrac,sfType,featureType);
     
     %% Format genes in loci with largest structure-function changes
     genes = unique(genes,'stable');
