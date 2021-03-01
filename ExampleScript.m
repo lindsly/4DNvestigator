@@ -33,10 +33,10 @@ end
 Data_Loc = 'data\exampleData\myodData\myodData.mat';
 Folder_Result = 'results\featureAnalyzerResults';
 chrSelect = 11;
-dimReduc = 'pca';
+dimReduc = 'tsne';
 binSize = 1E5;
-sfType = 'sfmatrix';
-% sfType = 'phaseplane';
+% sfType = 'sfmatrix';
+sfType = 'phaseplane';
 
 featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimReduc, binSize, sfType)
 

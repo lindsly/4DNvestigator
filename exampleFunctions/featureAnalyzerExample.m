@@ -45,7 +45,7 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     end
 
     %% Run the 4DNfeature analyzer visualization
-    [features,score,genes] = sfAnalysis_temp(goiH,log2(goiR+1),goi,[],[],dimReduc,topEllipseFrac,sfType);
+    [features,score,genes] = sfAnalysis(goiH,log2(goiR+1),goi,[],[],dimReduc,topEllipseFrac,sfType);
     
     %% Format genes in loci with largest structure-function changes
     genes = unique(genes,'stable');
