@@ -39,8 +39,12 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
                 goiR = R.s1mb.tpmMeanTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1,:);
                 goi = R.s1mb.geneTrim(H.s1mb.chrStartTrim(chrSelect):H.s1mb.chrStartTrim(chrSelect+1)-1);
             elseif strcmp(featureType,'other')
-                goi = input_data_genes;
-                goiR = input_data_signal;
+                % V Once other data is loaded, comment out the error below V
+                error('Please load your data signal and gene information for 1 Mb bins');
+                % Assign genes to goi in 1 Mb bins (rows) and time points (columns)
+%                 goi = input_data_genes;
+                % Assign 1D signal to goiR in 1 Mb bins
+%                 goiR = input_data_signal;
             end
         case 1E5
             goiH = H.s100kb.oeTrim{chrSelect};
@@ -48,8 +52,11 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
                 goiR = R.s100kb.tpmMeanTrim{chrSelect};
                 goi = R.s100kb.geneTrim{chrSelect};
             elseif strcmp(featureType,'other')
-                goi = input_data_genes;
-                goiR = input_data_signal;
+                error('Please load your data signal and gene information for 1 Mb bins');
+                % Assign 1D signal to goiR in 100 kb bins (rows) and time points (columns)
+%                 goiR = input_data_signal;
+                % Assign genes to goi in 100 kb bins
+%                 goi = input_data_genes;
             end
         otherwise
             error('please select a correct bin size (1E6 or 1E5)')
@@ -75,10 +82,6 @@ function [] = featureAnalyzerExample(Data_Loc, Folder_Result, chrSelect, dimRedu
     genes_table.Properties.RowNames = genes_table.geneName;
     genes_table.NCBI_web = url_ncbi;
     genes_table.GeneCards_web = url_genecards;
-
-    % Launch webpage via genes_table URL
-%     web(genes_table.NCBI_web{'PDGFD'})
-%     web(genes_table.GeneCards_web{'PDGFD'})
 
     %% Save figures
     FigList = findobj(allchild(0), 'flat', 'Type', 'figure');

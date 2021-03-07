@@ -28,6 +28,17 @@ if exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')==2
     [R] = fdnLoadRnaseq(Data_Loc,dataInfo,H);
 end
 
+%% Load Generic Hi-C data (pre-processed)
+
+numChr = 24;
+H_test = fdnEmptyHMatrix(numChr);
+
+Data_Loc = 'data\exampleData\GenericHiCData\';
+File_Name = 'generic_chr1_hic_test.txt';
+binSize = 1E5;
+chrSelect = 1;
+H_test = fdnLoadGenericHic(Data_Loc, File_Name, chrSelect, binSize, 1, H_test);
+
 %% Feature Analyzer Example
 % close all
 Data_Loc = 'data\exampleData\myodData\myodData.mat';

@@ -22,7 +22,7 @@ function [HTrim,badLocs] = hicTrim(H,numDiag,numSparse)
 
 %% set defaults if not specified
 if nargin<2;numDiag=1;end
-if nargin<3;numSparse=0;end
+if nargin<3;numSparse=0.1;end
 
 % turn nan to zero
 H(isnan(H)) = 0;
