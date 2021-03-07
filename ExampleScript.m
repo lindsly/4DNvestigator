@@ -28,8 +28,7 @@ if exist('sampleMyodDataIndexTp-48_8_80.xlsx','file')==2
     [R] = fdnLoadRnaseq(Data_Loc,dataInfo,H);
 end
 
-%% Load Generic Hi-C data (pre-processed)
-
+%% Load Generic Hi-C data (pre-processed chromosomes)
 numChr = 24;
 H_test = fdnEmptyHMatrix(numChr);
 

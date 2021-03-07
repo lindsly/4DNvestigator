@@ -31,9 +31,10 @@ function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
     intraFlag = 1;
 
     H_temp = hicTrim(juicerDump2mat(data,intraFlag));
+    [H_temp, badLocs] = hicTrim(H_temp);
 
     % extract KR
-    X = bnewt(hicTrim(H_temp));
+    X = bnewt(H_temp);
     scale_factor1 = max(max(H_temp));
     tempKr = diag(X)*H_temp*diag(X);
     scale_factor2 = max(max(tempKr));
@@ -76,9 +77,11 @@ function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
         case 1E5
             H.s100kb.krTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempKr;
             H.s100kb.oeTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempOE;
+            H.s100kb.oeTrimBadLocs{iChr} = badLocs;
         case 1E6
             H.s1mb.krTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempKr;
             H.s1mb.oeTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempOE;
+            H.s1mb.oeTrimBadLocs{iChr} = badLocs;
     end
 
 end
