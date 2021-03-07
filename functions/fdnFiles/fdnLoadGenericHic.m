@@ -1,12 +1,15 @@
 
 function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
 % fdnLoadGenericHic Loads and formats Hi-C data specified in dataInfo
-% that is in the form: loc1 loc2 contact
+% that is in the form: loc1 loc2 score
 %
 %   Input
-%   dataInfo:       structure containing all experiment metadata
-%   numericType:    string specifying numeric type to save as ('double'
-%                   [default] or 'single')
+%   Data_Loc:       string with folder where data is stored
+%   File_Name:      string with file name
+%   iChr:           current chromosome for this input file
+%   binSize:        100 kb (1E5) or 1 Mb (1E6)
+%   iSample:        current sample or time point
+%   H:              Hi-C data structure where formatted data will be stored
 %
 %   Output
 %   H:          structure containing all Hi-C data needed for 4DNvestigator
@@ -16,8 +19,8 @@ function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
 %   Created:    3/2/21
 %   
 %   Revision History:
-%   v1.0 (3/2/21)
-%   * fdnLoadGenericHic.m created
+%   v1.0 (3/7/21)
+%   * fdnLoadGenericHic.m version 1 created
 
 
     %% default parameters
@@ -27,13 +30,19 @@ function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
         H = fdnEmptyHMatrix(numChr);
     end
 
+    % Get data from input file
     data = importdata([Data_Loc,File_Name]);
     intraFlag = 1;
 
-    H_temp = hicTrim(juicerDump2mat(data,intraFlag));
+    % Extract data from loc1, loc2, score formatted input
+    H_temp = juicerDump2mat(data,intraFlag);
+    
+    % Trim data (removing rows/colums with mostly zeros) for better
+    % processing later
     [H_temp, badLocs] = hicTrim(H_temp);
 
-    % extract KR
+    % KR normalization and rescale back to original level (Note: may have
+    % slightly different values than automatic KR normalization from Juicer)
     X = bnewt(H_temp);
     scale_factor1 = max(max(H_temp));
     tempKr = diag(X)*H_temp*diag(X);
@@ -43,6 +52,8 @@ function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
     tempKr = tempKr*scale_factor;
     tempKr = max(cat(3,tempKr,tempKr'),[],3);
 
+    % Observed/Expected normalization (Note: may have slightly different
+    % values than automatic O/E normalization from Juicer)
     tempKrOe = ToepNorm(tempKr);
     tempKrOe(isnan(tempKrOe)) = 0;
     tempKrOe = max(cat(3,tempKrOe,tempKrOe'),[],3);
@@ -73,14 +84,15 @@ function [H] = fdnLoadGenericHic(Data_Loc,File_Name,iChr,binSize,iSample,H)
             tempOE = single(tempOE);
     end
 
+    % Assign to appropriate location 
     switch binSize
         case 1E5
-            H.s100kb.krTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempKr;
-            H.s100kb.oeTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempOE;
+            H.s100kb.krTrim{iChr}(:,:,iSample) = tempKr;
+            H.s100kb.oeTrim{iChr}(:,:,iSample) = tempOE;
             H.s100kb.oeTrimBadLocs{iChr} = badLocs;
         case 1E6
-            H.s1mb.krTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempKr;
-            H.s1mb.oeTrim{iChr}(1:length(tempKr),1:length(tempKr),iSample) = tempOE;
+            H.s1mb.krTrim{iChr}(:,:,iSample) = tempKr;
+            H.s1mb.oeTrim{iChr}(:,:,iSample) = tempOE;
             H.s1mb.oeTrimBadLocs{iChr} = badLocs;
     end
 
